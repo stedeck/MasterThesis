@@ -1,0 +1,263 @@
+\documentclass[10pt]{reportMaster}
+
+\title{Recommender system for multiple online shops}
+\author{S.\ Deckers}
+\id{} %TODO find out title
+\department{Artificial Intelligence}
+\committee{Dr. K. Driessens \\ Dr. J. Derks}
+\date{} %TODO fill in date of submission
+
+
+% new line instead of indent for new paragraph
+\usepackage[parfill]{parskip}
+
+\begin{document}
+
+\maketitle
+
+%==============================================================
+\chapter{Introduction}
+%TODO write introduction
+Recommendation systems are systems that aim to make personalized content recommendations to its users.
+They are widely used in the world wide web in different contexts such as movie recommendation in the streaming service Netflix or music recommendation as in last.fm as well as in e-commerce to recommend products that the user might purchase.
+They seek to provide users with items that are new to them or they might not have discovered otherwise.
+
+While in the context of Netflix or last.fm the users actively search for new movies or music and intentionally use the recommendation system, in the context of e-commerce recommendations are usually shown while browsing the website.
+This also reflects in the kind of input the users give to the recommendation system.
+In systems like Netflix and last.fm the users give explicit feedback to different items in the form of ratings to express how much a user likes an item or by simply stating whether the user likes or dislikes an item.
+E-commerce services in contrast need to derive user preferences from their purchase or browsing behaviour.
+This kind of feedback is called implicit feedback.
+
+
+Moreover the available datasets vary in number of users, number of items and amount of sparseness.
+The success of a specific recommendation technique depends on the available data.
+So for a specific dataset a suitable recommendation algorithm need to be found.
+%TODO find reference to prove that different datasets need different techniques
+%TODO find a dataset with more items than users (I think in handbook was news dataset was mentioned)
+%TODO add reference to further chapter where I will explain in more detail which techniques work well for which datasets
+
+
+... data is high dimensional and sparse ...
+... should be fast ...
+
+%todo eventually add more details about implicit feedback 
+%todo could add that there are interactive systems or configarionable ones
+%todo also could add different requirements from the handbook
+ 
+
+What are challenges?
+Where and why do I want to develop a Recommender system?
+
+\section{Problem statement}
+%TODO write problem statment section
+What is my specific task?
+my recommender system should serve different online shops / should work for different data
+since different techniques perform different on different datasets I first need to investigate which techniques to use.
+so first find how single recommenders perform and how they can be combined
+I need the recommender system to automatically tune for different datasets.
+general description of data (binary, implicit, sparse, purchases, views, shop cart entries, ...)
+
+\section{Contribution}
+%TODO write contribution section
+What is novel in my thesis?
+What is the specific challenge? (e-commerce seems to have different requirements (sarwar has different results for e-commerce and movielens data), implicit/binary data, no negative preferences, should work for multiple sets)
+
+\section{Related work}
+%TODO write related work section
+Who did similar work?
+What results did they observe?
+
+
+
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Recommender Systems}
+%TODO write Recommender systems introduction
+What kinds of recommender systems are there?
+What are their advantages and drawbacks?
+
+There are different kinds of techniques to solve a recommendation problem.
+They can be divided 
+
+\section{Collaborative filtering}
+%TODO write CF chapter
+
+\section{Content-based recommendation systems} %TODO see how content-based is written
+%TODO write contentbased section
+ 
+\section{Other recommendation systems}
+%TODO write other rs section
+demographic and network recommenders.
+why are they not used here?
+
+
+
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Hybrid recommendations systems}
+%TODO write introduction for hybrid rs
+
+\section{Switching hybrid}
+%TODO write switching hybrid section
+
+\section{Weighted hybrid}
+%TODO write weighted hybrid section
+
+\section{Cascade hybrid}
+%TODO write cascade hybrid section
+
+\section{Other hybrids}
+%TODO write other hybrids section
+shorty describe other hybrid sections from burke and why are they not used in this thesis
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Adaptive hybridization}
+%TODO write adaptive hybrid introduction
+
+\section{Adaptive switching hybrid}
+%TODO write adpative switching section
+
+
+\section{Adaptive weighted hybrid}
+%TODO write adaptive weighted hybrid
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Alternative models}
+%TODO write alternative models chapte intoductions
+
+\section{Incorporating browsing behaviour}
+%TODO write browsing behavior chapter
+
+
+
+
+
+
+%==============================================================
+\chapter{Implementation and Performance}
+%TODO write implementation and performance chapter introduction
+
+\section{Reactive design}
+%TODO write reactive design section
+
+\section{Implementation of purchase matrix}
+%TODO write purchase matrix implementation section
+
+\section{High level architecture}
+%TODO write high level architecture section
+
+%TODO maybe add results for different matrix implementations
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Experiments}
+%TODO write experiments chapter introduction
+
+\section{Data}
+%TODO write data section
+
+\section{Single recommendation systems}
+%TODO write single rs experiment section
+
+\section{Hybrid recommendation systems}
+%TODO write hybrid rs experiment section
+
+\section{Adaptive hybridization}
+%TODO write adaptive hybrid experiment section
+
+\section{Alternative models}
+%TODO write alternative models experiment section
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Results}
+%TODO write results chapter introction
+
+\section{Single recommendation systems}
+%TODO write single rs result section
+
+\section{Hybrid recommendation systems}
+%TODO write hybrid rs result section
+
+\section{Adaptive hybridization}
+%TODO write adaptive hybrid result section
+
+\section{Alternative models}
+%TODO write alternative models result section
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Discussion}
+%TODO write discussion chapter introduction
+
+\section{Single recommendation systems}
+%TODO write single rs discussion section
+
+\section{Hybrid recommendation systems}
+%TODO write hybrid rs discussion section
+
+\section{Adaptive hybridization}
+%TODO write adaptive hybrid discussion section
+
+\section{Alternative models}
+%TODO write alternative models discussion section
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Conclusion and Future Work}
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
