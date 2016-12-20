@@ -76,23 +76,62 @@ What results did they observe?
 
 %==============================================================
 \chapter{Recommender Systems}
-%TODO write Recommender systems introduction
-What kinds of recommender systems are there?
-What are their advantages and drawbacks?
-
-There are different kinds of techniques to solve a recommendation problem.
-They can be divided 
+There are different types of recommendation systems.
+They can be divided into collaborative filtering (CF), content-based (CB), demographic, knowledge-based or network-based recommenders. % TODO add reference
+The most important ones are collaborative filtering and content-based recommenders.% TODO why are they most important
+These techniques are applied for the recommendation system developed in the scope of this thesis and will be addressed in the next two sections.
+In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 
 \section{Collaborative filtering}
+\label{rs_cf}
 %TODO write CF chapter
+Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
+Recommendations are made based on the preferences of all users using their ratings in the context of netflix or their purchases in an e-commerce context.
+These information is represented a matrix where users a represented as rows and columns represent the items.
+Every matrix entry indicates the interaction of a specific user-item pair.
+For e-commerce data there is an entry of 1 indicating preference for every item a user purchased.
+The other entries remain empty or zero indicating that preference for these items are unknown. %TODO maybe write an own chapter for data representation and put this there
+
+Collaborative filtering techniques are divided again into two different approaches: memory-based and model-based approaches.
+While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this to make calculate recommendation.
+Model-based recommendation needs some time to train the model, but are able to make faster recommendations because the full purchase matrix does not need to be taken into account, but the more compact model can be used.
+Moreover model-based techniques usually need less memory, because the full purchase matrix is not needed.
+
+In this thesis two memory-based and one model-based approach was investigated.
+The memory-based techniques are nearest-neighbour algorithms applied on the purchase matrix.
+%TODO describe item-item and user-user
+%TODO advantaged and drawbacks of those 
+%TODO what are actual differences?
+%TODO find paper where those are applied or at least similiary applied and how mine version is different
+
+%TODO describe svd in general
+%TODO why do usual approaches not work on implicit feedback
+%TODO mention svd on implicit feedback papers and why they are not applicable
+%TODO what are my solutions for the problems (reference to boosting chapter)
 
 \section{Content-based recommendation systems} %TODO see how content-based is written
+\label{rs_cb}
 %TODO write contentbased section
  
 \section{Other recommendation systems}
+\label{rs_others}
 %TODO write other rs section
 demographic and network recommenders.
 why are they not used here?
+
+
+
+
+
+
+
+
+
+%==============================================================
+\chapter{AdaBoost for recommendation systes}
+\section{Boosting}
+%TODO plan and continue
+
 
 
 
