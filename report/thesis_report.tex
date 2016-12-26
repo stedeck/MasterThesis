@@ -10,6 +10,7 @@
 
 % new line instead of indent for new paragraph
 \usepackage[parfill]{parskip}
+\usepackage{ dsfont }
 
 \begin{document}
 \maketitle
@@ -86,24 +87,63 @@ In section \ref{rs_others} the other mentioned techniques will be shortly introd
 %TODO write CF chapter
 Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
 Recommendations are made based on the preferences of all users using their ratings in the context of netflix or their purchases in an e-commerce context.
-These information is represented a matrix where users a represented as rows and columns represent the items.
+These information is represented as a matrix where users a represented as rows and columns represent the items.
 Every matrix entry indicates the interaction of a specific user-item pair.
 For e-commerce data there is an entry of 1 indicating preference for every item a user purchased.
 The other entries remain empty or zero indicating that preference for these items are unknown. %TODO maybe write an own chapter for data representation and put this there
 
 Collaborative filtering techniques are divided again into two different approaches: memory-based and model-based approaches.
-While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this to make calculate recommendation.
-Model-based recommendation needs some time to train the model, but are able to make faster recommendations because the full purchase matrix does not need to be taken into account, but the more compact model can be used.
+While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this model to make recommendations.
+Model-based recommendation systems need some time to train the model, but are able to make faster recommendations, because the full purchase matrix does not need to be taken into account, but the more compact model can be used.
 Moreover model-based techniques usually need less memory, because the full purchase matrix is not needed.
 
 In this thesis two memory-based and one model-based approach was investigated.
-The memory-based techniques are nearest-neighbour algorithms applied on the purchase matrix.
+The memory-based techniques are k-nearest-neighbour algorithms applied on the purchase matrix.
+They either take the similarities between users or items into account. % TODO add references to other papers that use item-item approach
+In the item-item approach those items are recommended that are closest to the items the current user has already purchased.
+For every item $i$ the current user $u$ has not purchased a score is calculated by $S(u,i) = \sum_{j \in I(u)}{sim(R(:,i), R(:,j))}$. Here $R \in \mathds{R}^{n \times m}$ denotes the purchase matrix for $n$ users and $m$ items. $R(:,i)$ denotes the $i^{th}$ column vector. $I(u)$ is the set of items user u purchased.
+Then those items are purchased that reach the highest score. %TODO add pseudocode algorithm
+The function $sim(R(:,i), R(:,j))$ can be substituted by any vector similarity function.
+In this thesis experiments were performed using cosine similarity or the Jaccard coefficient explained in section . %TODO write section and reference to it
 
-%TODO describe item-item and user-user
+The second memory-based algorithm is a user-user similarity approach.
+Here the similarities between users is taken into account instead of item similarities.
+In the first step the nearest neighbours of the current user $u$ are determined by getting those users $v$ which reach the highest score according to $S(u,v) = sim(R(u,:)^T, R(v, :)^T)$.
+$R(u,:)$ and $R(v,:)$ are the $u^{th}$ and $v^{th}$ row vectors of the purchase matrix, respectively.
+The similarity function $sim(R(u,:)^T, R(v, :)^T)$ refers to the same vector similarities as in the item-item approach, see . %TODO add reference
+After the nearest neighbours of user $u$ are obtained, those items are recommended that are purchased most often by the determined neighbours. %TODO add pseudo code algorithm
+
+%TODO explain problems and my solutions:
+%TODO the neighbors may not have purchased enough items (either in general or additionaly to the items u already purchased). to reduce the risk a did not neighbors to the list that have a similarity of one, because a similarty of 1 means that the two users have purchased exactly the same set of items
+
 %TODO advantaged and drawbacks of those 
 %TODO what are actual differences?
 %TODO find paper where those are applied or at least similiary applied and how mine version is different
 
+%Explain general svd %TODO add references
+The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
+It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
+Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{n \times f}$, $\Sigma \in \mathds{R}^{f \times f}$ and $V \in \mathds{R}^{m \times f}$, such that $A = U \Sigma V^T$.
+The column vectors of $U$ are the eigenvectors of $A^TA$, the columns of $V$ are the eigenvectors of $AA^T$. %TODO or was it the other way around?
+$\Sigma$ is a diagonal matrix containing the corresponding eigenvalues. %TODO or the squares or root of eigenvalues? %TODO explain relation to pca
+The eigenvectors in $U$ and $V$ and their corresponding eigenvalues in $\Sigma$ are sorted in descending order.
+%TODO fix... n times f and so on is already reduced. explain how the dimension are before and how they can be reduced and that this is low rank approximation. explain how this is related to the feature matrix and how the resulting matrices can be interpreted. introduce matrices P and Q for user and item 
+
+%Explain linear regression approach commonly used for recommendation
+For recommendation systems the reduced user and item representations are often trained by linear regression instead of applying a numerical method to decompose a rating matrix.
+For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is trained by optimizing $r_{u,i} = $. %TODO add function and continue explaining alternating least squares, what are the actual updates, what about regulization, ...
+
+
+%describe problems for implicit / binary feedback
+
+%Explain my adaption to logistic regression
+
+%Explain possibilities of how to handle missing / zero values
+
+%summarize my version of the algorithm including pseudo code algorithm
+
+
+%TODO eventually add other approaches of sampling i have tried
 %TODO describe svd in general
 %TODO why do usual approaches not work on implicit feedback
 %TODO mention svd on implicit feedback papers and why they are not applicable
@@ -112,12 +152,41 @@ The memory-based techniques are nearest-neighbour algorithms applied on the purc
 \section{Content-based recommendation systems} %TODO see how content-based is written
 \label{rs_cb}
 %TODO write contentbased section
+Another common approach is content-based filtering.
+This approach generates recommendations from any kind of content-based item features independently from other users' preferences.
+The item features may be information about genres, actors or directors in a movie recommendation context.
+For the dataset used in this thesis there are categories and description texts about the items.
+An item can be in multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
+The vector elements $x_c \in \{0,1\}$ indicate whether the item belongs to a specific category or not. 
+Texts are represented as word vectors $\vec{x} \in \mathds{R}^{|T|}$ with $T$ being the total number of words in any of the item descriptions.
+The vector elements $x_i$ are either binary values indicating the occurrence or absence of a word in the text, the number of occurrences of a word (bag-of-word model) or the corresponding tf-idf value. %TODO explain tf-idf and the formula I used
+
+% What algorithms can be applied? explain naive bayes (because it seems to be often used) and nearest neighbor (because of simplicity)
+The general idea is to recommend items that are most similar to the items the user has already purchased with respect to the given content-based features.
+Two algorithms have been implemented: Naive Bayes classification and k-nearest-neighbour. % TODO add bayes references
+Naive Bayes determines the probability that a user purchases a specific item based on the likelihood of its single features.
+For every user a profile is trained consisting of the %TODO explain Bayes
+
+The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{rs_cf}.
+This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix the category or text feature vectors are used.
+In the case of bag-of-words or tf-idf representation of items the cosine-similarity is used.
+For the binary text or category representation either cosine similarity or the Jaccard coefficient can be used.
+
+% add pseudo code algorihtms for both approaches
+
+% explain problems (better in discussion section i guess, same for problems in other approaches above): too similar items, bayes takes to long. why?
+
+% explain possible solutions for problems: eventually combine with other recommenders
+
+
+
  
 \section{Other recommendation systems}
 \label{rs_others}
 %TODO write other rs section
-demographic and network recommenders.
-why are they not used here?
+% demographic and network recommenders.
+Besides collaborative filtering and content-based recommendation there are other recommendation systems like knowledge-based, demographic or network recommendation systems.
+Knowledge-based recommender systems 
 
 
 
@@ -128,7 +197,7 @@ why are they not used here?
 
 
 %==============================================================
-\chapter{AdaBoost for recommendation systes}
+\chapter{AdaBoost for recommendation systems}
 \section{Boosting}
 %TODO plan and continue
 
