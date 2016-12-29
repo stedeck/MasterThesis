@@ -11,6 +11,7 @@
 % new line instead of indent for new paragraph
 \usepackage[parfill]{parskip}
 \usepackage{ dsfont }
+\usepackage{amsmath}
 
 \begin{document}
 \maketitle
@@ -78,19 +79,19 @@ What results did they observe?
 \chapter{Recommender Systems}
 There are different types of recommendation systems.
 They can be divided into collaborative filtering (CF), content-based (CB), demographic, knowledge-based or network-based recommenders. % TODO add reference
-The most important ones are collaborative filtering and content-based recommenders.% TODO why are they most important
+The most used ones are collaborative filtering and content-based recommenders.
 These techniques are applied for the recommendation system developed in the scope of this thesis and will be addressed in the next two sections.
 In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 
 \section{Collaborative filtering}
 \label{rs_cf}
-%TODO write CF chapter
+\subsection{Memory-based collaborative filtering}
 Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
 Recommendations are made based on the preferences of all users using their ratings in the context of netflix or their purchases in an e-commerce context.
 These information is represented as a matrix where users a represented as rows and columns represent the items.
 Every matrix entry indicates the interaction of a specific user-item pair.
 For e-commerce data there is an entry of 1 indicating preference for every item a user purchased.
-The other entries remain empty or zero indicating that preference for these items are unknown. %TODO maybe write an own chapter for data representation and put this there
+The other entries remain empty or zero indicating that preference for these items are unknown. %todo maybe write an own chapter for data representation and put this there
 
 Collaborative filtering techniques are divided again into two different approaches: memory-based and model-based approaches.
 While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this model to make recommendations.
@@ -106,48 +107,96 @@ Then those items are purchased that reach the highest score. %TODO add pseudocod
 The function $sim(R(:,i), R(:,j))$ can be substituted by any vector similarity function.
 In this thesis experiments were performed using cosine similarity or the Jaccard coefficient explained in section . %TODO write section and reference to it
 
-The second memory-based algorithm is a user-user similarity approach.
-Here the similarities between users is taken into account instead of item similarities.
-In the first step the nearest neighbours of the current user $u$ are determined by getting those users $v$ which reach the highest score according to $S(u,v) = sim(R(u,:)^T, R(v, :)^T)$.
+The second memory-based algorithm is a user-user approach.
+Here the similarities between users instead of items are taken into account.
+In the first step the nearest neighbours of the current user $u$, denoted by $N(u)$, are determined by getting those users $v$ which reach the highest score according to $S(u,v) = sim(R(u,:)^T, R(v, :)^T)$.
 $R(u,:)$ and $R(v,:)$ are the $u^{th}$ and $v^{th}$ row vectors of the purchase matrix, respectively.
 The similarity function $sim(R(u,:)^T, R(v, :)^T)$ refers to the same vector similarities as in the item-item approach, see . %TODO add reference
 After the nearest neighbours of user $u$ are obtained, those items are recommended that are purchased most often by the determined neighbours. %TODO add pseudo code algorithm
 
-%TODO explain problems and my solutions:
-%TODO the neighbors may not have purchased enough items (either in general or additionaly to the items u already purchased). to reduce the risk a did not neighbors to the list that have a similarity of one, because a similarty of 1 means that the two users have purchased exactly the same set of items
+This approach is not able to garantuee a sufficiently large list of recommendations, if the neighbors $N(u)$ purchased less items than the number of required recommendations or additionaly to those $u$ already purchased.
+Being $I(N(u))$ the items the neighbors of $u$ purchased, a user-user approach is only able to recommend at most $|I(N(u)) \setminus I(u)|$ items to user $u$.
+This may especially be a problem for users with only a few purchases, because the less items a user purchased the less is the probability to find a user with the same set of purchased items.
+To reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation from the user's neighbors, only those neighbors are taken into account with a similarity score of less than 1, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 
-%TODO advantaged and drawbacks of those 
-%TODO what are actual differences?
-%TODO find paper where those are applied or at least similiary applied and how mine version is different
+Another user-user approach that does not suffer from the above problem was implemented by ... %TODO find and add reference
+Here for every item $i$ the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated: $S(u,i) = \sum_{v \in U(i)}{sim(u,v)}$.
+The nearest neighbors are not directly determined, so the recommendations are not limited to the items the neighbors purchased.
+The recommended items are those that were purchased by those users with the highest similarity to $u$.
+%TODO run algorithm again and add to experiments
 
+Both item-item and user-user perform on the full purchase matrix, but are expected to obtain different results.
+While an item-item approach tends to recommend items with many common users who purchased them, a user-user aproach works on user similarities.
+Since item-similarities are not taken into account, i.e. items do not need many common users, recommendations with a user-user technique may generate more diverse recommendations.
+For matrices like the purchase matrix in e-commerce datasets an item-item approach is supposed to obtain more accurate results, because the item-vectors are larger than the user-vectors and therefor are able to produce more confident similarities between them. 
+
+Since memory-based approaches need to parse the whole matrix for every recommendation, these methods are quite slow in contrast to model-based approaches.
+But they benefit from adaptivity, because they can immediately incorporate new purchases, and do not need to retrain a model after the purchase matrix is updated.
+Moreover the results can be intuitively explained to the user, because these approaches simply bases on purchases of similar users or similar items.
+
+\subsection{Model-based collaborative filtering}
 %Explain general svd %TODO add references
 The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
 It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
-Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{n \times f}$, $\Sigma \in \mathds{R}^{f \times f}$ and $V \in \mathds{R}^{m \times f}$, such that $A = U \Sigma V^T$.
-The column vectors of $U$ are the eigenvectors of $A^TA$, the columns of $V$ are the eigenvectors of $AA^T$. %TODO or was it the other way around?
-$\Sigma$ is a diagonal matrix containing the corresponding eigenvalues. %TODO or the squares or root of eigenvalues? %TODO explain relation to pca
-The eigenvectors in $U$ and $V$ and their corresponding eigenvalues in $\Sigma$ are sorted in descending order.
-%TODO fix... n times f and so on is already reduced. explain how the dimension are before and how they can be reduced and that this is low rank approximation. explain how this is related to the feature matrix and how the resulting matrices can be interpreted. introduce matrices P and Q for user and item 
+Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{m \times n}$, $\Sigma \in \mathds{R}^{n \times n}$ and $V \in \mathds{R}^{n \times n}$, such that $A = U \Sigma V^T$.
+The column vectors of $U$ are the eigenvectors of $AA^T$, the columns of $V$ are the eigenvectors of $A^TA$.
+$\Sigma$ is a diagonal matrix $diag(\sigma_1, ..., \sigma_n)$ containing the square roots of the corresponding eigenvalues.  %todo explain relation to pca
+The eigenvectors in $U$ and $V$ and their eigenvalues in $\Sigma$ are sorted such that $\sigma_1 \geq \sigma_i \geq ... \geq \sigma_n \geq 0$.
+Intuitively $AA^T$ contains the similarities of row vectors, i.e. users.
+Element $a_{ij}$ of $AA^T$ corresponds to the similiraty between user $i$ and $j$, where user similarities are expressed as their common purchases.
+The eigenvalues are stored in descending order of their eigenvalues in $U$ and span a vector space of the user similarities.
+So the first column of $U$ is a vector pointing into the direction of highest user similarity. %TODO add svd reference
+Item similarities are stored in V respectively.
+Dimensions of the purchase matrix A can than be reduced by cutting lower eigenvalues in $\Sigma$ and their eigenvectors in $U$ and $V$, because the lower eigenvalues are less able to detect purchase patterns of different users or items and are therefor less able to derive user and item features from.
+Cutting eigenvectors and eigenvalues up to $f \in \mathbf{R}$ results in the singular value decomposition $A_f = U_f \Sigma_f V_f^T$, with $A_f \in \mathds{R}^{m \times n}$, $U_f \in \mathbf{R}^{m \times f}$, $\Sigma_f \in \mathds{R}^{f \times f}$ and $V_f \in \mathds{R}^{n \times f}$.
+This can be transformed to $A_f = U_f \Sigma_f^{1/2} \Sigma_f^{1/2} V_f^T = P_f Q_f$, with $\Sigma_f^{1/2} = diag(\sqrt{\sigma_1}, ..., \sqrt{\sigma_f})$, $P_f = U_f \Sigma_f^{1/2}$ and $Q_f = \Sigma_f^{1/2} V_f^T$.
+Users and items are expressed as $f$ latent features in $P_f$ and $Q_f$ respectively.
+So every user $u$ can be assigned a feature vector $p_u$ and every item $i$ a feature vector $q_i$, whose elements are from the same latent feature space.
+Predictions are performed by multiplying these feature vectors.
+Preference of user $u$ for item $i$ can be estimated by $\hat{r}_{ui} = p_u^T q_i$.
 
 %Explain linear regression approach commonly used for recommendation
-For recommendation systems the reduced user and item representations are often trained by linear regression instead of applying a numerical method to decompose a rating matrix.
-For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is trained by optimizing $r_{u,i} = $. %TODO add function and continue explaining alternating least squares, what are the actual updates, what about regulization, ...
-
-
-%describe problems for implicit / binary feedback
+There are several algorithms to compute a singular value decomposition like proposed in \cite{svdGolubSolution}.
+For recommendation systems the reduced user and item representations are often trained by alternating least squares regression instead of applying numerical methods. %TODO add svd paper
+For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is learned by minimizing the cost function $\sum_{u, i}{(r_{ui} - p_u^T q_i)^2 + \lambda (||p_u||^2 + ||q_i||^2)}$.
+$e_{ui} = r_{ui} - p_u^T q_i$ is the error term that has to be reduced.
+$\lambda (||p_u||^2 + ||q_i||^2)$ is a regulization term to prevent the model from overfitting.
+Optimization is performed by gradient descent.
+The feature vectors are updated into the opposite direction of the partial derivatives of the $p_u$ or $q_i$ vectors of the cost function.
+This yields the update rules $p_u = p_u + \alpha \sum_{ui}{e_{ui} q_i + \lambda p_u}$ and $q_i = q_i + \alpha \sum_{ui}{e_{ui} p_u + \lambda q_i}$, where $\alpha$ denotes the learning rate.
+This approach is referred to as batch gradient descent, because for every feature update an iteration over the whole training set is needed.
+A faster way is stochastic gradient descent. %TODO add refernce to any paper that uses "my" version of stochatic descent
+There a feature vector is updated for every trainings example what leads to update rules $p_u = p_u + \alpha (e_{ui} q_i + \lambda p_u)$ and $q_i = q_i + \alpha (e_{ui} p_u + \lambda q_i)$.
+%todo explain difference between funk and me and why his methods doesn't work for me
 
 %Explain my adaption to logistic regression
+In most applications of this CF-approach, the user feedback $r_{ui}$ is given as any kind of explictly given rating.
+This information is not available in the e-commerce datasets, but there is information about whether a user purchased an item.
+This yields binary values for $r_ui$, where $r_{ui} = 1$ denotes that user $u$ has purchased item $i$, and $r_{ui} = 0$ denotes that he has not.
+So the predicting user preferences is becomes a classification rather than a regression problem.
+So in the scope of this thesis the SVD approach is transformed into a logistic regression problem trying to predict a value $r_{ui} \in {0,1}$.
+Prediction is performed by $\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}$.
+When training the updates of user and item features vectors the prediction error is then replaced with $e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}$.
+%todo add experiments to compare linear and logistic regression with lara
 
 %Explain possibilities of how to handle missing / zero values
+Another problem with this approach arises from the fact that in e-commerce data there is no negative feedback.
+While for rating data there are positive as well as negative preferences available in the form of different ratings, in e-commerce there are only purchased items to be considered at interesing for the user and not purchased items that may be either not interesting or unknown to the user.
+The logistic regression model cannot be trained only on the positive values, so some of the unknown instances have to be used for training as well.
+In \cite{occf} different sampling and weighting methods are investigated to address this issue.
+Here the negative training instances are obtained by randomly choosing them from the unknown instances.
+For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that user or items with many postive examples (i.e. many purchases) get about as many negative ones for ensure balanced classification problems. %TODO somewhere introduce U as set of Users and I as set of Items
+To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules become $p_u = p_u + w_n \alpha (e_{ui} q_i + \lambda p_u)$ and $q_i = q_i + w_n \alpha (e_{ui} p_u + \lambda q_i)$. %todo try different weights for p_u and q_i maybe? 
+The weight is set to $w_n = 1$ for known positive trainings instances and to $w_n < 1$ for the other randomly chosen negative weights. %TODO which weight is used? Add experiments and reference to it
 
-%summarize my version of the algorithm including pseudo code algorithm
+%TODO summarize my version of the algorithm including pseudo code algorithm
 
 
-%TODO eventually add other approaches of sampling i have tried
-%TODO describe svd in general
-%TODO why do usual approaches not work on implicit feedback
-%TODO mention svd on implicit feedback papers and why they are not applicable
-%TODO what are my solutions for the problems (reference to boosting chapter)
+%todo Add other approaches of sampling i have tried aman or one random value per positive training instance
+%todo add other weighting schemes i have tried (user based from occf paper)
+
+
+%todo what problems still arise and how do i solve them? (reference to boosting chapter)
 
 \section{Content-based recommendation systems} %TODO see how content-based is written
 \label{rs_cb}
@@ -165,14 +214,36 @@ The vector elements $x_i$ are either binary values indicating the occurrence or 
 The general idea is to recommend items that are most similar to the items the user has already purchased with respect to the given content-based features.
 Two algorithms have been implemented: Naive Bayes classification and k-nearest-neighbour. % TODO add bayes references
 Naive Bayes determines the probability that a user purchases a specific item based on the likelihood of its single features.
-For every user a profile is trained consisting of the %TODO explain Bayes
+For every user a profile is trained consisting of the prior probability that $u$ purchases an item $p_u(c=1)$ and  the likelihoods of $f$ item features $p_u(x_f|c=1)$.
+The probability of $u$ purchasing an item given in terms of item features $x$ can be calculated using the Bayes theorem by 
+
+\begin{equation}
+\label{BayesPost}
+	p_u(c=1|x) = \frac{p_u(c=1) p_u(x|c=1)}{p_u(x)+2} = \frac{p_u(x|c=1)}{p_u(x)+2}
+\end{equation}
+
+$p_u(c=1)$ denotes the probability that user $u$ purchases an item independently from its features.
+This value is the same for any item, so for calculating the recommendations it can be left out.
+$p_u(x|c=1)$ is calculated by 
+
+\begin{equation}
+\label{BayesEvid}
+p_u(x|c=1) = \prod_f{p_u(x_f|c=1)+1}
+\end{equation}
+
+due to the independence assumption.
+The $p_u(x_f|c=1)$ are obtained by counting the number of items $u$ purchased that contain feature $x_f$ divided by the total number of features $u$ purchased.
+The constants $2$ and $1$ in equations \ref{BayesPost} and \ref{BayesEvid} respectively are added to avoid that the probability becomes zero when one of the feature likelihoods is zero, i.e. when a user has not purchased an item of a specific feature.
+This technique is called Laplace-smoothing. %TODO add reference
 
 The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{rs_cf}.
 This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix the category or text feature vectors are used.
 In the case of bag-of-words or tf-idf representation of items the cosine-similarity is used.
 For the binary text or category representation either cosine similarity or the Jaccard coefficient can be used.
 
+
 % add pseudo code algorihtms for both approaches
+
 
 % explain problems (better in discussion section i guess, same for problems in other approaches above): too similar items, bayes takes to long. why?
 

@@ -37,11 +37,61 @@ Collaborative filtering - Memory-based
 Amazons item-item approach (should be similar to mine)
 
 
+@inproceedings{aiolli2013efficient,
+	title={Efficient top-n recommendation for very large scale binary rated datasets},
+	author={Aiolli, Fabio},
+	booktitle={Proceedings of the 7th ACM conference on Recommender systems},
+	pages={273--280},
+	year={2013},
+	organization={ACM}
+}
+item-item and user-user approaches with improvements
+
+
+@inproceedings{volkovs2015effective,
+	title={Effective Latent Models for Binary Feedback in Recommender Systems},
+	author={Volkovs, Maksims and Yu, Guang Wei},
+	booktitle={Proceedings of the 38th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+	pages={313--322},
+	year={2015},
+	organization={ACM}
+}
+Different CF-approaches (memory- and model-based) for binary data. Used k-nearest-neighbor notation from there.
+Applied (numeric) SVD to item-item / user-user - score matrix instead of feedback matrix
+
 
 
 ===========================================================================
 Collaborative filtering - Model-based
 ===========================================================================
+
+
+
+===========================================================================
+SVD
+===========================================================================
+
+@inbook{svdGolubGeneral,
+	title={Matrix computations. third},
+	author={Golub, Gene H and Van Loan, Charles F},
+	chapter = {2},
+	year={1996},
+	publisher={The John Hopkins University Press}
+}
+SVD basics (general features and such, no computation/algorithms)
+
+
+@article{svdGolubSolution,
+	title={Singular value decomposition and least squares solutions},
+	author={Golub, Gene H and Reinsch, Christian},
+	journal={Numerische mathematik},
+	volume={14},
+	number={5},
+	pages={403--420},
+	year={1970},
+	publisher={Springer}
+}
+SVD algorithm
 
 ===========================================================================
 Dimensionality reduction
@@ -55,6 +105,17 @@ Dimensionality reduction
 }
 Neighbour-based methods applied on decomposed matrix
 
+
+@article{ng2000cs229,
+	title={CS229 Lecture notes},
+	author={Ng, Andrew},
+	journal={CS229 Lecture notes},
+	volume={1},
+	number={1},
+	pages={1--3},
+	year={2000}
+}
+Andrew Ng lecture notes about linear regression
 
 ===========================================================================
 Implicit feedback, one-class recommendation, ranking problematic
@@ -110,7 +171,7 @@ Boosting on predicting ratings
 Comparison of resampling and reweighting techniques in boosting
 
 
-@inproceedings{liu2015boosting,
+@inproceedings{boostingAUC,
 	title={A boosting algorithm for item recommendation with implicit feedback},
 	author={Liu, Yong and Zhao, Peilin and Sun, Aixin and Miao, Chunyan},
 	booktitle={IJCAI},
