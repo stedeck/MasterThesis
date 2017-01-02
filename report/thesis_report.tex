@@ -12,6 +12,13 @@
 \usepackage[parfill]{parskip}
 \usepackage{ dsfont }
 \usepackage{amsmath}
+\usepackage{textcomp} % for texttimes
+
+% figure stuff
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
 
 \begin{document}
 \maketitle
@@ -302,40 +309,7 @@ Given a set of training instances $X$ and their corresponding class labels $Y = 
 
 \section{Other hybrids}
 %TODO write other hybrids section
-shorty describe other hybrid sections from burke and why are they not used in this thesis
-
-
-
-
-
-
-
-%==============================================================
-\chapter{Adaptive hybridization}
-%TODO write adaptive hybrid introduction
-
-\section{Adaptive switching hybrid}
-%TODO write adpative switching section
-
-
-\section{Adaptive weighted hybrid}
-%TODO write adaptive weighted hybrid
-
-
-
-
-
-
-
-%==============================================================
-\chapter{Alternative models}
-%TODO write alternative models chapte intoductions
-
-\section{Incorporating browsing behaviour}
-%TODO write browsing behavior chapter
-
-
-
+% shortly describe other hybrid sections from burke and why are they not used in this thesis
 
 
 
@@ -349,7 +323,7 @@ shorty describe other hybrid sections from burke and why are they not used in th
 \section{Implementation of purchase matrix}
 %TODO write purchase matrix implementation section
 
-\section{High level architecture}
+\section{Architecture}
 %TODO write high level architecture section
 
 %TODO maybe add results for different matrix implementations
@@ -361,70 +335,82 @@ shorty describe other hybrid sections from burke and why are they not used in th
 
 
 %==============================================================
-\chapter{Experiments}
-%TODO write experiments chapter introduction
+\chapter{Experimentation}
+% TODO
+
+The described algorithms are evaluated against a sample e-commerce dataset.
+On one hand it is aimed to compare different recommendation approaches on e-commerce data and on the other hand the impact of different parameters is analysed to be able to tune algorithms for different datasets.
+In the next section the data used for evaluating the algorithm is presented.
+\ref{sec:eval} explains the used evaluation measures.
+The last two sections of this chapter show the obtained results and discuss them.
 
 \section{Data}
 %TODO write data section
+To evaluate the different recommendation approaches data from an online pharmacy is used.
+The dataset contains purchases from 81835 users and 14964 articles.
+Those n' articles contain many duplicates, because article of the same product, but with different package sizes or different colours are considered as different articles in the database.
+There is no attribute to determine real distinct articles, but the amount of duplicates could be reduced by aggregating items of the same name and handle them as one item.
+This reduces the number of items to 11775.
+So dimensions of the used purchase matrix are 81835 \texttimes \ 11775.
+It contains 663731 purchases, so it is only 0.06888\% dense, there are 56.37 purchases per user and 8.11 purchases per item. % TODO make table out of stats
+Figure \ref{fig:dataDistribution} shows a histogram showing how the purchases per user and item are distributed.
 
-\section{Single recommendation systems}
+%todo add median, 1st and 3rd quantile and create boxplots
+
+%TODO make nicer plot (with visible axis labels...)
+\begin{figure}
+	\label{fig:dataDistribution}
+	\begin{subfigure}[c]{1\textwidth}
+		\caption{Distribution of user purchases.}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/userPurchaseHistogram}
+	\end{subfigure}
+	\begin{subfigure}[c]{1\textwidth}
+		\caption{Distribution of article purchases.}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchaseHistogram_partly}
+	\end{subfigure}
+	
+\end{figure}
+
+Besides purchases there is content-based information about items.
+Most items are assigned one or more categories they belong to.
+Moreover there are different kinds of texts like descriptions, content or usage information.
+
+%todo Eventually demographic information and other browsing history stuff
+
+
+\section{Evaluation}
+\label{sec:eval}
+% TODO
+
+The recommendation systems are evaluated using 80 percent of the data as training set to treat as given and to build the model and 20 percent as test set.
+The test set is built by iterating user- and item-wise over purchases and adding every 5th item to the test set and removing it from the training set.
+This ensures that the test purchases are equally distributed over all users.
+Users that only have purchases one item, are removed beforehand, because they cannot be evaluated, since at least one item must be left for training.
+Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique, that is not of interest in this thesis.
+
+Evaluation is measured in terms of the mean average precision.
+%todo evaluation measures: MAP, user precision and overall precision
+
+\section{Results}
+% TODO
+
+% 
+
+
+\section{Discussion}
+% TODO
+
+\subsection{Single recommendation systems}
 %TODO write single rs experiment section
 
-\section{Hybrid recommendation systems}
+
+\subsection{AdaBoost}
+%TODO
+
+\subsection{Hybrid recommendation systems}
 %TODO write hybrid rs experiment section
-
-\section{Adaptive hybridization}
-%TODO write adaptive hybrid experiment section
-
-\section{Alternative models}
-%TODO write alternative models experiment section
-
-
-
-
-
-
-
-%==============================================================
-\chapter{Results}
-%TODO write results chapter introction
-
-\section{Single recommendation systems}
-%TODO write single rs result section
-
-\section{Hybrid recommendation systems}
-%TODO write hybrid rs result section
-
-\section{Adaptive hybridization}
-%TODO write adaptive hybrid result section
-
-\section{Alternative models}
-%TODO write alternative models result section
-
-
-
-
-
-
-
-%==============================================================
-\chapter{Discussion}
-%TODO write discussion chapter introduction
-
-\section{Single recommendation systems}
-%TODO write single rs discussion section
-
-\section{Hybrid recommendation systems}
-%TODO write hybrid rs discussion section
-
-\section{Adaptive hybridization}
-%TODO write adaptive hybrid discussion section
-
-\section{Alternative models}
-%TODO write alternative models discussion section
-
-
-
 
 
 
