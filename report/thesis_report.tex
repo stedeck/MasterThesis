@@ -276,9 +276,24 @@ When all models are trained predictions are made by majority voting of all train
 
 \section{AdaBoost}
 The most known boosting algorithm is AdaBoost (adaptive Boosting) developed by Freund and Schapire (\cite{boostingIntro}).
-Given a set of training instances $X$ and their corresponding class labels $Y = {0, 1}$ the first model $M_1$ is trained on a sample distribution D
+Given a set of training instances $X = \{x_1, ..., x_n\}$ and their corresponding class labels $Y = \{y_1, ..., y_n\}$, with $y_i \in \{-1, 1\}$ the first model $M_1$ is trained on a sample set according to a distribution $D_1(i) = \frac{1}{n}$, so each training instance has the same probability of being added to the training set for the first model.
+Sampling is performed without replacement, so in general one instance may occur more than once in the training set.
+The model $M_t$ is then tested on the training set and the error $\epsilon_t$ is calculated as the amount of incorrectly classified instances.
+Dependent on this error the model is assigned a weight $\alpha_t = \frac{1}{2} ln(\frac{1 - \epsilon_t}{\epsilon_t})$, such that better models have a higher impact on final predictions.
+The model error is also used to build the distribution for the next model: 
 
+$ D_{t+1}(i) = \frac{D_t(i)}{Z_t} \times 
+\begin{cases}
+	e^{-\alpha_t} & \text{if $ x_i $ was correctly classified} \\ 
+	e^{\alpha_t} & \text{if $ x_i $ was misclassified}
+\end{cases}
+$
 
+$Z_t$ is a normalization factor to ensure $D_{t+1}$ is a distribution.
+For the next model $D_{t+1}$ misclassified training instances get a higher probability of being added to the training set, while correctly classified one get a more unlikely to be chose.
+So the next model set higher emphasize on instances that are hard to classify.
+
+In the final prediction all models participate according to their corresponding weights with $H(x) = sign(\sum_{t = 1}^T\alpha_th_t(x)$.
 
 \section{AdaBoost for recommendation}
 %TODO how to apply boosting in recommendation systems
