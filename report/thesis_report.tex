@@ -2,7 +2,7 @@
 
 \title{Recommender system for multiple online shops}
 \author{S.\ Deckers}
-\id{} %TODO find out title
+\id{} %TODO find out id
 \department{Artificial Intelligence}
 \committee{Dr. K. Driessens \\ Dr. J. Derks}
 \date{} %TODO fill in date of submission
@@ -300,12 +300,37 @@ $Z_t$ is a normalization factor to ensure $D_{t+1}$ is a distribution.
 For the next model $D_{t+1}$ misclassified training instances get a higher probability of being added to the training set, while correctly classified one get a more unlikely to be chose.
 So the next model set higher emphasize on instances that are hard to classify.
 
-In the final prediction all models participate according to their corresponding weights with $H(x) = sign(\sum_{t = 1}^T\alpha_th_t(x)$.
+In the final prediction all models participate according to their corresponding weights with $H(x) = sign(\sum_{t = 1}^T\alpha_th_t(x))$.
 
-\section{AdaBoost for recommendation}
-%TODO how to apply boosting in recommendation systems
 
 \section{Reweighting and resampling}
+In the original AdaBoost approach explained in the last section the weights of the training instances are used for resampling.
+So only a sample of the full available training set is used for one iteration and the weights correspond to the chance that a training instance is added to it.
+Another approach is to incorporate the weights into the training process if it is possible in the used algorithm.
+When AdaBoost is applied with reweighting in each iteration the whole training set can be used as usual.
+A comparative study was performed in \cite{resamplingReweighting} showing that there is no remarkable difference in performance comparing reweighting and resampling.
+
+
+\section{AdaBoost for recommendation}
+Attempts were made using AdaBoost for recommendation among others in \cite{boostingCFRatings} and \cite{boostingAUC}.
+AdaBoost is applied to the SVD - approach similar to the one explained in section \ref{rs_cf}.
+In \cite{boostingCFRatings} is applied to a rating dataset by optimizing the mean squared error. %TODO check, what they optimized
+In \cite{boostingAUC} AdaBoost was applied to an implicit feedback dataset, but instead of optimizing the prediction error, as it was attempted in this thesis, they optimized the ranking measures MAP and AUC directly. % TODO what is AUC, shortly explain %TODO what dataset did they use? % TODO why don't I use this approach?
+Here boosting was applied to the logistic regression algorithm for training the SVD model.
+
+%TODO explain the used algorithm
+
+%TODO how did I update the weights?
+
+%TODO why did I use reweighting?
+
+%TODO how prediction is made
+
+%TODO apply userbased and articlebased prediction
+
+%TODO add pseudocode
+
+
 
 
 
