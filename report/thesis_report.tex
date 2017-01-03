@@ -23,18 +23,26 @@
 \begin{document}
 \maketitle
 
+%TODO add table of contents (be aware of numbering!)
+
 %==============================================================
 \chapter{Introduction}
-%TODO write introduction
 Recommendation systems are systems that aim to make personalized content recommendations to its users.
 They are widely used in the world wide web in different contexts such as movie recommendation in the streaming service Netflix or music recommendation as in last.fm as well as in e-commerce to recommend products that the user might purchase.
 They seek to provide users with items that are new to them or they might not have discovered otherwise.
 
+%Probelms with e-commerce data
 While in the context of Netflix or last.fm the users actively search for new movies or music and intentionally use the recommendation system, in the context of e-commerce recommendations are usually shown while browsing the website.
 This also reflects in the kind of input the users give to the recommendation system.
 In systems like Netflix and last.fm the users give explicit feedback to different items in the form of ratings to express how much a user likes an item or by simply stating whether the user likes or dislikes an item.
 E-commerce services in contrast need to derive user preferences from their purchase or browsing behaviour.
 This kind of feedback is called implicit feedback.
+For recommendation this kind of feedback leads to problems for several reasons.
+First implicit feedback might be noisy, since it bases on the assumption that a user it interested in an item if he purchased it.
+This assumption is not necessary true, because he may have bought it for a friend or is just unsatisfied with the product.
+If a user watches a movie, he is able to give it a low rating.
+This option is not necessary available in online shops.
+% 
 
 Moreover the available datasets vary in number of users, number of items and amount of sparseness.
 The success of a specific recommendation technique depends on the available data.
@@ -91,6 +99,8 @@ These techniques are applied for the recommendation system developed in the scop
 In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 
 \section{Collaborative filtering}
+%TODO insert visible paragraph heads for different algorithms
+%TODO emphasize formulas, make equations of important ones
 \label{rs_cf}
 \subsection{Memory-based collaborative filtering}
 Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
@@ -269,6 +279,16 @@ Knowledge-based recommender systems are based on any kind of knowledge-base that
 
 %TODO why are those systems not used here?
 
+\section{Hybrid recommendation systems}
+% shortly describe other hybrid sections from burke and why are they not used in this thesiss
+
+%TODO explain switching hybrids
+
+%TODO explain weighted hybrid
+
+%TODO explain cascade hybrid 
+
+%TODO explain other hybrids 
 
 
 %==============================================================
@@ -334,24 +354,6 @@ Here boosting was applied to the logistic regression algorithm for training the 
 
 
 
-%==============================================================
-\chapter{Hybrid recommendations systems}
-%TODO write introduction for hybrid rs
-
-\section{Switching hybrid}
-%TODO write switching hybrid section
-
-\section{Weighted hybrid}
-%TODO write weighted hybrid section
-
-\section{Cascade hybrid}
-%TODO write cascade hybrid section
-
-\section{Other hybrids}
-%TODO write other hybrids section
-% shortly describe other hybrid sections from burke and why are they not used in this thesis
-
-
 
 %==============================================================
 \chapter{Implementation and Performance}
@@ -376,8 +378,6 @@ Here boosting was applied to the logistic regression algorithm for training the 
 
 %==============================================================
 \chapter{Experimentation}
-% TODO
-
 The described algorithms are evaluated against a sample e-commerce dataset.
 On one hand it is aimed to compare different recommendation approaches on e-commerce data and on the other hand the impact of different parameters is analysed to be able to tune algorithms for different datasets.
 In the next section the data used for evaluating the algorithm is presented.
@@ -392,7 +392,7 @@ Those n' articles contain many duplicates, because article of the same product, 
 There is no attribute to determine real distinct articles, but the amount of duplicates could be reduced by aggregating items of the same name and handle them as one item.
 This reduces the number of items to 11775.
 So dimensions of the used purchase matrix are 81835 \texttimes \ 11775.
-It contains 663731 purchases, so it is only 0.06888\% dense, there are 56.37 purchases per user and 8.11 purchases per item. % TODO make table out of stats
+It contains 663731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. % TODO make table out of stats
 Figure \ref{fig:dataDistribution} shows a histogram showing how the purchases per user and item are distributed.
 
 %todo add median, 1st and 3rd quantile and create boxplots
@@ -422,47 +422,89 @@ Moreover there are different kinds of texts like descriptions, content or usage 
 
 \section{Evaluation}
 \label{sec:eval}
-% TODO
-
 The recommendation systems are evaluated using 80 percent of the data as training set to treat as given and to build the model and 20 percent as test set.
 The test set is built by iterating user- and item-wise over purchases and adding every 5th item to the test set and removing it from the training set.
 This ensures that the test purchases are equally distributed over all users.
 Users that only have purchases one item, are removed beforehand, because they cannot be evaluated, since at least one item must be left for training.
-Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique, that is not of interest in this thesis.
+Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique.
+%TODO what are dimension of used dataset? what training and test sets?
+
+Cold-start users are not of interest in this thesis, but an unpersonalized recommendation technique is used as a baseline for evaluation.
+This used approach is denoted \textit{MostPop} and always recommends those items to a user that are purchased most often and were not yet purchased by the current user.
+
 
 Evaluation is measured in terms of the mean average precision.
-%todo evaluation measures: MAP, user precision and overall precision
+%TODO evaluation measures: MAP, user precision and overall precision
+All experiments are performed calculating a ranked list of ten recommendations.
+Larger lists would increase performance, because more items would participate in the evaluation and could increase the precisions. %todo how large is the list in literature? difference in evaluation in contrast to rating predcition?
+But in an online-shop a list of more than ten recommended items would not be useful to the user, since the recommended items are not actively requested by the user, but only shown besides the user browses the shop.
 
 \section{Results}
-% TODO
+The unpersonalized approach receives a MAP of 0.0499, a user precision of 0.2453 and an overall precision of 0.13142, i.e about 25\% of users got at least one correct recommendation and 13\% of items from the test set were correctly recommended to the users who purchased them.
+The developed personalized recommendation systems are supposed to being able to outperform approach.
 
-% 
+% How does CFItemNN perform with Jaccard and Cosine?
+The model-based collaborative filtering approaches were evaluated using either the Jaccard coefficient or cosine similarity.
+The item-item approach will further be denoted CFItemNN, while CFUserNN refers to the user-user approach.
+CFItemNN works better using the Jaccard coefficient resulting in a MAP of 0.1371, a user precision of 0.3897 and an overall precision of 0.2269.
+% TODO add cosine
 
+%TODO How does CFUserNN perfrom with Jaccard and Cosine over number of neighbors?
+CFUserNN was tested with the Jaccard coefficient and cosine similarity as well.
+Moreover the performance was measured over different neighbourhood sizes.
+%TODO plot both curves (Jaccard and cosine) over neighborhood sizes
+%mention best settings for each curve
+%in discussion section: with increasing neighbors CFUserNN converges to MostPop
+
+%TODO How does SVD perform over different number of iteration?
+
+
+%TODO How does it perform over number of features?
+%TODO How does it using different weights for negative weights?
+
+%TODO Which prediction scheme for AdaBoost performs best?
+
+%TODO How does does CBNN perform?
+	% with categories using Jaccard and Cosine
+	% with text using binary word representation using Jaccard and Cosine
+	% with text using bag-of-words model using Cosine
+	% with text using tf-idf model using Cosine
+	
+%TODO How does Naive Bayes perform?
+
+%TODO How do results of different recommendation techniques correlate?
+
+%TODO cascade using mostPop (using candidate with at least x purchases)
+
+%TODO add summary/comparison of best performers for every algorithm, how much better is it than baseline (in percent)?
 
 \section{Discussion}
-% TODO
+% TODO wirte discussion intro
 
 \subsection{Single recommendation systems}
-%TODO write single rs experiment section
+%TODO Explain strong and weak performers. What are pros and cons.
 
 
 \subsection{AdaBoost}
-%TODO
+%TODO Why does AdaBoost improve results?
+%TODO explain different perfomances of prediction schemes
 
 \subsection{Hybrid recommendation systems}
-%TODO write hybrid rs experiment section
+%TODO why is a hybrid recommender not useful
+
+%TODO why does cascade with mostPop work (at least for some thresholds)
 
 
 
 
 %==============================================================
 \chapter{Conclusion and Future Work}
+%TODO write conclusion and future work
 
 
 
 
-
-
+%TODO add tables of figures, equations, tables and abbreviations
 
 
 
