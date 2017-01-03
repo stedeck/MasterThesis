@@ -41,8 +41,15 @@ For recommendation this kind of feedback leads to problems for several reasons.
 First implicit feedback might be noisy, since it bases on the assumption that a user it interested in an item if he purchased it.
 This assumption is not necessary true, because he may have bought it for a friend or is just unsatisfied with the product.
 If a user watches a movie, he is able to give it a low rating.
-This option is not necessary available in online shops.
-% 
+This option is not necessarily available within online shops.
+Moreover implicit e-commerce datasets do not contain any information about negative feedback.
+Positive feedback, i.e. interest in a product, can be derived from purchases, shopping cart entries or page visits, but there is no indication for disinterest in an item.
+While in a rating dataset items that are not liked by the user have a low rating and not rated ones are considered unknown, in e-commerce dataset it is unknown whether items that have not been purchased are not interesting or not known to the user.
+This raises two problems.
+It may happen that a user gets repeatedly recommendations of items he does not need, since he has no chance to mark them as interesting.
+This might lead to decreased user satisfaction and recommendation performance, but this issue will not be addressed in the scope of this thesis.
+The second problem is, that negative feedback is necessary for some recommendation models, since in general machine learning models cannot be trained if only instances of one class are available.
+So some sampling techniques need to be investigated, to figure out how to treat unknown instances.s
 
 Moreover the available datasets vary in number of users, number of items and amount of sparseness.
 The success of a specific recommendation technique depends on the available data.
