@@ -350,8 +350,12 @@ A comparative study was performed in \cite{resamplingReweighting} showing that t
 \subsection{AdaBoost for recommendation}
 Attempts were made using AdaBoost for recommendation among others in \cite{boostingCFRatings} and \cite{boostingAUC}.
 AdaBoost is applied to the SVD - approach similar to the one explained in section \ref{rs_cf}.
-In \cite{boostingCFRatings} is applied to a rating dataset by optimizing the mean squared error. %TODO check, what they optimized
-In \cite{boostingAUC} AdaBoost was applied to an implicit feedback dataset, but instead of optimizing the prediction error, as it was attempted in this thesis, they optimized the ranking measures MAP and AUC directly. % TODO what is AUC, shortly explain %TODO what dataset did they use? % TODO why don't I use this approach?
+In \cite{boostingCFRatings} is applied to a movie rating dataset by optimizing the mean squared error. %TODO check, what they optimized
+In \cite{boostingAUC} AdaBoost was applied to an implicit feedback dataset, but instead of optimizing the prediction error, as it was attempted in this thesis, they optimized the ranking measures MAP and AUC (Area Under Curve) directly.
+AUC is another measure to evaluate the precision of ranked lists taking also recall into account. %todo explain AUC  %TODO what dataset did they use? % TODO why don't I use this approach?
+There the authors evaluated their approach on a movie rating dataset that they transformed into a binary feedback dataset.
+
+
 Here boosting was applied to the logistic regression algorithm for training the SVD model.
 
 %TODO explain the used algorithm
@@ -459,19 +463,31 @@ Moreover there are different kinds of texts like descriptions, content or usage 
 The recommendation systems are evaluated using 80 percent of the data as training set to treat as given and to build the model and 20 percent as test set.
 The test set is built by iterating user- and item-wise over purchases and adding every 5th item to the test set and removing it from the training set.
 This ensures that the test purchases are equally distributed over all users.
-Users that only have purchases one item, are removed beforehand, because they cannot be evaluated, since at least one item must be left for training.
+Users that only have purchased one item, are removed beforehand, because they cannot be evaluated, since at least one item must be left for training.
 Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique.
 %TODO what are dimension of used dataset? what training and test sets?
 
 Cold-start users are not of interest in this thesis, but an unpersonalized recommendation technique is used as a baseline for evaluation.
 This used approach is denoted \textit{MostPop} and always recommends those items to a user that are purchased most often and were not yet purchased by the current user.
 
+Evaluation is measured in terms of the mean average precision, a common measure in information retrieval.
+It is a measure for evaluating ranked list, since it measures precision and incorporates the rank of correct recommendations.
+It is calculated by:
 
-Evaluation is measured in terms of the mean average precision.
-%TODO evaluation measures: MAP, user precision and overall precision
+\begin{equation}
+	MAP_n = \frac{1}{|U|} \sum_u^{|U|} \frac{1}{|I_u|}\sum_i^{|I_u|} Precision(i)
+\end{equation}
+
+Here $U$ is the set of users who got recommendation in the evaluation process and $I_u$ is the list of items that is recommended to user $u$.
+$Precision(i)$ denotes the precision of the recommended list up to position $i$, i.e. the number of correct recommendations within list elements $1$ to $i$ divided by $i$.
+So it is the mean of precisions measured at every position of the list of recommendations averaged over all users who got recommendations.
 All experiments are performed calculating a ranked list of ten recommendations.
 Larger lists would increase performance, because more items would participate in the evaluation and could increase the precisions. %todo how large is the list in literature? difference in evaluation in contrast to rating predcition?
 But in an online-shop a list of more than ten recommended items would not be useful to the user, since the recommended items are not actively requested by the user, but only shown besides the user browses the shop.
+MAP is a good measure to evaluate the accuracy of a ranked list, but it is quite unintuitive.
+So next to the MAP the precision independent of the rank is measured, i.e. how many of the test instances were recommended correctly, and the user precision is measured.
+User precision means the amount of users who got at least one correct recommendation.
+
 
 \section{Results}
 The unpersonalized approach receives a MAP of 0.0499, a user precision of 0.2453 and an overall precision of 0.13142, i.e about 25\% of users got at least one correct recommendation and 13\% of items from the test set were correctly recommended to the users who purchased them.
