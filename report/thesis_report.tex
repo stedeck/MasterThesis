@@ -97,14 +97,6 @@ AdaBoost was already applied to collaborative filtering by \cite{boostingCFRatin
 This work is original in applying it to a logistic regression approach for recommendation on a real e-commerce dataset.
 
 
-\section{Related work}
-%TODO write related work section
-% 
-
-Who did similar work?
-What results did they observe?
-
-
 \section{Organization}
 %TODO How is the thesis structured?
 
@@ -113,22 +105,20 @@ What results did they observe?
 
 
 
-
-
-
 %==============================================================
-\chapter{Recommender Systems}
+\chapter{Related Work}
+\section{Recommender Systems}
 There are different types of recommendation systems.
 They can be divided into collaborative filtering (CF), content-based (CB), demographic, knowledge-based or network-based recommenders. % TODO add reference
 The most used ones are collaborative filtering and content-based recommenders.
 These techniques are applied for the recommendation system developed in the scope of this thesis and will be addressed in the next two sections.
 In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 
-\section{Collaborative filtering}
+\subsection{Collaborative filtering}
 %TODO insert visible paragraph heads for different algorithms
 %TODO emphasize formulas, make equations of important ones
 \label{rs_cf}
-\subsection{Memory-based collaborative filtering}
+\subsubsection{Memory-based collaborative filtering}
 Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
 Recommendations are made based on the preferences of all users using their ratings in the context of Netflix or their purchases in an e-commerce context.
 These information is represented as a matrix where users a represented as rows and columns represent the items.
@@ -177,7 +167,7 @@ Since memory-based approaches need to parse the whole matrix for every recommend
 But they benefit from adaptivity, because they can immediately incorporate new purchases, and do not need to retrain a model after the purchase matrix is updated.
 Moreover the results can be intuitively explained to the user, because these approaches simply bases on purchases of similar users or similar items.
 
-\subsection{Model-based collaborative filtering}
+\subsubsection{Model-based collaborative filtering}
 %Explain general svd %TODO add references
 The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
 It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
@@ -241,7 +231,7 @@ The weight is set to $w_n = 1$ for known positive trainings instances and to $w_
 
 %todo what problems still arise and how do i solve them? (reference to boosting chapter)
 
-\section{Content-based recommendation systems} %TODO see how content-based is written
+\subsection{Content-based recommendation systems} %TODO see how content-based is written
 \label{rs_cb}
 %TODO write contentbased section
 Another common approach is content-based filtering.
@@ -296,7 +286,7 @@ So for online-shops content-based recommender systems may only be used for new u
 %TODO add pseudo code algorihtms for both approaches
 
  
-\section{Other recommendation systems}
+\subsection{Other recommendation systems}
 \label{rs_others}
 %TODO write other rs section and find papers of implementations
 % demographic and network recommenders.
@@ -305,7 +295,7 @@ Knowledge-based recommender systems are based on any kind of knowledge-base that
 
 %TODO why are those systems not used here?
 
-\section{Hybrid recommendation systems}
+\subsection{Hybrid recommendation systems}
 % shortly describe other hybrid sections from burke and why are they not used in this thesiss
 
 %TODO explain switching hybrids
@@ -318,7 +308,7 @@ Knowledge-based recommender systems are based on any kind of knowledge-base that
 
 
 %==============================================================
-\chapter{Boosting}
+\section{Boosting}
 Boosting is an ensemble learning technique for classification that aims to improve the performance of a learning algorithms by training multiple models.
 First boosting algorithms were introduced by Schapire \cite{boostingSchapire} and Freund \cite{boostingFreund}.
 The idea is to train multiple models of the same type iteratively such that every model performs slightly better than the preceding model.
@@ -327,7 +317,7 @@ This is achieved by focusing on training instances that are hard to classify.
 After a model $M_i$ is trained, the next model $M_{i+1}$ is trained with higher emphasize on trainings examples that are misclassified by $M_i$. 
 When all models are trained predictions are made by majority voting of all trained models.
 
-\section{AdaBoost}
+\subsection{AdaBoost}
 The most known boosting algorithm is AdaBoost (adaptive Boosting) developed by Freund and Schapire (\cite{boostingIntro}).
 Given a set of training instances $X = \{x_1, ..., x_n\}$ and their corresponding class labels $Y = \{y_1, ..., y_n\}$, with $y_i \in \{-1, 1\}$ the first model $M_1$ is trained on a sample set according to a distribution $D_1(i) = \frac{1}{n}$, so each training instance has the same probability of being added to the training set for the first model.
 Sampling is performed without replacement, so in general one instance may occur more than once in the training set.
@@ -349,7 +339,7 @@ So the next model set higher emphasize on instances that are hard to classify.
 In the final prediction all models participate according to their corresponding weights with $H(x) = sign(\sum_{t = 1}^T\alpha_th_t(x))$.
 
 
-\section{Reweighting and resampling}
+\subsection{Reweighting and resampling}
 In the original AdaBoost approach explained in the last section the weights of the training instances are used for resampling.
 So only a sample of the full available training set is used for one iteration and the weights correspond to the chance that a training instance is added to it.
 Another approach is to incorporate the weights into the training process if it is possible in the used algorithm.
@@ -357,7 +347,7 @@ When AdaBoost is applied with reweighting in each iteration the whole training s
 A comparative study was performed in \cite{resamplingReweighting} showing that there is no remarkable difference in performance comparing reweighting and resampling.
 
 
-\section{AdaBoost for recommendation}
+\subsection{AdaBoost for recommendation}
 Attempts were made using AdaBoost for recommendation among others in \cite{boostingCFRatings} and \cite{boostingAUC}.
 AdaBoost is applied to the SVD - approach similar to the one explained in section \ref{rs_cf}.
 In \cite{boostingCFRatings} is applied to a rating dataset by optimizing the mean squared error. %TODO check, what they optimized
@@ -375,6 +365,23 @@ Here boosting was applied to the logistic regression algorithm for training the 
 %TODO apply userbased and articlebased prediction
 
 %TODO add pseudocode
+
+
+
+
+
+
+
+
+
+
+%==============================================================
+\chapter{Implementation and Performance}
+
+
+
+
+
 
 
 
