@@ -49,7 +49,7 @@ This raises two problems.
 It may happen that a user gets repeatedly recommendations of items he does not need, since he has no chance to mark them as interesting.
 This might lead to decreased user satisfaction and recommendation performance, but this issue will not be addressed in the scope of this thesis.
 The second problem is, that negative feedback is necessary for some recommendation models, since in general machine learning models cannot be trained if only instances of one class are available.
-So some sampling techniques need to be investigated, to figure out how to treat unknown instances.s
+So some sampling techniques need to be investigated, to figure out how to treat unknown instances.
 
 Moreover the available datasets vary in number of users, number of items and amount of sparseness.
 The success of a specific recommendation technique depends on the available data.
@@ -60,34 +60,53 @@ In this thesis different algorithms will be investigated to find a suitable tech
 
 A general challenge for recommendation is the high dimensionality and sparseness of the data.
 Usually there is a high amount of users and items, but a single user only interacts with a relatively small amount of items and many items are only considered by a small amount of users.
-% TODO how is this relevant for my thesis? fast recommendation are more difficult
+This must be taken into account for the choice of recommendation algorithms as well as for implementation aspects, especially for the representation of the large sparse matrix. %TODO ref to implementation section
 
-
-
-%todo eventually add more details about implicit feedback 
 %todo could add that there are interactive systems or configarionable ones
-%todo also could add different requirements from the handbook
+%todo also could add different requirements/criteria from the handbook
 
 
 \section{Problem statement}
-%TODO write problem statment section
-What is my specific task?
-my recommender system should serve different online shops / should work for different data
-since different techniques perform different on different datasets I first need to investigate which techniques to use.
-so first find how single recommenders perform and how they can be combined
-I need the recommender system to automatically tune for different datasets.
-general description of data (binary, implicit, sparse, purchases, views, shop cart entries, ...)
+% Investigate different techniques, see how they perform, what are their pro and cons
+The goal of this thesis is to find a recommendation system for e-commerce datasets.
+It is required to provide accurate recommendations in terms of the precision measure described in section \ref{sec:eval} as well fast recommendation to preserve user satisfaction when using the online shops.
+So the first tasks of this thesis is to implement different recommendation techniques, measure their performance on an e-commerce dataset and analyse their advantages and drawbacks.
+The implemented techniques include different collaborative filtering approaches, i.e. memory-based and model-based collaborative filtering, and content-based recommendation, see section %TODO add ref to rs chapter
+Some techniques, especially model-based collaborative filtering, need to be adjusted to the implicit feedback datasets, especially regarding the lack of negative feedback.
+So a collaborative filtering algorithm is developed that learns latent factors from binary feedback by applying logistic regression.
+To overcome the problems of missing negative feedback and the skewed data distribution as explained in section ... an AdaBoost approach is applied to the developed algorithm. %TODO add ref to section where i describe the data
+%todo explain more detailed why I used AdaBoost
+
+% How do they correlate, maybe hybrid
+The single recommendation systems are evaluated and their errors are compared in order to find a hybrid technique that makes use of the benefits of different recommenders. %TODO add reference that shows that hybrids perform better
+So the resulting recommendation lists are compared and investigated for correlation.
+Techniques with low error correlation might be able to form a hybrid system with better results.
+
 
 \section{Contribution}
-%TODO write contribution section
-What is novel in my thesis?
-What is the specific challenge? (e-commerce seems to have different requirements (sarwar has different results for e-commerce and movielens data), implicit/binary data, no negative preferences, should work for multiple sets)
+% Comparative study of different algorithms for e-commerce data
+There are two main contributions of this thesis.
+First it serves of a comparative study of basic recommendation algorithms applied to a real e-commerce dataset.
+Benefits and drawback are pointed out, especially concerning known problems with this kind of datasets.
+For model-based collaborative filtering an approach is suggested to adapt matrix factorization to e-commerce datasets by applying logistic regression.
+
+% AdaBoost for reco
+Furthermore AdaBoost is applied to the presented algorithm to tackle some of the problems raising due to implicit feedback datasets.
+AdaBoost was already applied to collaborative filtering by \cite{boostingCFRatings} on a rating dataset.
+\cite{boostingAUC} applied it to implicit feedback datasets by optimizing ranking measures like the area under the curve (AUC) measure or the mean average precision (MAP, see \ref{sec:eval}).
+This work is original in applying it to a logistic regression approach for recommendation on a real e-commerce dataset.
+
 
 \section{Related work}
 %TODO write related work section
+% 
+
 Who did similar work?
 What results did they observe?
 
+
+\section{Organization}
+%TODO How is the thesis structured?
 
 
 
