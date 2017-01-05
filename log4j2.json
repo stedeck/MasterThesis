@@ -1,0 +1,75 @@
+{
+  "configuration": {
+    "properties": {
+      "property": [
+        {
+          "name": "logDir",
+          "value": "tmp/var/log/"
+        },
+        {
+          "name": "serviceName",
+          "value": "recommendation"
+        }
+      ]
+    },
+    "status": "warn",
+    "name": "LogProperties",
+    "appenders": {
+      "Console": {
+        "name": "STDOUT",
+        "PatternLayout": {
+          "pattern": "%d{ISO8601} %-5p [%t] [%c{1}] %m (%F:%L)%n"
+        }
+      },
+      "RollingFile": {
+        "name": "fileLogger",
+        "bufferedIO": true,
+        "fileName": "${logDir}/${serviceName}.log",
+        "filePattern": "${logDir}/${serviceName}/$${date:yyyy-MM}/${serviceName}-%d{MM-dd-yyyy}-%i.log.gz",
+        "PatternLayout": {
+          "pattern": "%d{ISO8601} %-5p [%t] [%c{1}] %m (%F:%L)%n"
+        },
+        "SizeBasedTriggeringPolicy": {
+          "size": "100 KB"
+        },
+        "DefaultRolloverStrategy": {
+          "max": 20
+        }
+      },
+      "Async": {
+        "name": "asyncLogger",
+        "AppenderRef": {
+          "ref": "fileLogger"
+        }
+      }
+    },
+    "loggers": {
+      "logger": [
+        {
+          "name": "recommendation.recoVerticle",
+          "level": "debug",
+          "additivity": "false",
+          "AppenderRef": [
+			{
+				"ref": "STDOUT"
+			},
+			{
+				"ref": "asyncLogger"
+			}
+			]
+        }
+      ],
+      "root": {
+        "level": "debug",
+        "AppenderRef": [
+          {
+            "ref": "STDOUT"
+          },
+          {
+            "ref": "asyncLogger"
+          }
+        ]
+      }
+    }
+  }
+}

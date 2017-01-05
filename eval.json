@@ -1,0 +1,35 @@
+{ 
+  "svd_numIter" : 500,
+  "svd_learningRate" : 0.001,
+  "svd_featureInit" : 0.1,
+  "svd_featureNum" : 400,
+  "svd_regularizationUserFeatures" : 0.01,
+  "svd_regularizationItemFeatures" : 0.01,
+  "svd_weightNegative" : 0.5,
+  "svd_userbasedWeighting" : 0,
+  "svdBoost_modelNum": 5,
+  "svdBoost_serFileName" : "tmp\\svdModels\\04\\adaBoostSVDModel_%s_v1.ser",
+  "svdBoost_errorFileName" : "tmp\\errors\\04\\adaBoostErrors_%s_v1.txt",
+  "svdBoost_predFunc" : "article",
+  
+  "eval_k": 5,
+  "eval_lowerUBound" : -1,
+  "eval_upperUBound" : -1,
+  "eval_recNum" : 10,
+  "eval_dataFileName": "tmp\\reducedU2DistMapPurchaseMatrixWithoutRX_v1.ser",
+  "eval_corFileName": "tmp\\fullItemCorMatrixWithoutRX_v1.ser",
+  "eval_plot" : 0,
+  
+  "neighborUser_neighborNum" : 3000,
+  "userNN_sim" : "CosineBin",
+  "itemNN_sim" : "CosineBin",
+  "CBNN_sim" : "Jaccard",
+  
+  "candidateThreshold" : 1,
+  "purchaseThreshold" : 5,
+  
+  "cascade_candRecNum" : 50,
+  
+  "reco_ThreadNum" : 1
+  
+}
