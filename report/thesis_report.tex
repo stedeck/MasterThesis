@@ -110,7 +110,10 @@ This work is original in applying it to a logistic regression approach for recom
 
 %==============================================================
 \chapter{Related Work}
+\label{sec:relatedWork}
+
 \section{Recommender Systems}
+\label{sec:recommenderSystems}
 There are different types of recommendation systems.
 They can be divided into collaborative filtering (CF), content-based (CB), demographic, knowledge-based or network-based recommenders. % TODO add reference
 The most used ones are collaborative filtering and content-based recommenders.
@@ -118,10 +121,13 @@ These techniques are applied for the recommendation system developed in the scop
 In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 
 \subsection{Collaborative filtering}
+\label{sec:collaborativeFiltering}
 %TODO insert visible paragraph heads for different algorithms
 %TODO emphasize formulas, make equations of important ones
 \label{rs_cf}
+
 \subsubsection{Memory-based collaborative filtering}
+\label{sec:memBasedCF}
 Collaborative filtering is the most implemented and successful recommendation technique. %TODO add reference
 Recommendations are made based on the preferences of all users using their ratings in the context of Netflix or their purchases in an e-commerce context.
 These information is represented as a matrix where users are represented as rows and columns represent the items.
@@ -189,6 +195,7 @@ But they benefit from adaptivity, because they can immediately incorporate new p
 Moreover the results can be intuitively explained to the user, because these approaches simply bases on purchases of similar users or similar items.
 
 \subsubsection{Model-based collaborative filtering}
+\label{sec:modelBasedCF}
 %Explain general svd %TODO add references
 The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
 It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
@@ -282,6 +289,8 @@ The weight is set to $w_n = 1$ for known positive trainings instances and to $w_
 
 %todo what problems still arise and how do i solve them? (reference to boosting chapter)
 
+%TODO add that tv show cf for collaborative filtering approach
+
 \subsection{Content-based recommendation systems} %TODO see how content-based is written
 \label{rs_cb}
 %TODO write contentbased section
@@ -320,7 +329,7 @@ The $p_u(x_f|c=1)$ are obtained by counting the number of items $u$ purchased th
 The constants $2$ and $1$ in equations \ref{BayesPost} and \ref{BayesEvid} respectively are added to avoid that the probability becomes zero when one of the feature likelihoods is zero, i.e. when a user has not purchased an item of a specific feature.
 This technique is called Laplace-smoothing. %TODO add reference
 
-The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{rs_cf}.
+The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{sec:collaborativeFiltering}.
 This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix the category or text feature vectors are used.
 In the case of bag-of-words or tf-idf representation of items the cosine-similarity is used.
 For the binary text or category representation either cosine similarity or the Jaccard coefficient can be used.
@@ -407,20 +416,6 @@ AUC is another measure to evaluate the precision of ranked lists taking also rec
 There the authors evaluated their approach on a movie rating dataset that they transformed into a binary feedback dataset.
 
 
-Here boosting was applied to the logistic regression algorithm for training the SVD model.
-
-%TODO explain the used algorithm
-
-%TODO how did I update the weights?
-
-%TODO why did I use reweighting?
-
-%TODO how prediction is made
-
-%TODO apply userbased and articlebased prediction
-
-%TODO add pseudocode
-
 
 
 
@@ -431,14 +426,30 @@ Here boosting was applied to the logistic regression algorithm for training the 
 
 
 %==============================================================
-\chapter{Approaches for e-commerce}
-%TODO
-%Findind good approach for e-commerce by analysing different algorithms...
+\chapter{Recommendation in e-commerce}
+\label{sec:ecommerceRec}
+Different approaches from the last chapter were implemented and applied to a e-commerce dataset.
+In section \ref{sec:comparison} the basic approach are analysed and compared.
+Some enhancements were made with respect to e-commerce datasets, described in sections \ref{sec:logRegSVD} and \ref{sec:myAdaBoost}.
+
 
 \section{Comparison of basic approaches}
+\label{sec:comparison}
 %TODO What and how did I implement?
+Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
+Both an item-item and a user-user approach like described in section \ref{sec:memBasedCF} are implemented.
+The item-item approach from ... was directly implemented without any changes. %TODO ref to algorithm
+The user-user algorithm from ... was used. %TODO add ref to algorithm and explain why I did not use the other one
+As in many applications the cosine similarity is used for both approaches.
+Since the user and item vectors are binary experiments were also performed using Jaccard similarity. %TODO explain why Jaccard sim is supposed to perform better
+
+The collaborative filtering approaches cannot be applied directly to implicit feedback datasets.
+%TODO continue
+
+
 
 \section{Matrix factorization using logistic regression}
+\label{sec:logRegSVD}
 %TODO 
 %TODO move to my work chapter
 %Explain my adaption to logistic regression
@@ -452,7 +463,21 @@ When training the updates of user and item features vectors the prediction error
 %todo add experiments to compare linear and logistic regression with lara
 
 \section{AdaBoost}
+\label{sec:myAdaBoost}
 %TODO How did I apply AdaBoost
+Here boosting was applied to the logistic regression algorithm for training the SVD model.
+
+%TODO explain the used algorithm
+
+%TODO how did I update the weights?
+
+%TODO why did I use reweighting?
+
+%TODO how prediction is made
+
+%TODO apply userbased and articlebased prediction
+
+%TODO add pseudocode
 
 
 
