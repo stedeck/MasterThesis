@@ -171,8 +171,6 @@ This approach is not able to guarantee a sufficiently large list of recommendati
 Being $I(N(u))$ the items the neighbours of $u$ purchased, a user-user approach is only able to recommend at most $|I(N(u)) \setminus I(u)|$ items to user $u$.
 This may especially be a problem for users with only a few purchases, because the less items a user purchased the higher is the probability to find a user with the same set of purchased items.
 
-%TODO move this to chapter with my work
-%To reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation from the user's neighbours, only those neighbours are taken into account with a similarity score of less than 1, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 
 Another user-user approach that does not suffer from the above problem was implemented by ... %TODO find and add reference
 Here for every item $i$ the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated: 
@@ -441,10 +439,21 @@ Both an item-item and a user-user approach like described in section \ref{sec:me
 The item-item approach from ... was directly implemented without any changes. %TODO ref to algorithm
 The user-user algorithm from ... was used. %TODO add ref to algorithm and explain why I did not use the other one
 As in many applications the cosine similarity is used for both approaches.
-Since the user and item vectors are binary experiments were also performed using Jaccard similarity. %TODO explain why Jaccard sim is supposed to perform better
+Since the user and item vectors are binary, experiments were also performed using Jaccard similarity. %TODO explain why Jaccard sim is supposed to perform better
+Jaccard similarity treats the user and items more element-wise, while cosine similarity treats them as vectors.
+Both measures take the amount of common attributes attributes account, but normalization is performed differently.
+For cosine similarity the normalization factor is the product of the lengths of the single vectors.
+Jaccard similarity counts the total amount of set attributes, i.e. the union of the sets representing the vectors, for normalization.
+%For example there are vectors $\vec{a_1} = \{1,1,1,1,0\}^T$, $\vec{a_2} = \{0,1,1,1,1\}^T$ and $\vec{b_1} = \{1,1,1,0,0\}^T$, $\vec{b_2} = \{1,1,1,1,1\}^T$.
+For recommendation Jaccard similarity is more promising, because the amount of common attributes is more important then single vector length.
+
+To reduce the chance of not being able to find a sufficiently large list of recommendations in the user-user approach and ensure that there is at least one recommendation from the user's neighbours, only those neighbours are taken into account with a similarity score of less than 1, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 
 The collaborative filtering approaches cannot be applied directly to implicit feedback datasets.
+
 %TODO continue
+
+
 
 
 
