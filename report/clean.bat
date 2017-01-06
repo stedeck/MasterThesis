@@ -1,6 +1,6 @@
-rm thesis_report.aux
-rm thesis_report.pdf
-rm thesis_report.synctex.gz
-rm thesis_report.log
-rm thesis_report.blg
-rm thesis_report.bbl
+del thesis_report.aux
+del thesis_report.pdf
+del thesis_report.synctex.gz
+del thesis_report.log
+del thesis_report.blg
+del thesis_report.bbl
