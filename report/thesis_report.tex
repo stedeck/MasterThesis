@@ -433,23 +433,30 @@ Some enhancements were made with respect to e-commerce datasets, described in se
 
 \section{Comparison of basic approaches}
 \label{sec:comparison}
-%TODO What and how did I implement?
 Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
 Both an item-item and a user-user approach like described in section \ref{sec:memBasedCF} are implemented.
 The item-item approach from ... was directly implemented without any changes. %TODO ref to algorithm
-The user-user algorithm from ... was used. %TODO add ref to algorithm and explain why I did not use the other one
+Both user-user approaches were implemented, though algorithm algo2 requires a lot more runtime. %TODO add ref to algorithm and explain why I did not use the other one %TODO add runtime requiremnts
+In algo1 a small change was applied to reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation.
+When determining the nearest neighbours only those are taken into account with a similarity score of less than one, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 As in many applications the cosine similarity is used for both approaches.
-Since the user and item vectors are binary, experiments were also performed using Jaccard similarity. %TODO explain why Jaccard sim is supposed to perform better
+Since the user and item vectors are binary, experiments were also performed using Jaccard similarity.
 Jaccard similarity treats the user and items more element-wise, while cosine similarity treats them as vectors.
 Both measures take the amount of common attributes attributes account, but normalization is performed differently.
 For cosine similarity the normalization factor is the product of the lengths of the single vectors.
 Jaccard similarity counts the total amount of set attributes, i.e. the union of the sets representing the vectors, for normalization.
 %For example there are vectors $\vec{a_1} = \{1,1,1,1,0\}^T$, $\vec{a_2} = \{0,1,1,1,1\}^T$ and $\vec{b_1} = \{1,1,1,0,0\}^T$, $\vec{b_2} = \{1,1,1,1,1\}^T$.
-For recommendation Jaccard similarity is more promising, because the amount of common attributes is more important then single vector length.
+For recommendation Jaccard similarity is more promising, because the amount of common attributes is more important than single vector length.
 
-To reduce the chance of not being able to find a sufficiently large list of recommendations in the user-user approach and ensure that there is at least one recommendation from the user's neighbours, only those neighbours are taken into account with a similarity score of less than 1, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
+The collaborative filtering approaches cannot be applied directly to implicit feedback datasets, because there are no ratings available for e-commerce.
+In traditional approaches the available ratings are used for training a model that predicts an unknown rating of a user for a specific item.
+Instead of ratings there are only purchases available that are denoted as 1, while not purchased items are marked with zero.
+It is also considered whether a user purchases an item or not, regardless of how often he bought it, because the amount of purchases probably does not correlate with the users need or interest in that item..
+There are items that are in general only bought once, while others are usually needed and bought on a more regular basis. 
+So in the next chapter an approach is suggested to adapt the matrix factorization approach to a binary feedback dataset.
 
-The collaborative filtering approaches cannot be applied directly to implicit feedback datasets.
+Moreover both the nearest-neighbour and the Naive Bayes approaches for content-based recommendation are investigated.
+The same similarity measures are applied as in the memory-based collaborative filtering approaches.
 
 %TODO continue
 
