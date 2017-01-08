@@ -275,11 +275,9 @@ There a feature vector is updated for every trainings example what leads to upda
 This approach is usually applied to rating datasets and raises some problems when applied to implicit feedback data.
 While for rating data there are positive as well as negative preferences available in the form of different ratings, in e-commerce there are only purchased items to be considered at interesting for the user and not purchased items that may be either not interesting or unknown to the user.
 The least-squares regression model cannot be trained only on the positive values, so some of the unknown instances have to be used for training as well.
-In \cite{occf} different sampling and weighting methods are investigated to address this issue.
-Here the negative training instances are obtained by randomly choosing them from the unknown instances.
-For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that user or items with many positive examples (i.e. many purchases) get about as many negative ones for ensure balanced classification problems. %TODO somewhere introduce U as set of Users and I as set of Items
-To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules become $p_u = p_u + w_n \alpha (e_{ui} q_i + \lambda p_u)$ and $q_i = q_i + w_n \alpha (e_{ui} p_u + \lambda q_i)$. %todo try different weights for p_u and q_i maybe? 
-The weight is set to $w_n = 1$ for known positive trainings instances and to $w_n < 1$ for the other randomly chosen negative weights. %TODO which weight is used? Add experiments and reference to it
+In \cite{occf} different sampling and weighting methods are investigated to address this issue. %TODO summarize the presented schemes
+
+%TODO shortly explain cf for implicit feedback datasets paper
 
 %todo Add other approaches of sampling i have tried aman or one random value per positive training instance
 %todo add other weighting schemes i have tried (user based from occf paper)
@@ -294,10 +292,7 @@ The weight is set to $w_n = 1$ for known positive trainings instances and to $w_
 %TODO write contentbased section
 Another common approach is content-based filtering.
 This approach generates recommendations from any kind of content-based item features independently from other users' preferences.
-The item features may be information about genres, actors or directors in a movie recommendation context.
-For the dataset used in this thesis there are categories and description texts about the items.
-An item can be in multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
-The vector elements $x_c \in \{0,1\}$ indicate whether the item belongs to a specific category or not. 
+The item features may be any available information like genres, actors or directors in a movie recommendation context or any kind of texts in general.
 Texts are represented as word vectors $\vec{x} \in \mathds{R}^{|T|}$ with $T$ being the total number of words in any of the item descriptions.
 The vector elements $x_i$ are either binary values indicating the occurrence or absence of a word in the text, the number of occurrences of a word (bag-of-word model) or the corresponding tf-idf value. %TODO explain tf-idf and the formula I used
 
@@ -328,18 +323,7 @@ The constants $2$ and $1$ in equations \ref{BayesPost} and \ref{BayesEvid} respe
 This technique is called Laplace-smoothing. %TODO add reference
 
 The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{sec:collaborativeFiltering}.
-This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix the category or text feature vectors are used.
-In the case of bag-of-words or tf-idf representation of items the cosine-similarity is used.
-For the binary text or category representation either cosine similarity or the Jaccard coefficient can be used.
-
-The naive Bayes and the k-nearest-neighbour recommenders are expected to produce different recommendations, because with k-nearest-neighbour an item is likely to be recommended if its whole set of features is similar to the those of items the user has already purchased.
-Naive Bayes in contrast also may recommend items that have single item features in common to many of the users purchases.
-
-Content-based recommendation systems generate intuitive recommendations, since they are always similar to the items the current user already purchased.
-But this also limits the recommendation to a specific set of items features, while in collaborative filtering a greater diversity of items can be recommended.
-In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him.
-For example if the recommendations only differ in size, colour or brand from the product the user already owns.
-So for online-shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %TODO refer to hybrid chapter 
+This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix content-based feature vectors are used.
 
 %TODO add pseudo code algorihtms for both approaches
 
@@ -367,6 +351,7 @@ Knowledge-based recommender systems are based on any kind of knowledge-base that
 
 %==============================================================
 \section{Boosting}
+\label{sec:boosting}
 Boosting is an ensemble learning technique for classification that aims to improve the performance of a learning algorithms by training multiple models.
 First boosting algorithms were introduced by Schapire \cite{boostingSchapire} and Freund \cite{boostingFreund}.
 The idea is to train multiple models of the same type iteratively such that every model performs slightly better than the preceding model.
@@ -376,6 +361,7 @@ After a model $M_i$ is trained, the next model $M_{i+1}$ is trained with higher 
 When all models are trained predictions are made by majority voting of all trained models.
 
 \subsection{AdaBoost}
+\label{sec:adaBoost}
 The most known boosting algorithm is AdaBoost (adaptive Boosting) developed by Freund and Schapire (\cite{boostingIntro}).
 Given a set of training instances $X = \{x_1, ..., x_n\}$ and their corresponding class labels $Y = \{y_1, ..., y_n\}$, with $y_i \in \{-1, 1\}$ the first model $M_1$ is trained on a sample set according to a distribution $D_1(i) = \frac{1}{n}$, so each training instance has the same probability of being added to the training set for the first model.
 Sampling is performed without replacement, so in general one instance may occur more than once in the training set.
@@ -398,6 +384,7 @@ In the final prediction all models participate according to their corresponding 
 
 
 \subsection{Reweighting and resampling}
+\label{sec:reweightingResampling}
 In the original AdaBoost approach explained in the last section the weights of the training instances are used for resampling.
 So only a sample of the full available training set is used for one iteration and the weights correspond to the chance that a training instance is added to it.
 Another approach is to incorporate the weights into the training process if it is possible in the used algorithm.
@@ -406,6 +393,7 @@ A comparative study was performed in \cite{resamplingReweighting} showing that t
 
 
 \subsection{AdaBoost for recommendation}
+\label{sec:adaBoostForRecommendation}
 Attempts were made using AdaBoost for recommendation among others in \cite{boostingCFRatings} and \cite{boostingAUC}.
 AdaBoost is applied to the SVD - approach similar to the one explained in section \ref{rs_cf}.
 In \cite{boostingCFRatings} is applied to a movie rating dataset by optimizing the mean squared error. %TODO check, what they optimized
@@ -433,6 +421,8 @@ Some enhancements were made with respect to e-commerce datasets, described in se
 
 \section{Comparison of basic approaches}
 \label{sec:comparison}
+
+% Memory-based appraoches
 Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
 Both an item-item and a user-user approach like described in section \ref{sec:memBasedCF} are implemented.
 The item-item approach from ... was directly implemented without any changes. %TODO ref to algorithm
@@ -448,46 +438,99 @@ Jaccard similarity counts the total amount of set attributes, i.e. the union of 
 %For example there are vectors $\vec{a_1} = \{1,1,1,1,0\}^T$, $\vec{a_2} = \{0,1,1,1,1\}^T$ and $\vec{b_1} = \{1,1,1,0,0\}^T$, $\vec{b_2} = \{1,1,1,1,1\}^T$.
 For recommendation Jaccard similarity is more promising, because the amount of common attributes is more important than single vector length.
 
+%Collaborative filtering
 The collaborative filtering approaches cannot be applied directly to implicit feedback datasets, because there are no ratings available for e-commerce.
 In traditional approaches the available ratings are used for training a model that predicts an unknown rating of a user for a specific item.
 Instead of ratings there are only purchases available that are denoted as 1, while not purchased items are marked with zero.
-It is also considered whether a user purchases an item or not, regardless of how often he bought it, because the amount of purchases probably does not correlate with the users need or interest in that item..
+It is only considered whether a user purchases an item or not, regardless of how often he bought it, because the amount of purchases probably does not correlate with the users need or interest in that item.
 There are items that are in general only bought once, while others are usually needed and bought on a more regular basis. 
 So in the next chapter an approach is suggested to adapt the matrix factorization approach to a binary feedback dataset.
 
+% Content-based approaches
 Moreover both the nearest-neighbour and the Naive Bayes approaches for content-based recommendation are investigated.
+It was applied to item categories as well as descriptions.
+An item can be in multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
+The vector elements $x_c \in \{0,1\}$ indicate whether the item belongs to a specific category or not. 
+Texts were represented as binary word vectors, bag-of-words or tf-idf vectors. %todo what approach are expected to work best?
 The same similarity measures are applied as in the memory-based collaborative filtering approaches.
+The naive Bayes and the k-nearest-neighbour recommenders are expected to produce different recommendations, because with k-nearest-neighbour an item is likely to be recommended if its whole set of features is similar to the those of items the user has already purchased.
+Naive Bayes in contrast also may recommend items that have single item features in common to many of the users purchases.
+Content-based recommendation systems generate intuitive recommendations, since they are always similar to the items the current user already purchased.
+But this also limits the recommendation to a specific set of items features, while in collaborative filtering a greater diversity of items can be recommended.
+In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him.
+For example if the recommendations only differ in size, colour or brand from the product the user already owns.
+So for online-shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %TODO refer to hybrid chapter 
 
-%TODO continue
-
-
-
+% Correlation
+To compare the different algorithms they are separately applied to an e-commerce dataset.
+Moreover it was investigated whether they may complement each other when applied as a hybrid system.
+Chapter \ref{chap:experimentation} shows experiments to find out correlations and their results.
 
 
 \section{Matrix factorization using logistic regression}
 \label{sec:logRegSVD}
-%TODO 
-%TODO move to my work chapter
+
 %Explain my adaption to logistic regression
-In most applications of this CF-approach, the user feedback $r_{ui}$ is given as any kind of explicitly given rating.
-This information is not available in the e-commerce datasets, but there is information about whether a user purchased an item.
-This yields binary values for $r_ui$, where $r_{ui} = 1$ denotes that user $u$ has purchased item $i$, and $r_{ui} = 0$ denotes that he has not.
+For reasons explained above the matrix factorization as a model-based collaborative filtering technique needs some adaption for e-commerce data.
+The given feedback about user preferences $r_ui$ consist of binary values, where $r_{ui} = 1$ denotes that user $u$ has purchased item $i$, and $r_{ui} = 0$ denotes that he has not.
 So predicting user preferences becomes a classification rather than a regression problem.
-So in the scope of this thesis the SVD approach is transformed into a logistic regression problem trying to predict a value $r_{ui} \in {0,1}$.
-Prediction is performed by $\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}$.
-When training the updates of user and item features vectors the prediction error is then replaced with $e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}$.
+So in the scope of this thesis the SVD approach explained in section \ref{sec:modelBasedCF} is transformed into a logistic regression problem trying to predict a value $\hat{r}_{ui} \in {0,1}$.
+Then Prediction is performed by 
+
+\begin{equation}
+	\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}
+\end{equation}
+
+When training the updates of user and item features vectors the prediction error is then replaced with 
+
+\begin{equation}
+	e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}
+\end{equation}
 %todo add experiments to compare linear and logistic regression with lara
+
+To address the problem of missing negative instances the negative training instances are obtained by randomly choosing them from the unknown instances.
+For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that user or items with many positive examples (i.e. many purchases) get about as many negative ones for ensure balanced classification problems. %TODO somewhere introduce U as set of Users and I as set of Items
+To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules become 
+
+\begin{equation}
+	p_u = p_u + w_n \alpha (e_{ui} q_i + \lambda p_u)
+\end{equation}
+
+and 
+
+\begin{equation}
+	q_i = q_i + w_n \alpha (e_{ui} p_u + \lambda q_i)
+\end{equation}
+%todo try different weights for p_u and q_i maybe? 
+The weight is set to $w_n = 1$ for known positive trainings instances and to $w_n < 1$ for the other randomly chosen negative weights. %TODO which weight is used? Add experiments and reference to it
 
 \section{AdaBoost}
 \label{sec:myAdaBoost}
-%TODO How did I apply AdaBoost
-Here boosting was applied to the logistic regression algorithm for training the SVD model.
+The logistic regression based approach for matrix factorization still suffers from unbalanced feature updates in a way that users or items with more purchases get more updates and therefore tend to get higher feature values.
+This results into items that are purchased more often get a higher probability of being recommended.
+Items with fewer purchases are harder to train, because there are less training instances.
+To overcome this problem and emphasize training of the feature vectors of items with fewer purchases AdaBoost is applied to the presented matrix factorization approach.
+Instead of resampling training instances the reweighting approach explained in section \ref{sec:reweightingResampling} is applied, because resampling would produce an even sparser purchase matrix.
+The weights are applied to the learning rate of the feature updates, such that instances with higher weights get larger feature updates than those with fewer weights.
+So updates are performed by 
+
+\begin{equation}
+p_u = p_u + w_n \alpha d(u,i) (e_{ui} q_i + \lambda p_u)
+\end{equation}
+
+and 
+
+\begin{equation}
+q_i = q_i + w_n \alpha d(u,i) (e_{ui} p_u + \lambda q_i)
+\end{equation}
+
+where $d(u,i)$ denotes the weight for training instance of user $u$ for item $i$.
+
+
 
 %TODO explain the used algorithm
 
 %TODO how did I update the weights?
-
-%TODO why did I use reweighting?
 
 %TODO how prediction is made
 
@@ -530,6 +573,7 @@ Here boosting was applied to the logistic regression algorithm for training the 
 
 %==============================================================
 \chapter{Experimentation}
+\label{chap:experimentation}
 The described algorithms are evaluated against a sample e-commerce dataset.
 On one hand it is aimed to compare different recommendation approaches on e-commerce data and on the other hand the impact of different parameters is analysed to be able to tune algorithms for different datasets.
 In the next section the data used for evaluating the algorithm is presented.
@@ -537,7 +581,8 @@ In the next section the data used for evaluating the algorithm is presented.
 The last two sections of this chapter show the obtained results and discuss them.
 
 \section{Data}
-%TODO write data section
+\label{sec:data}
+
 To evaluate the different recommendation approaches data from an online pharmacy is used.
 The dataset contains purchases from 81835 users and 14964 articles.
 Those n' articles contain many duplicates, because article of the same product, but with different package sizes or different colours are considered as different articles in the database.
@@ -604,6 +649,7 @@ User precision means the amount of users who got at least one correct recommenda
 
 
 \section{Results}
+\label{sec:results}
 The unpersonalized approach receives a MAP of 0.0499, a user precision of 0.2453 and an overall precision of 0.13142, i.e about 25\% of users got at least one correct recommendation and 13\% of items from the test set were correctly recommended to the users who purchased them.
 The developed personalized recommendation systems are supposed to being able to outperform approach.
 
