@@ -507,30 +507,33 @@ The weight is set to $w_n = 1$ for known positive trainings instances and to $w_
 \section{AdaBoost}
 \label{sec:myAdaBoost}
 The logistic regression based approach for matrix factorization still suffers from unbalanced feature updates in a way that users or items with more purchases get more updates and therefore tend to get higher feature values.
-This results into items that are purchased more often get a higher probability of being recommended.
+This results into items that are purchased more often get a higher probability for being recommended.
 Items with fewer purchases are harder to train, because there are less training instances.
 To overcome this problem and emphasize training of the feature vectors of items with fewer purchases AdaBoost is applied to the presented matrix factorization approach.
 Instead of resampling training instances the reweighting approach explained in section \ref{sec:reweightingResampling} is applied, because resampling would produce an even sparser purchase matrix.
 The weights are applied to the learning rate of the feature updates, such that instances with higher weights get larger feature updates than those with fewer weights.
-So updates are performed by 
+So the update rules from the presented logistic regression matrix factorization are transformed to: 
 
 \begin{equation}
-p_u = p_u + w_n \alpha d(u,i) (e_{ui} q_i + \lambda p_u)
+p_u^{(t)} = p_u^{(t)} + w_n \alpha d^{(t)}(u,i) (e_{ui}^{(t)} q_i^{(t)} + \lambda p_u^{(t)})
 \end{equation}
 
 and 
 
 \begin{equation}
-q_i = q_i + w_n \alpha d(u,i) (e_{ui} p_u + \lambda q_i)
+q_i^{(t)} = q_i^{(t)} + w_n \alpha d^{(t)}(u,i) (e_{ui}^{(t)} p_u^{(t)} + \lambda q_i^{(t)})
 \end{equation}
 
 where $d(u,i)$ denotes the weight for training instance of user $u$ for item $i$.
+For the first model the weights are $1$ for all training instances, such that all feature vectors are updated according to the unweighted learning rate.
+The trained model is evaluated using the training set and the weights for next model updated according to $d^{(t+1)}(u,i) = d^{(t)}(u,i) \exp(e_{ui})$, such that instances with a larger prediction errors will get larger feature updates when training the next model.
+After all weights are updated they are normalized by $d^{t+1}(u,i) = \frac{d^{t+1}(u,i) |P_{train}|}{\sum_{(u,i)}{d^{t+1}(u,i)}}$, such that the sum of all instance weights adds up to the number of purchases again.
+$P_{train}$ is the set of $(u,i)$ tuples of all purchases of the training set.
+In traditional AdaBoost approaches the weights are updated dependent on the model error, while weights of correctly classified instances are decreased and misclassified instances are increased.
+Here the updates only depend on the instance errors.
+This allows to perform higher updates for instances with high errors and lower updates for instances with lower errors instead of different update rules for correctly or incorrectly classified instances. 
+%TODO why didn't I incorporate the model error?
 
-
-
-%TODO explain the used algorithm
-
-%TODO how did I update the weights?
 
 %TODO how prediction is made
 
