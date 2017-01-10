@@ -515,19 +515,19 @@ The weights are applied to the learning rate of the feature updates, such that i
 So the update rules from the presented logistic regression matrix factorization are transformed to: 
 
 \begin{equation}
-p_u^{(t)} = p_u^{(t)} + w_n \alpha d^{(t)}(u,i) (e_{ui}^{(t)} q_i^{(t)} + \lambda p_u^{(t)})
+p_{u,t} = p_{u,t} + w_n \alpha d_{ui,t} (e_{ui,t} q_{i,t} + \lambda p_{u,t})
 \end{equation}
 
 and 
 
 \begin{equation}
-q_i^{(t)} = q_i^{(t)} + w_n \alpha d^{(t)}(u,i) (e_{ui}^{(t)} p_u^{(t)} + \lambda q_i^{(t)})
+q_{i,t} = q_{i,t} + w_n \alpha d_{ui,t} (e_{ui,t} p_{u,t} + \lambda q_{i,t})
 \end{equation}
 
-where $d(u,i)$ denotes the weight for training instance of user $u$ for item $i$.
+where $d_{ui}$ denotes the weight for training instance of user $u$ for item $i$.
 For the first model the weights are $1$ for all training instances, such that all feature vectors are updated according to the unweighted learning rate.
-The trained model is evaluated using the training set and the weights for next model updated according to $d^{(t+1)}(u,i) = d^{(t)}(u,i) \exp(e_{ui})$, such that instances with a larger prediction errors will get larger feature updates when training the next model.
-After all weights are updated they are normalized by $d^{t+1}(u,i) = \frac{d^{t+1}(u,i) |P_{train}|}{\sum_{(u,i)}{d^{t+1}(u,i)}}$, such that the sum of all instance weights adds up to the number of purchases again.
+The trained model is evaluated using the training set and the weights for next model updated according to $d_{ui,t+1} = d_{ui,t} \exp(e_{ui})$, such that instances with a larger prediction errors will get larger feature updates when training the next model.
+After all weights are updated they are normalized by $d_{ui,t+1} = \frac{d_{ui,t+1} |P_{train}|}{\sum_{(u,i)}{d_{ui,t+1}}}$, such that the sum of all instance weights adds up to the number of purchases again.
 $P_{train}$ is the set of $(u,i)$ tuples of all purchases of the training set.
 In traditional AdaBoost approaches the weights are updated dependent on the model error, while weights of correctly classified instances are decreased and misclassified instances are increased.
 Here the updates only depend on the instance errors.
@@ -539,16 +539,60 @@ Taking the model error into account might diminish this effect, because users an
 After $T$ models are trained recommendation is performed by combining the prediction of those models.
 In classification problems a weighted majority vote determines the final predicted class.
 Every model's prediction is multiplied by a model weight $\alpha_t = ln(\frac{1-\epsilon_t}{\epsilon_t})$ and summed up.
-For recommendation this leads to following prediction rule to determine the score for a user- item-pair: %TODO see whether others used the same formula and add reference
+For recommendation this leads to the following prediction rule to determine the score for a user-item-pair: %TODO see whether others used the same formula and add reference
 
 \begin{equation}
-	s(u,i) = \sum_t^T{\frac{ln(\frac{1 - \epsilon_t}{\epsilon_t})}{1 + exp((p_u^{(t)})^Tq_i^{(t)})} }
-\end{equation} %TODO fix this... looks shitty
+	\label{eq:adaBoostPredRule}
+	s(u,i) = \sum_t^T{\frac{ln(\frac{1 - \epsilon_t}{\epsilon_t})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+\end{equation}
 
+The next section describes some alternative prediction schemes that are applied in the scope of this thesis.
 
-%TODO how prediction is made
+\section{Prediction rules}
+\label{sec:predictionRules}
 
-%TODO apply userbased and articlebased prediction
+The prediction rule in equation \ref{eq:adaBoostPredRule} incorporates the errors of the whole models trained during AdaBoost recommendation.
+Though the models consist of user and item features that may vary in performance, i.e. one model may perform better for some users or items while another model may perform better on other users or items.
+So the prediction rule for AdaBoost was adopted to incorporate the errors for users or items instead of the total model error.
+The errors for a user $u$ and an item $i$ are calculated as shown in equations \ref{eq:userError} and \ref{eq:articleError}, respectively.
+
+\begin{equation}
+	\label{eq:userError}
+	e_{u} = \frac{1}{|P(u)|} \sum_{(u,i) \in P(u)}{e_{ui}}
+\end{equation}
+
+\begin{equation}
+	\label{eq:articleError}
+	e_{i} = \frac{1}{|P(i)|} \sum_{(u,i) \in P(i)}{e_{ui}}
+\end{equation}
+
+$P(u)$ is the set of $(u,i)$ tuples for all items $u$ purchased.
+$P(i)$ are the tuples for users that purchased item $i$.
+
+Replacing the model error $e_t$ with the user or item errors leads to the following prediction rules:
+
+\begin{equation}
+\label{eq:userErrorPrediction}
+	s(u,i) = \sum_t^T{\frac{ln(\frac{1 - e_u}{e_u})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+\end{equation}
+
+\begin{equation}
+\label{eq:articleErrorPrediction}
+s(u,i) = \sum_t^T{\frac{ln(\frac{1 - e_i}{e_i})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+\end{equation}
+
+A third possibility is to incorporate both the user and item errors by 
+
+\begin{equation}
+\label{eq:combinedErrorPrediction}
+s(u,i) = \sum_t^T{\frac{ln(\frac{1 - e_u}{e_u})ln(\frac{1 - e_i}{e_i})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+\end{equation}
+
+Prediction rules \ref{eq:articleErrorPrediction} and \ref{eq:combinedErrorPrediction} do not only weight the results of the different, but also assign different weights to different items according to their error.
+Intuitively those weights refer to the confidence of the calculated prediction.
+For articles with a higher error the confidence of the prediction is lower and so the calculated score is lower as well.
+The article error based prediction can also be applied to a single model, i.e. to the presented logistic regression matrix factorization approach.
+
 
 %TODO add pseudocode
 
