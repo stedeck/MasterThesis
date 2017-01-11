@@ -708,7 +708,6 @@ Figure \ref{fig:dataDistribution} shows a histogram showing how the purchases pe
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchaseHistogram_partly}
 	\end{subfigure}
-	
 \end{figure}
 
 Besides purchases there is content-based information about items.
@@ -718,7 +717,7 @@ Moreover there are different kinds of texts like descriptions, content or usage 
 %todo Eventually demographic information and other browsing history stuff
 
 
-\section{Evaluation}
+ \section{Evaluation}
 \label{sec:eval}
 The recommendation systems are evaluated using 80 percent of the data as training set to treat as given and to build the model and 20 percent as test set.
 The test set is built by iterating user- and item-wise over purchases and adding every 5th item to the test set and removing it from the training set.
@@ -758,14 +757,30 @@ The developed personalized recommendation systems are supposed to being able to 
 The model-based collaborative filtering approaches were evaluated using either the Jaccard coefficient or cosine similarity.
 The item-item approach will further be denoted CFItemNN, while CFUserNN refers to the user-user approach.
 CFItemNN works better using the Jaccard coefficient resulting in a MAP of 0.1371, a user precision of 0.3897 and an overall precision of 0.2269.
-% TODO add cosine
+Using the cosine similarity CFItemNN reaches a MAP of 0.1333, a user precision of 0.3866 and a precision of 0.2228.
 
-%TODO How does CFUserNN perfrom with Jaccard and Cosine over number of neighbors?
+\begin{figure}
+	\caption{Results for CFUserNN}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/CFUserNN}
+	\label{fig:CFUserNN}
+\end{figure}
+
 CFUserNN was tested with the Jaccard coefficient and cosine similarity as well.
-Moreover the performance was measured over different neighbourhood sizes.
-%TODO plot both curves (Jaccard and cosine) over neighborhood sizes
-%mention best settings for each curve
-%in discussion section: with increasing neighbors CFUserNN converges to MostPop
+Moreover the performance was measured over different neighbourhood sizes, see figure \ref{fig:CFUserNN}.
+Like with CFItemNN Jaccard similarity outperforms cosine similarity.
+The best number of nearest neighbours to be investigated to calculate the recommendation are 300.
+Up to this point performance of the algorithm increases, but it decreases for larger neighbourhood sizes.
+Too few neighbours are not able to suggest enough possible recommendations and recommendations are not that confident as if voted for by more neighbours.
+Too many neighbours on the other hand produce fuzzy recommendations, because the neighbours may not be close enough to the current user.
+MAP for more users converges to the approach of recommending the most purchased items, because MostPop and CFUserNN result in the same algorithm if all users are considered as neighbours.
+Algorithm ... was also evaluated and produces a MAP of 0.0916, a user precision of 0.3188 and an overall precision of 0.1718 with Jaccard similarity and a MAP of 0.0897, a user precision of 0.3165 and an overall precision of 0.1705 with cosine similarity. %TODO reference
+So results are worse than the observed ones from algorithm... %TODO reference
+%TODO investigate size of recommendation lists...
+%TODO take similarity into account, use them as weights somehow
+
+
+
 
 %TODO How does SVD perform over different number of iteration?
 
