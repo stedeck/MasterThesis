@@ -46,7 +46,17 @@ Collaborative filtering - Memory-based
 Amazons item-item approach (should be similar to mine)
 
 
-@inproceedings{aiolli2013efficient,
+@inproceedings{itemItemAlgorithms,
+	title={Item-based collaborative filtering recommendation algorithms},
+	author={Sarwar, Badrul and Karypis, George and Konstan, Joseph and Riedl, John},
+	booktitle={Proceedings of the 10th international conference on World Wide Web},
+	pages={285--295},
+	year={2001},
+	organization={ACM}
+}
+For rating, with correlation and cosine similaritiy, compared to user-user
+
+@inproceedings{efficientTopN,
 	title={Efficient top-n recommendation for very large scale binary rated datasets},
 	author={Aiolli, Fabio},
 	booktitle={Proceedings of the 7th ACM conference on Recommender systems},
@@ -57,7 +67,7 @@ Amazons item-item approach (should be similar to mine)
 item-item and user-user approaches with improvements
 
 
-@inproceedings{volkovs2015effective,
+@inproceedings{effectiveLatentModels,
 	title={Effective Latent Models for Binary Feedback in Recommender Systems},
 	author={Volkovs, Maksims and Yu, Guang Wei},
 	booktitle={Proceedings of the 38th International ACM SIGIR Conference on Research and Development in Information Retrieval},
@@ -65,7 +75,7 @@ item-item and user-user approaches with improvements
 	year={2015},
 	organization={ACM}
 }
-Different CF-approaches (memory- and model-based) for binary data. Used k-nearest-neighbor notation from there.
+Different CF-approaches (memory- and model-based) for binary data. Used k-nearest-neighbour notation from there.
 Applied (numeric) SVD to item-item / user-user - score matrix instead of feedback matrix
 
 
@@ -178,14 +188,12 @@ Boosting
 
 
 @article{boostingCFRatings,
-	title={Improved boosting algorithms using confidence-rated predictions},
-	author={Schapire, Robert E and Singer, Yoram},
-	journal={Machine learning},
-	volume={37},
-	number={3},
-	pages={297--336},
-	year={1999},
-	publisher={Springer}
+	title={Novel Boosting Frameworks to Improve the Performance of Collaborative Filtering.},
+	author={Jiang, Xiaotian and Niu, Zhendong and Guo, Jiamin and Mustafa, Ghulam and Lin, Zi-Han and Chen, Baomi and Zhou, Qian},
+	journal={ACML},
+	volume={13},
+	pages={87--99},
+	year={2013}
 }
 Boosting on predicting ratings
 
@@ -235,7 +243,29 @@ Application of boosting optimizing MAP or AUC value
 
 
 ===========================================================================
+Content-based
+============================================================
+
+@incollection{contentbasedPazzani,
+	title={Content-based recommendation systems},
+	author={Pazzani, Michael J and Billsus, Daniel},
+	booktitle={The adaptive web},
+	pages={325--341},
+	year={2007},
+	publisher={Springer}
+}
+Some content-based techniques, among other bayes and nearest neighbors
+
+===========================================================================
 Hybrid systems
 ===========================================================================
 
-
+@incollection{hybridSurvey,
+	title={Hybrid web recommender systems},
+	author={Burke, Robin},
+	booktitle={The adaptive web},
+	pages={377--408},
+	year={2007},
+	publisher={Springer}
+}
+Survey of different hybrids for restaurant recommender (knowledge-based)

@@ -4,3 +4,4 @@ del thesis_report.synctex.gz
 del thesis_report.log
 del thesis_report.blg
 del thesis_report.bbl
+del thesis_report.toc
