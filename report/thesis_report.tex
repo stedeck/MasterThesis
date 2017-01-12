@@ -712,7 +712,10 @@ Figure \ref{fig:dataDistribution} shows a histogram showing how the purchases pe
 
 Besides purchases there is content-based information about items.
 Most items are assigned one or more categories they belong to.
-Moreover there are different kinds of texts like descriptions, content or usage information.
+In total there are 353 different categories.
+Moreover there are different kinds of texts like general information, indication, ingredient, side effects or interactions.
+For evaluation purposes the texts for general information and indication are used, because they seem to be most relevant to judge the similarity of medicine.
+Within the general information texts there are in total 44755 words, the corpus of indications texts contain 21516 words. %todo check number of items... something seems to be wrong there, since there are more items in the feature matrix than in the purchase matrix (the items that are not in the purchase matrix are not relevant)
 
 %todo Eventually demographic information and other browsing history stuff
 
@@ -754,8 +757,8 @@ The unpersonalized approach receives a MAP of 0.0499, a user precision of 0.2453
 The developed personalized recommendation systems are supposed to being able to outperform approach.
 
 % How does CFItemNN perform with Jaccard and Cosine?
-The model-based collaborative filtering approaches were evaluated using either the Jaccard coefficient or cosine similarity.
-The item-item approach will further be denoted CFItemNN, while CFUserNN refers to the user-user approach.
+The memory-based collaborative filtering approaches were evaluated using either the Jaccard coefficient or cosine similarity.
+The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted CFItemNN, while CFUserNN refers to the user-user approach.
 CFItemNN works better using the Jaccard coefficient resulting in a MAP of 0.1371, a user precision of 0.3897 and an overall precision of 0.2269.
 Using the cosine similarity CFItemNN reaches a MAP of 0.1333, a user precision of 0.3866 and a precision of 0.2228.
 
@@ -779,34 +782,76 @@ So results are worse than the observed ones from algorithm... %TODO reference
 %TODO investigate size of recommendation lists...
 %TODO take similarity into account, use them as weights somehow
 
+The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (algorithm ...) was investigated for the impact of different parameters. %TODO add reference
+First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
+Figure ... shows the MAP for different number of features over the trained iterations. % TODO plot and insert figure and explain what can be seen
+Moreover the impact of the weights of the random sampled negative feedback are investigated.
+Different weights were assigned to the negative instances. Results can be seen in figure... . %TODO plot and insert figure and explain what can be seen
+
+%TODO number of models
+To evaluate the performance of the implemented AdaBoost approach (algorithm ...) the MAPs have been compared for different numbers of models. %TODO reference to algorithm
+Using only one model refers to the normal \text{LogRegSVD} algorithm.
+The results are shown in figure .... %TODO plot and add figure and explain what can be seen
+
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features as can be seen in figure .... %TODO plot and add figure. explain figure
+
+The content-based naive Bayes recommender in algorithm ... was applied to category information about articles. %TODO reference to algorithm
+It results in a MAP of 0.00306, a user precision of 0.0664 and an overall precision of 0.00572.
+
+The nearest-neighbour algorithm using content-based features (algorithm ...) was applied to categories, the general information and indication texts.%TODO add reference to algorithm
+The texts were represented in different ways, i.e. either in binary, bag-of-words or tf-idf representation.
+In all cases the cosine similarity is applied.
+In the cases of category data and binary text representation also Jaccard similarity was applied. 
+Results are shown in table .... %TODO add table and explain
+
+\begin{table}
+	\caption{Results for CBNN applied to different content-based information and different similarity functions.}
+\label{tab:CBNN}
+\begin{tabular}{|c|c|c|}
+	\hline
+&Jaccard&Cosine\\ \hline
+categories&0.00546&0.00532\\ \hline
+indication (binary)&&\\ \hline	
+indication (bag-of-words)&-&\\ \hline	
+indication (td-idf)&-&\\ \hline	
+general information (binary)&&\\ \hline	
+general information (bag-of-words)&-&\\ \hline	
+general information (tf-idf)&-&\\ \hline	
+\end{tabular}
+\end{table}
+
+To find out whether hybridization of these techniques are able to improve recommendation performance the resulting lists of recommendation were investigated for correlation.
+A hybrid recommender is only useful if the component recommender produce different results such that they are able to complement each other.
+To analyse whether two algorithms are able to complement each other the true positives of both recommenders are taken into account.
+The amount of correct recommendations are measured that have been recommended by both, only by one or only by the other recommender.
+Only if there are many recommendations that are only recommended by the first and many that are only recommended by the second recommender, those recommenders might be able to be combined to a more effective hybrid recommender systems.
+So the recommendations of different pairs of recommenders are analysed. %TODO perform correaltion experiments, create pie charts and explain them
+
+Besides recommendation performance consideration a cascade hybrid recommendation system was implemented to speed up the recommendation process.
+Figure ... shows the number of purchases per article. %TODO add article purchases figure, plot it again before...
+It can be seen, that there are few items with many purchases and most item just have few purchases.
+The items with many purchases generally have a higher probability of being purchased, i.e. being a correct recommendation.
+In order to avoid to iterate through the full list of items to make a recommendation only those items are taken into account that were purchased at least $c$ times.
+$c$ will further be denoted as candidate threshold, since it delimits the number of candidates for recommendations.
+This approach can be viewed as a cascade hybrid between the \textit{MostPop} and any other recommendation approach.
+It was applied to different recommendations systems to see whether it diminishes or even improves recommendation performance.
+%TODO perform experiment with other approaches and add
+
+\begin{figure}
+	\label{fig:CFItemNNCandidates}
+	\caption{MAP of CFItemNN over different for different candidate thresholds. }
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
+\end{figure}
 
 
 
-%TODO How does SVD perform over different number of iteration?
-
-
-%TODO How does it perform over number of features?
-%TODO How does it using different weights for negative weights?
-
-%TODO Which prediction scheme for AdaBoost performs best?
-
-%TODO How does does CBNN perform?
-	% with categories using Jaccard and Cosine
-	% with text using binary word representation using Jaccard and Cosine
-	% with text using bag-of-words model using Cosine
-	% with text using tf-idf model using Cosine
-	
-%TODO How does Naive Bayes perform?
-
-%TODO How do results of different recommendation techniques correlate?
-
-%TODO cascade using mostPop (using candidate with at least x purchases)
 
 %TODO add summary/comparison of best performers for every algorithm, how much better is it than baseline (in percent)?
 
 \section{Discussion}
 \label{sec:discussion}
-% TODO wirte discussion intro
+% TODO write discussion intro
 
 \subsection{Single recommendation systems}
 %TODO Explain strong and weak performers. What are pros and cons.
