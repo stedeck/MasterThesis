@@ -43,11 +43,19 @@ import de.erichseifert.gral.graphics.Orientation;
 
 public class LinePlot extends ExamplePanel{
 	public static void main(String[] args) {
-		String file_name = args[0];
+		String file_name = "..\\..\\..\\MasterThesis\\LogRegSVDPrediction.csv";
 		new LinePlot(file_name);
 	}
 	
 	private static final Random random = new Random();
+	
+	/** First corporate color used for normal coloring.*/
+	protected static final Color COLOR1 = new Color( 55, 170, 200);
+	/** Second corporate color used as signal color */
+	protected static final Color COLOR2 = new Color(200,  80,  75);
+	
+	protected static final Color COLOR3 = Color.GREEN;
+	protected static final Color COLOR4 = Color.BLACK;
 	
 
 	
@@ -76,23 +84,27 @@ public class LinePlot extends ExamplePanel{
 		}
 		
 		// Plot
-		DataSeries series1 = new DataSeries("Jaccard", dataTable, 0, 1);
-		DataSeries series2 = new DataSeries("Cosine", dataTable, 0, 2);
-		XYPlot plot = new XYPlot(series1, series2);
+		DataSeries series1 = new DataSeries("Model", dataTable, 0, 1);
+		DataSeries series2 = new DataSeries("Article", dataTable, 0, 2);
+		DataSeries series3 = new DataSeries("User", dataTable, 0, 3);
+		DataSeries series4 = new DataSeries("ArticleUser", dataTable, 0, 4);
+		XYPlot plot = new XYPlot(series1, series2, series3, series4);
 		plot.setLegendVisible(true);
 		plot.getLegend().setAlignmentX(1);
+		plot.getLegend().setAlignmentY(1);
 		plot.getPlotArea().setBorderStroke(null);
 		
 		// Format plot
-		plot.setInsets(new Insets2D.Double(100.0, 100.0, 100.0, 100.0));
+		plot.setInsets(new Insets2D.Double(70.0, 70.0, 70.0, 70.0));
 		plot.setBackground(Color.WHITE);
 		plot.getTitle().setText(getDescription());
 		
 		// Format axes
 		AxisRenderer axisRendererX = plot.getAxisRenderer(XYPlot.AXIS_X);
 		AxisRenderer axisRendererY = plot.getAxisRenderer(XYPlot.AXIS_Y);
-		axisRendererX.setLabel(new Label("X axis"));
-		axisRendererY.setLabel(new Label("Y axis"));
+		axisRendererY.setLabelDistance(2);
+		axisRendererX.setLabel(new Label("# models"));
+		axisRendererY.setLabel(new Label("MAP"));
 		plot.setAxisRenderer(XYPlot.AXIS_X, axisRendererX);
 		plot.setAxisRenderer(XYPlot.AXIS_Y, axisRendererY);
 		
@@ -100,17 +112,35 @@ public class LinePlot extends ExamplePanel{
 		PointRenderer pointRenderer1 = new DefaultPointRenderer2D();
 		pointRenderer1.setColor(GraphicsUtils.deriveDarker(COLOR1));
 		plot.setPointRenderers(series1, pointRenderer1);
+		
 		PointRenderer pointRenderer2 = new DefaultPointRenderer2D();
 		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR2));
 		plot.setPointRenderers(series2, pointRenderer2);
+		
+		PointRenderer pointRenderer3 = new DefaultPointRenderer2D();
+		pointRenderer3.setColor(GraphicsUtils.deriveDarker(COLOR3));
+		plot.setPointRenderers(series3, pointRenderer3);
+		
+		PointRenderer pointRenderer4 = new DefaultPointRenderer2D();
+		pointRenderer4.setColor(GraphicsUtils.deriveDarker(COLOR4));
+		plot.setPointRenderers(series3, pointRenderer4);
 		
 		// Format data lines
 		LineRenderer lineRenderer1 = new DefaultLineRenderer2D();
 		lineRenderer1.setColor(COLOR1);
 		plot.setLineRenderers(series1, lineRenderer1);
+		
 		LineRenderer lineRenderer2 = new DefaultLineRenderer2D();
 		lineRenderer2.setColor(COLOR2);
 		plot.setLineRenderers(series2, lineRenderer2);
+		
+		LineRenderer lineRenderer3 = new DefaultLineRenderer2D();
+		lineRenderer3.setColor(COLOR3);
+		plot.setLineRenderers(series3, lineRenderer3);
+		
+		LineRenderer lineRenderer4 = new DefaultLineRenderer2D();
+		lineRenderer4.setColor(COLOR4);
+		plot.setLineRenderers(series4, lineRenderer4);
 		
 		// Add plot to Swing component
 		add(new InteractivePanel(plot), BorderLayout.CENTER);
@@ -119,11 +149,11 @@ public class LinePlot extends ExamplePanel{
 
 	@Override
 	public String getTitle() {
-		return "CFUserNN";
+		return "LogRegSVD";
 	}
 
 	@Override
 	public String getDescription() {
-		return "CFUserNN";
+		return "LogRegSVD";
 }
 }

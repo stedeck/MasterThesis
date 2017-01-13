@@ -159,7 +159,7 @@ In this thesis two memory-based are investigated.
 The memory-based techniques are k-nearest-neighbour algorithms applied to the purchase matrix.
 They either take the similarities between users or items into account.
 
-\paragraph{Item-Item similarity}
+\paragraph{Item-Item}
 In the item-item approach those items are recommended that are closest to the items the current user has already purchased.
 It was among other implemented by Amazon \cite{amazonItemItem}.
 In \cite{itemItemAlgorithms} it is evaluated using different similarity measures for rating data. %todo found further references
@@ -169,8 +169,8 @@ For every item $i$ the current user $u$ has not purchased a score is calculated 
 	 s(u,i) = \sum_{j \in I(u)}{sim(R(:,i), R(:,j))}
 \end{equation}
 
-Here $R \in \mathds{R}^{n \times m}$ denotes the purchase matrix for $n$ users and $m$ items. $R(:,i)$ denotes the $i^{th}$ column vector. $I(u)$ is the set of items user u purchased.
-Then those items are recommended that reach the highest score. %TODO add pseudocode algorithm
+Here $A \in \mathds{R}^{n \times m}$ denotes the purchase matrix for $n$ users and $m$ items. $A(:,i)$ denotes the $i^{th}$ column vector. $I(u)$ is the set of items user u purchased.
+Then those items are recommended that reach the highest score.
 The function $sim(R(:,i), R(:,j))$ can be substituted by any vector similarity function.
 In this thesis experiments were performed using cosine similarity or the Jaccard coefficient explained in section. %TODO write section and reference to it
 
@@ -178,7 +178,7 @@ In this thesis experiments were performed using cosine similarity or the Jaccard
 	\caption{CFItemNN}
 	\label{alg:CFItemNN}
 	\begin{algorithmic}[1]
-		\Require current user $u$, feedback matrix $R$, set of items $I$, numberof recommendations $q$
+		\Require current user $u$, feedback matrix $A$, set of items $I$, number of recommendations $q$
 		\Ensure list of recommendations \textit{recs}
 		\State Init list of recommendations \textit{recs}
 		\For{every $i \in I \setminus I(u)$}
@@ -191,30 +191,57 @@ In this thesis experiments were performed using cosine similarity or the Jaccard
 				\State add $i$ to $recs$
 			\EndIf
 		\EndFor
-	\end{algorithmic}
-	
+	\end{algorithmic}	
 \end{algorithm}
 
 
-\paragraph{User-User similarity}
+\paragraph{User-User}
 The second memory-based algorithm is a user-user approach. %todo can i find a paper where this is implemented?
 Here the similarities between users instead of items are taken into account.
 In the first step the nearest neighbours of the current user $u$, denoted by $N(u)$, are determined by getting those users $v$ which reach the highest score according to
 
 \begin{equation}
-	s(u,v) = sim(R(u,:)^T, R(v, :)^T)
+	s(u,v) = sim(A(u,:)^T, A(v, :)^T)
 \end{equation}
 
-$R(u,:)$ and $R(v,:)$ are the $u^{th}$ and $v^{th}$ row vectors of the purchase matrix, respectively.
-The similarity function $sim(R(u,:)^T, R(v, :)^T)$ refers to the same vector similarities as in the item-item approach, see . %TODO add reference to similarity section
-After the nearest neighbours of user $u$ are obtained, those items are recommended that are purchased most often by the determined neighbours. %TODO add pseudo code algorithm
+$A(u,:)$ and $A(v,:)$ are the $u^{th}$ and $v^{th}$ row vectors of the purchase matrix, respectively.
+The similarity function $sim(A(u,:)^T, A(v, :)^T)$ refers to the same vector similarities as in the item-item approach, see \ref{alg:CFUserNN}.
+After the nearest neighbours of user $u$ are obtained, those items are recommended that are purchased most often by the determined neighbours.
+
+\begin{algorithm}
+	\caption{CFUserNN}
+	\label{alg:CFUserNN}
+	\begin{algorithmic}[1]
+		\Require current user $u$, feedback matrix $A$, set of users $U$, number of neighbours $n$, number of recommendations $q$
+		\Ensure list of recommendations \textit{recs}
+		\State Init list of neighbours \textit{N}
+		\For{every $v \in U \setminus u$}
+			\State $s(u,v) := sim(A(u,:), A(v,:))$
+			\If{$s(u,v) > min(neighbours)$ or $size(N) < n$} 
+				\State add $v$ to $N$
+			\EndIf
+		\EndFor
+		Init map \text{counters}
+		\For{every $n \in N$}
+			\For{every $i \in I(n)$}
+				\State increment \textit{counters\{i\}} by $1$
+			\EndFor
+		\EndFor
+		\State Init list of recommendations \textit{recs}
+		\For{every $(i, c) \in counters$}
+			\If{$c > min(recs)$ or $size(recs) < q$} 
+			\State add $i$ to $recs$
+			\EndIf
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
 
 This approach is not able to guarantee a sufficiently large list of recommendations, if the neighbours $N(u)$ purchased less items than the number of required recommendations or additionally to those $u$ already purchased.
 Being $I(N(u))$ the items the neighbours of $u$ purchased, a user-user approach is only able to recommend at most $|I(N(u)) \setminus I(u)|$ items to user $u$.
 This may especially be a problem for users with only a few purchases, because the less items a user purchased the higher is the probability to find a user with the same set of purchased items.
 
-Another user-user approach that does not suffer from the above problem was implemented in \cite{aiolli2013efficient} or \cite{effectiveLatentModels}.
-Here for every item $i$ the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated: 
+Another user-user approach, that does not suffer from the above problem was implemented in \cite{aiolli2013efficient} or \cite{effectiveLatentModels}, see algorithm \ref{alg:CFUserNN2}.
+Here for every item $i$ the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated by: 
 
 \begin{equation}
 	S(u,i) = \sum_{v \in U(i)}{sim(u,v)}
@@ -222,6 +249,25 @@ Here for every item $i$ the current user $u$ has not purchased, the similarity s
 
 The nearest neighbours are not directly determined, so the recommendations are not limited to the items the neighbours purchased.
 The recommended items are those that were purchased by those users with the highest similarity to $u$.
+
+\begin{algorithm}
+	\caption{CFUserNN2}
+	\label{alg:CFUserNN2}
+	\begin{algorithmic}[1]
+		\Require current user $u$, feedback matrix $A$, set of items $I$, set of users $U$, number of recommendations $q$
+		\Ensure list of recommendations \textit{recs}
+		\State Init list of recommendations \textit{recs}
+		\For{every $i \in I \setminus I(u)$}
+			\State $s(u,i) := 0$
+			\For{every $v \in U(i)$}
+				\State $s(u,i) := s(u,i) + sim(A(u,:), A(v,:))$
+			\EndFor
+			\If{$s(u,i) > min(recs)$ or $size(recs) < q$} 
+				\State add $v$ to $N$
+			\EndIf
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
 
 Both item-item and user-user perform on the full purchase matrix, but are expected to obtain different results.
 While an item-item approach tends to recommend items with many common users who purchased them, a user-user approach works on user similarities.
@@ -234,7 +280,7 @@ Moreover the results can be intuitively explained to the user, because these app
 
 \subsubsection{Model-based collaborative filtering}
 \label{sec:modelBasedCF}
-%Explain general svd %TODO add references
+%Explain general svd
 The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
 It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
 Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{m \times n}$, $\Sigma \in \mathds{R}^{n \times n}$ and $V \in \mathds{R}^{n \times n}$, such that 
@@ -339,32 +385,75 @@ The vector elements $x_i$ are either binary values indicating the occurrence or 
 The general idea is to recommend items that are most similar to the items the user has already purchased with respect to the given content-based features.
 Two algorithms have been implemented: Naive Bayes classification and k-nearest-neighbour like explained in \cite{contentbasedPazzani}.
 Naive Bayes determines the probability that a user purchases a specific item based on the likelihood of its single features.
-For every user a profile is trained consisting of the prior probability that $u$ purchases an item $p_u(c=1)$ and  the likelihoods of $f$ item features $p_u(x_f|c=1)$.
+For every user a profile is trained consisting of the prior probability that $u$ purchases an item $p_u(b=1)$ and  the likelihoods of $f$ item features $p_u(x_f|b=1)$.
 The probability of $u$ purchasing an item given in terms of item features $x$ can be calculated using the Bayes theorem by 
 
 \begin{equation}
 \label{BayesPost}
-	p_u(c=1|x) = \frac{p_u(c=1) p_u(x|c=1)}{p_u(x)+2} \propto \frac{p_u(x|c=1)}{p_u(x)+2}
+	p_u(b=1|x) = \frac{p_u(b=1) p_u(x|b=1)}{p_u(x)+2} \propto \frac{p_u(x|b=1)}{p_u(x)+2}
 \end{equation}
 
-$p_u(c=1)$ denotes the probability that user $u$ purchases an item independently from its features.
+$p_u(b=1)$ denotes the probability that user $u$ purchases an item independently from its features.
 This value is the same for any item, so for calculating the recommendations it can be left out.
-$p_u(x|c=1)$ is calculated by 
+$p_u(x|b=1)$ is calculated by 
 
 \begin{equation}
 \label{BayesEvid}
-p_u(x|c=1) = \prod_f{p_u(x_f|c=1)+1}
+p_u(x|b=1) = \prod_f{p_u(x_f|b=1)+1}
 \end{equation}
-%TODO define p_u(x_f)|c=1)
+
 due to the independence assumption.
-The $p_u(x_f|c=1)$ are obtained by counting the number of items $u$ purchased that contain feature $x_f$ divided by the total number of features $u$ purchased.
+The likelihoods of single item features $f$ are calculated using a users past purchases by
+\begin{equation}
+p_u(x_f|b=1) = \frac{|I(u) \cup I(f)|}{|I(u)|}
+\end{equation}
+
+Here $I(u)$ denotes all item $purchased$ and $I(f)$ are all items that have feature $f$.
 The constants $2$ and $1$ in equations \ref{BayesPost} and \ref{BayesEvid} respectively are added to avoid that the probability becomes zero when one of the feature likelihoods is zero, i.e. when a user has not purchased an item of a specific feature.
 This technique is called Laplace-smoothing.
 
-The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{sec:collaborativeFiltering}.
-This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix content-based feature vectors are used.
+\begin{algorithm}
+	\caption{CBBayes}
+	\label{alg:CBBayes}
+	\begin{algorithmic}[1]
+		\Require current user $u$, content matrix $C$, set of items $I$, number of recommendations $q$
+		\Ensure list of recommendations \textit{recs}
+		\State Init list of recommendations \text{recs}
+		\For{every item represented by a feature vector $x \in I \setminus I(u)$}
+			\State 	$p_u(b=1|x) = \frac{p_u(x|b=1)}{p_u(x)+2}$
+			\If{$p_u(b=1|x) >min(recs)$ or $size(recs) < q$}
+				\State add $i$ to \textit{recs}
+			\EndIf
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
 
-%TODO add pseudo code algorihtms for both approaches
+The recommendation process is shown in algorithm \ref{alg:CBBayes}.
+The user profiles consisting of the likelihoods $p_u(x_f|b=1)$, that user purchases an item that has item feature $x_f$, are precomputed.
+
+The second algorithm is another k-nearest-neighbour implementation similar to item-item approach explained in section \ref{sec:collaborativeFiltering}.
+This is the same implementation as in the collaborative filtering recommendation system, but instead of the column vectors of the purchase matrix content-based feature vectors are used, see algorithm \ref{alg:CBNN}.
+For this purpose a content matrix $C \in \mathds{R}^{n \times c}$, where $n$ is the number of items and $c$ is the number of item features.
+
+
+\begin{algorithm}
+	\caption{CBNN}
+	\label{alg:CBNN}
+	\begin{algorithmic}[1]
+		\Require current user $u$, content matrix $C$, set of items $I$, number of recommendations $q$
+		\Ensure list of recommendations \textit{recs}
+		\State Init list of recommendations \textit{recs}
+		\For{every $i \in I \setminus I(u)$}
+			\State $s(u,i) := 0$
+			\For{every $j \in I(u)$}
+				\State $s(u,i) := s(u,i) + sim(R(:,i), R(:,j))$
+			\EndFor
+			\If{$s(u,i) > min(recs)$ or $size(recs) < q$} 
+				\State add $v$ to $N$
+			\EndIf
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
 
  
 \subsection{Other recommendation systems}
@@ -466,8 +555,8 @@ Some enhancements were made with respect to e-commerce datasets, described in se
 % Memory-based appraoches
 Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
 Both an item-item and a user-user approach like described in section \ref{sec:memBasedCF} are implemented.
-The item-item approach from ... was directly implemented without any changes. %TODO ref to algorithm
-Both user-user approaches were implemented, though algorithm algo2 requires a lot more runtime. %TODO add ref to algorithm and explain why I did not use the other one %TODO add runtime requiremnts
+The item-item approach in algorithm \ref{alg:CFItemNN} was directly implemented without any changes.
+Both user-user approaches were implemented, though algorithm \ref{alg:CFUserNN2} requires a lot more runtime. %TODO add runtime requiremnts
 In algo1 a small change was applied to reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation.
 When determining the nearest neighbours only those are taken into account with a similarity score of less than one, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 As in many applications the cosine similarity is used for both approaches.
@@ -547,6 +636,46 @@ and
 The weight is set to $w_n = 1$ for known positive trainings instances and to $w_n < 1$ for the other randomly chosen negative weights.
 In section \ref{sec:results} experiments for different weights are performed to see how they effect the performance of the algorithm.
 
+\begin{algorithm}
+	\caption{LogRegSVD Training}
+	\label{alg:LogRegSVDTraining}
+	\begin{algorithmic}[1]
+		\Require purchase matrix $A$, set of purchases $P$, number of features $F$, number of iterations $iterNum$, weight for negative instance $w_n$, learning rate $\alpha$, regularization factor $\lambda$
+		\Ensure user and item features $p_u$ and $q_i$ for every user $u$ and every item $i$
+		\State Init $p_u$'s and $q_i$'s using Gaussian distribution with mean $0$ and small standard deviation
+		\For{($i = 0;\ i < iterNum;\ i$++)}
+			\For{every purchase $(u,i) \in P$}
+				\State Calculate error:
+				\State $e_{ui} := 1 - \frac{1}{1 + e^{-p_u^Tq_i}}$
+				
+				\State Update feature vectors:
+				\For{every feature f}
+					\State $p_u^{(f)} := p_u^{(f)} + w_n \alpha (e_{ui} q_i^{(f)} + \lambda p_u^{(f)})$
+					\State $q_i^{(f)} := q_i^{(f)} + w_n \alpha (e_{ui} p_u^{(f)} + \lambda q_i^{(f)})$
+				\EndFor	
+				\State Randomly choose two tuples $(u,j)$ and $(v,i)$ and repeat
+			\EndFor
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{LogRegSVD Recommendation}
+	\label{alg:LogRegSVDRecommendation}
+	\begin{algorithmic}[1]
+		\Require current user $u$, user feature vector $p_u$ and item feature vectors $q_i$, set of items $I$, number of recommendations $r$
+		\Ensure list of recommendations \textit{recs}
+		\State Init list of recommendations \textit{recs}
+		\For{every $i \in I \setminus I(u)$}
+			\State $s(u,i) := p_u^Tq_i$
+			\If{$s(u,i) > min(recs)$ or $size(recs) < r$} 
+			\State add $i$ to \textit{recs}
+			\EndIf
+		\EndFor
+	\end{algorithmic}	
+\end{algorithm}
+
 \section{AdaBoost}
 \label{sec:myAdaBoost}
 The logistic regression based approach for matrix factorization still suffers from unbalanced feature updates in a way that users or items with more purchases get more updates and therefore tend to get higher feature values.
@@ -590,6 +719,46 @@ For recommendation this leads to the following prediction rule to determine the 
 \end{equation}
 
 The next section describes some alternative prediction schemes that are applied in the scope of this thesis.
+
+\begin{algorithm}
+	\caption{AdaBoost LogRegSVD Training}
+	\label{alg:AdaBoostLogRegSVDTraining}
+	\begin{algorithmic}[1]
+		\Require purchase matrix $A$, set of purchases $P$, number of features $F$, number of iterations $iterNum$, weight for negative instance $w_n$, learning rate $\alpha$, regularization factor $\lambda$, number of models $T$
+		\Ensure $T$ models consisting of user and item features $p_u$ and $q_i$ for every user $u$ and every item $i$
+		\State Init instance weights first model $d_{*,0} := 1$
+			\For{$t = 0;\ t < T;\ t$++}
+				\State Init $p_{u,t}$'s and $q_{i,t}$'s using Gaussian distribution with mean $0$ and small standard deviation
+				\For{($i = 0;\ i < iterNum;\ i$++)}
+					\For{every purchase $(u,i) \in P$}
+					\State Calculate error:
+					\State $e_{ui,t} = 1 - \frac{1}{1 + e^{-p_{u,t}^Tq_{i,t}}}$
+					
+					\State Update feature vectors:
+					\For{every feature f}
+						\State $p_{u,t}^{(f)} = p_{u,t}^{(f)} + w_n d_{ui,t} \alpha (e_{ui, t} q_{i,t}^{(f)} + \lambda p_{u,t}^{(f)})$
+						\State $q_{i,t}^{(f)} = q_{i,t}^{(f)} + w_n d_{ui,t} \alpha (e_{ui, t} p_{u,t}^{(f)} + \lambda q_{i,t}^{(f)})$
+					\EndFor	
+					\State Randomly choose two tuples $(u,j)$ and $(v,i)$ and repeat
+				\EndFor
+			\EndFor
+			
+			\State Update weights:
+			\For{every purchase $(u,i) \in P$}
+				\State $d_{ui,t+1} := d_{ui,t} * e^{ui,}$
+			\EndFor
+			
+			\State Normalize weights:
+			\For{every purchase $(u,i) \in P$}
+			\State $d_{ui,t+1} := \frac{d_{ui,t+1} |P|}{\sum_{(u,i) \in P}{d_{ui, t+1}}}$
+			\EndFor 
+		\EndFor
+		
+		
+	\end{algorithmic}	
+\end{algorithm}
+
+%todo add prediction with adaboost...
 
 \section{Prediction rules}
 \label{sec:predictionRules}
@@ -635,13 +804,6 @@ Prediction rules \ref{eq:articleErrorPrediction} and \ref{eq:combinedErrorPredic
 Intuitively those weights refer to the confidence of the calculated prediction.
 For articles with a higher error the confidence of the prediction is lower and so the calculated score is lower as well.
 The article error based prediction can also be applied to a single model, i.e. to the presented logistic regression matrix factorization approach.
-
-
-%TODO add pseudocode
-
-
-
-
 
 
 
@@ -777,28 +939,55 @@ Up to this point performance of the algorithm increases, but it decreases for la
 Too few neighbours are not able to suggest enough possible recommendations and recommendations are not that confident as if voted for by more neighbours.
 Too many neighbours on the other hand produce fuzzy recommendations, because the neighbours may not be close enough to the current user.
 MAP for more users converges to the approach of recommending the most purchased items, because MostPop and CFUserNN result in the same algorithm if all users are considered as neighbours.
-Algorithm ... was also evaluated and produces a MAP of 0.0916, a user precision of 0.3188 and an overall precision of 0.1718 with Jaccard similarity and a MAP of 0.0897, a user precision of 0.3165 and an overall precision of 0.1705 with cosine similarity. %TODO reference
-So results are worse than the observed ones from algorithm... %TODO reference
+Algorithm \ref{alg:CFUserNN2} was also evaluated and produces a MAP of 0.0916, a user precision of 0.3188 and an overall precision of 0.1718 with Jaccard similarity and a MAP of 0.0897, a user precision of 0.3165 and an overall precision of 0.1705 with cosine similarity.
+So results are worse than the observed ones from algorithm \ref{alg:CFUserNN2}.
 %TODO investigate size of recommendation lists...
-%TODO take similarity into account, use them as weights somehow
+%todo take similarity into account, use them as weights somehow
 
-The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (algorithm ...) was investigated for the impact of different parameters. %TODO add reference
+\begin{figure}
+	\caption{MAP of LogRegSVD over number of training iterations for different number of features.}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDIterations}
+	\label{fig:LogRegSVDIterations}
+\end{figure}
+%todo add some iteration until curves are obviously flater
+
+The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) was investigated for the impact of different parameters.
 First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
-Figure ... shows the MAP for different number of features over the trained iterations. % TODO plot and insert figure and explain what can be seen
+Figure \ref{fig:LogRegSVDIterations} shows the MAP for different number of features over the number of iterations during training.
+First there can be seen that the MAP increases with the number of iterations regardless of how many features are used.
+This is because more iterations result in a better trained model, because the feature vectors are updated more often.
+Moreover the MAP increased when more features are used.
+The more features are used when factorizing the purchase matrix, the more information can be preserved, similar to an ordinary singular value decomposition.
+The Frobenius norm of the reduced matrix is closer to the Frobenius norm of the original matrix, the greater the rank of the reduced matrix is.
+Removing more features in the decomposition results in a worse approximation, but on the other hand preserves more memory and runtime requirements.
+
+\begin{figure}
+	\caption{MAP for LogRegSVD with AdaBoost over different number of models for different numbers of features.}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDModels}
+	\label{fig:LogRegSVDModels}
+\end{figure}
+
 Moreover the impact of the weights of the random sampled negative feedback are investigated.
-Different weights were assigned to the negative instances. Results can be seen in figure... . %TODO plot and insert figure and explain what can be seen
+Different weights were assigned to the negative instances.
+Results can be seen in figure .... %TODO plot and explain what can be seen
 
-%TODO number of models
-To evaluate the performance of the implemented AdaBoost approach (algorithm ...) the MAPs have been compared for different numbers of models. %TODO reference to algorithm
+To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs have been compared for different numbers of models.
 Using only one model refers to the normal \text{LogRegSVD} algorithm.
-The results are shown in figure .... %TODO plot and add figure and explain what can be seen
+The results are shown in figure ... \ref{fig:LogRegSVDModels}.
+As expected the MAP gets better if more models are used.
+Especially between the one and two models there is a large improvement.
+Here for 100 features the MAP increases about 29\%, for 200 features about 11\% and for 300 features about 9%.
+So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 
-The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features as can be seen in figure .... %TODO plot and add figure. explain figure
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features as can be seen in figure .... %TODO reference to figures...
+%TODO plot and add figure. explain figure
 
-The content-based naive Bayes recommender in algorithm ... was applied to category information about articles. %TODO reference to algorithm
+The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} was applied to category information about articles.
 It results in a MAP of 0.00306, a user precision of 0.0664 and an overall precision of 0.00572.
 
-The nearest-neighbour algorithm using content-based features (algorithm ...) was applied to categories, the general information and indication texts.%TODO add reference to algorithm
+The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) was applied to categories, the general information and indication texts.
 The texts were represented in different ways, i.e. either in binary, bag-of-words or tf-idf representation.
 In all cases the cosine similarity is applied.
 In the cases of category data and binary text representation also Jaccard similarity was applied. 
@@ -836,6 +1025,7 @@ $c$ will further be denoted as candidate threshold, since it delimits the number
 This approach can be viewed as a cascade hybrid between the \textit{MostPop} and any other recommendation approach.
 It was applied to different recommendations systems to see whether it diminishes or even improves recommendation performance.
 %TODO perform experiment with other approaches and add
+%TODO find out how much the thresholds reduce the candidate dataset, add runtime improvements
 
 \begin{figure}
 	\label{fig:CFItemNNCandidates}
@@ -843,6 +1033,7 @@ It was applied to different recommendations systems to see whether it diminishes
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
 \end{figure}
+%TODO add cosine curve as well
 
 
 

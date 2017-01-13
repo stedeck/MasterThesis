@@ -35,11 +35,6 @@ public abstract class ExamplePanel extends JPanel {
 	/** Version id for serialization. */
 	private static final long serialVersionUID = 8221256658243821951L;
 
-	/** First corporate color used for normal coloring.*/
-	protected static final Color COLOR1 = new Color( 55, 170, 200);
-	/** Second corporate color used as signal color */
-	protected static final Color COLOR2 = new Color(200,  80,  75);
-
 	/**
 	 * Performs basic initialization of an example,
 	 * like setting a default size.
