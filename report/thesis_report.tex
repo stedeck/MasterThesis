@@ -817,6 +817,7 @@ The article error based prediction can also be applied to a single model, i.e. t
 \chapter{Implementation and Performance}
 %TODO write implementation and performance chapter introduction
 
+
 \section{Reactive design}
 %TODO write reactive design section
 
@@ -978,7 +979,7 @@ Using only one model refers to the normal \text{LogRegSVD} algorithm.
 The results are shown in figure ... \ref{fig:LogRegSVDModels}.
 As expected the MAP gets better if more models are used.
 Especially between the one and two models there is a large improvement.
-Here for 100 features the MAP increases about 29\%, for 200 features about 11\% and for 300 features about 9%.
+Here for 100 features the MAP increases about 23\%, for 200 features about 12\% and for 300 features about 10%.
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 
 The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features as can be seen in figure .... %TODO reference to figures...
@@ -1043,20 +1044,67 @@ It was applied to different recommendations systems to see whether it diminishes
 \section{Discussion}
 \label{sec:discussion}
 % TODO write discussion intro
+In the last section several experiments and their results are presented.
+This sections aims to analyse the results.
+The weaknesses and strengths of the basic recommendation systems in e-commerce context are pointed out.
+The success of the presented \textit{LogRegSVD} algorithm is discussed.
+Moreover the performance of the AdaBoost approach and the applied prediction rules are summarized.
 
 \subsection{Single recommendation systems}
-%TODO Explain strong and weak performers. What are pros and cons.
+\label{sec:discSingleRecommendationSystems}
+% Memory-based: CFItem works better
+The experiments performed for the memory-based collaborative filtering approaches show that the item-item approach performs best on the e-commerce dataset.
+CFItemNN probably works better, because the similarity of items are more confident than the similarity of users, since the item vectors are larger than the user vectors.
+For the user-user similarity approaches it was shown that algorithm \ref{alg:CFUserNN} outperforms algorithm \ref{alg:CFUserNN2}, though the second algorithm requires much more runtime.
+The recommendation of algorithm \ref{alg:CFUserNN2} might be too fuzzy, because all users' preferences are taken account instead of only those users' purchases that are similar to the current user.
+For both algorithm \ref{alg:CFItemNN} and \ref{alg:CFUserNN} it was shown, that Jaccard similarity results in a slightly better MAP than cosine similarity.
+
+%  LogRegSVD
+The presented \textit{LogRegSVD} approach (algorithm \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) is much faster in making recommendation, but performs worse than the memory-based approaches.
+This might be due to the fact, that information gets lost, when factorizing the purchase matrix into smaller features vectors.
+Using larger matrices might improve the results as figure \ref{fig:LogRegSVDIterations} indicates, but using larger feature vector does not only slow training training of the model, but also slows down the recommendation process, because vector multiplication has to be performed on larger features vectors.
+
+% contentbased are even much worse than mostpop, because too similar
+The content-based approaches \ref{alg:CBNN} and \ref{alg:CBBayes} perform much worse the collaborative filtering approaches.
+They are even worse than the unpersonalized approach of recommending the most purchased item.
+This results from the nature of e-commerce data.
+The dataset contains duplicate items, that only differ in brand, size of package, colour or the like.
+So items that are recommended by a content-based recommender are probably too similar to the items the current user already purchased, since he probably will not buy products that are almost the same he already bought.
+
+%todo add table with best performances for each approach
 
 
 \subsection{AdaBoost}
-%TODO Why does AdaBoost improve results?
-%TODO explain different perfomances of prediction schemes
+\label{sec:discAdaBoost}
+% Outperfroms CFUserNN, but worse than CFItemNN
+AdaBoost using 5 models achieves an improvement in the MAP of about 15\% as compared with a single \textit{LogRegSVD} model.
+So focussing on instances with a high recommendation error in the training process increases the recommendation performance.
+Probably the instances with higher errors are those that have only few entries in the purchase matrix, such that AdaBoost achieves a more balanced training process between instances of different numbers of purchases.
+The boosted \textit{LogRegSVD} outperforms the user-user approach, but still performs worse than the memory-based item-item approach, but the recommendation process is much faster and less memory intensive, because it does not require the full purchase matrix.
+
+%todo see whether instance error correlate with number of purchases
+
+\subsection{Prediction rules}
+\label{sec:discPredRules}
+% prediction rules were not able to improve performance, if model is sufficiently trained
+The alternative prediction rules suggested for multiple or single \textit{LogRegSVD} models were not able to improve the MAP.
+It only outperformed the traditional prediction rules for single \textit{LogRegSVD} models, that have not been sufficiently trained, i.e. model that have been trained with to few number of iterations.
+In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, in some cases is able to outperform the traditional prediction.
+%TODO check this after plots were made, to prove this
+%todo explain why
 
 \subsection{Hybrid recommendation systems}
+\label{sec:discHybrid}
 %TODO why is a hybrid recommender not useful
+The experiments performed to investigate error correlation of the single hybrids showed that all recommenders make similar recommendation errors.
+It could be seen that the better performers have more true positives than the weak ones, but in no combination of recommenders the weaker performer could enhance the stronger one by adding a significant amount of recommendation.
+So a hybrid recommender system would take more time to predict ratings the a single one, but provide no better, but probably even worse results, than the single strong recommender.
 
-%TODO why does cascade with mostPop work (at least for some thresholds)
-
+The hybrid recommender using the unpersonalized \textit{MostPop} approach and any other personalized recommendation showed small improvements over the single unpersonalized ones.
+This is due to the removal of items that are rarely purchased and therefore have a lower probability to be purchased.
+The improvements only occur up to specific thresholds otherwise the relevant items are removed by the \textit{MostPop} recommender.
+Moreover it was shown that it slightly increases recommendation performance, because the most purchased items can be precomputed, such that the set of items that have to be taken into account by the personalized recommender is smaller in the actual recommendation step.
+%TODO perform experiments to see, whether that's the case for all recommenders
 
 
 
