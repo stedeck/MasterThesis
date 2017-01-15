@@ -10,7 +10,7 @@
 
 % new line instead of indent for new paragraph
 \usepackage[parfill]{parskip}
-\usepackage{ dsfont }
+\usepackage{dsfont}
 \usepackage{amsmath}
 \usepackage{textcomp} % for texttimes
 \usepackage{algpseudocode}
@@ -21,11 +21,17 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
+\usepackage{url}
+
 
 \begin{document}
 \maketitle
 
 \tableofcontents
+
+\listoffigures
+\listoftables
+\listofalgorithms
 
 %==============================================================
 \chapter{Introduction}
@@ -815,20 +821,53 @@ The article error based prediction can also be applied to a single model, i.e. t
 
 %==============================================================
 \chapter{Implementation and Performance}
-%TODO write implementation and performance chapter introduction
-
+\label{chap:ImplemenationAndPerformance}
+Recommendation system raise some challenges concerning implementation of different algorithms due to a large feedback matrix and the need to provide fast recommendations.
+The following section will give some implementation details. 
+The reactive design of the shop environments requires a reactive implementation of the recommender system as well.
+Moreover the sparse feedback matrix needs to implemented in an efficient way, such that algorithms do not need to iterate over empty elements and that empty elements do not require much memory.
+The next sections show some implementation details regarding those problems and give an overview of the implemented class structure.
 
 \section{Reactive design}
-%TODO write reactive design section
+\label{sec:ReactiveDesign}
+The online shops are implemented using the Java toolkit vert.x (see \cite{vertx}).
+It is a framework to build reactive, event-driven applications.
+Vert.x is based on an event loop, that manages various events and event handlers.
+This allows asynchronous applications without the need for many threads, because the event loop generally only needs one thread, but is able to asynchronously react on different events.
+This framework is able to quickly react on a large number of events, but intensive computations raise problems, because they block the event loop and prevent other events to be handled.
+Recommendation systems need to compute large amounts of data and need to perform expensive computation, that would block the event loop.
+This has to be considered when implementing the recommenders by ensuring to run the intensive computations using so called worker threads provided by vert.x.
+
+
 
 \section{Implementation of purchase matrix}
-%TODO write purchase matrix implementation section
+\label{sec:ImplementationOfPurchaseMatrix}
+Recommender systems, especially memory-based collaborative filtering approaches, need so store and process very large, but sparse matrix, since there are usually many items in online shops and even more users, that have to be processed to make recommendations.
+Storing the whole matrix array-like would not be feasible both for memory and computation time reason, because most of the entries are zero.
+Generally there are different approaches to store sparse matrices like compressed row or compressed column storage matrix representations.
+They only store the matrix elements that are not empty and maintain there indices over additional arrays to store their elements column and row positions.
+The compressed row format allows to quickly access matrix rows and the compressed column format allows for quick column accesses.
+Depending recommendation approach either columns or items are computed.
+For example item-item approaches need to process columns, while user-user approaches need to process rows.
+Because in the scope of this thesis different approaches have been implemented, a matrix representation was chosen, that allows quick row as well as column access.
+Rows and columns are stored in a map each, consisting of the row or column index as key and a list of all values that are within that row or column.
+Values are stored redundant, because they appear both in the row and column map, but row and columns can both be easily accesses by getting the lists in the row or column map.
+Using a map allows to preserve the actual user or item ids.
+Alternatively the map can be replaced by an array, which would speed up matrix accesses.
+But with an array-based matrix implementation another map is needed to store the ids.
+The ids are especially important for content-based recommendation systems in order to find the content-based feature vectors to the items from the purchase matrix.
+Using array-based matrix implementations would require additional accesses to a map storing the ids for every item index in the purchase matrix.
+
+
 
 \section{Architecture}
-%TODO write high level architecture section
+\label{sec:Architecture}
+The recommender systems were split up into classes for data retrieval and actual recommendation processes.
+For the \textit{LogRegSVD} approach an additional class for training and storing a model was introduced.
+This allows the run the recommender class with different precomputed models.
+The models can easily be serialized, such they can be stored and exchanged without needing to train them again.
 
-%TODO maybe add results for different matrix implementations
-
+%TODO create class diagram, reference to it and explain it
 
 
 
@@ -970,9 +1009,17 @@ Removing more features in the decomposition results in a worse approximation, bu
 	\label{fig:LogRegSVDModels}
 \end{figure}
 
+
+\begin{figure}
+	\caption{MAP for LogRegSVD over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDWeights}
+	\label{fig:LogRegSVDWeights}
+\end{figure}
 Moreover the impact of the weights of the random sampled negative feedback are investigated.
 Different weights were assigned to the negative instances.
-Results can be seen in figure .... %TODO plot and explain what can be seen
+Results can be seen in figure \ref{fig:LogRegSVDWeights}.
+For the models trained with 200 and 300 features there is a peak for a weight of 0.5.
 
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs have been compared for different numbers of models.
 Using only one model refers to the normal \text{LogRegSVD} algorithm.
@@ -982,8 +1029,23 @@ Especially between the one and two models there is a large improvement.
 Here for 100 features the MAP increases about 23\%, for 200 features about 12\% and for 300 features about 10%.
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 
-The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features as can be seen in figure .... %TODO reference to figures...
-%TODO plot and add figure. explain figure
+\begin{figure}
+	\label{fig:LogRegSVDPrediction}
+	\caption{Comparison of different prediction rules. Plots show model-based, user-based, aricle-based or combined prediction of user and article errors for five and one \text{LogRegSVD} model.}
+	\begin{subfigure}[c]{1\textwidth}
+		\caption{Different prediction rules over number of features. The models are trained with 2000 iterations.}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNum}
+	\end{subfigure}
+	\begin{subfigure}[c]{1\textwidth}
+		\caption{Different prediction rules over number of iterations. The models are trained with 300 features.}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNum}
+	\end{subfigure}
+\end{figure}
+
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features and iteration as can be seen in figure \ref{fig:LogRegSVDPrediction}. 
+Only the article-based prediction rule is able ro reach improvements in terms of the MAP when applied to a single \text{LogRegSVD} model for some numbers of iterations.
 
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} was applied to category information about articles.
 It results in a MAP of 0.00306, a user precision of 0.0664 and an overall precision of 0.00572.
@@ -1043,7 +1105,6 @@ It was applied to different recommendations systems to see whether it diminishes
 
 \section{Discussion}
 \label{sec:discussion}
-% TODO write discussion intro
 In the last section several experiments and their results are presented.
 This sections aims to analyse the results.
 The weaknesses and strengths of the basic recommendation systems in e-commerce context are pointed out.
@@ -1090,12 +1151,10 @@ The boosted \textit{LogRegSVD} outperforms the user-user approach, but still per
 The alternative prediction rules suggested for multiple or single \textit{LogRegSVD} models were not able to improve the MAP.
 It only outperformed the traditional prediction rules for single \textit{LogRegSVD} models, that have not been sufficiently trained, i.e. model that have been trained with to few number of iterations.
 In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, in some cases is able to outperform the traditional prediction.
-%TODO check this after plots were made, to prove this
 %todo explain why
 
 \subsection{Hybrid recommendation systems}
 \label{sec:discHybrid}
-%TODO why is a hybrid recommender not useful
 The experiments performed to investigate error correlation of the single hybrids showed that all recommenders make similar recommendation errors.
 It could be seen that the better performers have more true positives than the weak ones, but in no combination of recommenders the weaker performer could enhance the stronger one by adding a significant amount of recommendation.
 So a hybrid recommender system would take more time to predict ratings the a single one, but provide no better, but probably even worse results, than the single strong recommender.
@@ -1110,13 +1169,33 @@ Moreover it was shown that it slightly increases recommendation performance, bec
 
 %==============================================================
 \chapter{Conclusion and Future Work}
-\label{chap:conclustionAndFutureWork}
-%TODO write conclusion and future work
+\label{chap:conclusionAndFutureWork}
+%TODO write future work
+In this work several common recommendation techniques were implemented and applied to an e-commerce dataset.
+In detail the recommenders are a user-user and an item-item memory-based collaborative approach, a new matrix factorization approach adapting a common SVD-based approach to binary data called \textit{LogRegSVD} and content-based recommendation techniques.
+The recommenders were evaluated using the mean average precision when trained on a training set consisting of 80\% of the data, and a test set consisting of the remaining 20\%.
+It was shown that item-item approach performs best on this dataset, but conflicts with the requirement of online shop to provide immediate recommendations.
+This could be solved by precomputing and storing the similarities between every user and item pairs, which would require a large amount of memory.
+User-User approaches reaches a MAP of at leas twice as good as the unpersonalized baseline predictor.
+The \textit{LogRegSVD} approach was able to outperform the user-user approach, both in terms of MAP and computation time.
+Results are still worse than those provided by the item-item approach, but recommendation can be made faster, because only a pretrained model needs to be computed instead of the full matrix of all purchases.
+The results of this approach were tried to be enhances by applying AdaBoost to it, a meta algorithm to improve results of weak classifiers.
+Results could be enhanced by 16\% to 39\% depending on the number of trained latent features.
+Moreover alternative prediction rules were suggested that incorporate different types of errors to express confidence of prediction.
+These rules did not show any remarkable improvements in recommendation process.
+The content-based recommendation systems showed results that were much worse than those provided by the unpersonalized recommender.
+This is due to duplicate item in e-commerce datasets.
+The user gets recommendations of items, that are almost equal to those he already purchased, but only differ in brand, size or colour.
 
+Moreover the errors of the evaluated recommenders were analysed for correlation to find candidates for possible hybridization of different recommenders.
+No candidates were found that show remarkable differences in prediction errors, such that hybrid recommenders would probably not improve but possibly even worsen recommendation results, though slowing down recommendation process.
+Combinations between the unpersonalized and the other approaches were implemented as a cascade hybrid recommendation system.
+This approaches removes rarely purchases items from the set before , such that the personalized recommenders have to process a smaller set of items.
+This hybridization achieves slight improvements in computation time and MAP.
+%TODO check after i added experiments
 
+Tasks for future work are on one hand applying the algorithms to other e-commerce dataset to work out whether datasets of different dimensions or different domains achieve significantly different results.
 
-
-%TODO add tables of figures, equations, tables and abbreviations
 
 
 
