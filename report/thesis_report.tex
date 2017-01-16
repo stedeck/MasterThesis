@@ -118,12 +118,12 @@ Section \ref{sec:boosting} explains the concept of Boosting and some application
 In chapter \ref{sec:ecommerceRec} explains how the presented techniques are applied to the e-commerce dataset and several adaption of some techniques are explained.
 Section \ref{sec:comparison} compares the basic approaches and points out problems that occur when applying them to e-commerce data.
 Sections \ref{sec:logRegSVD}, \ref{sec:myAdaBoost} and \ref{sec:predictionRules} suggest some solutions to the occurring problems by presenting an alternative matrix factorization approach, applying AdaBoost to this approach and introduce alternative prediction rules for matrix factorization approaches. 
-In section ... some considerations about the implementation and the performance in terms of runtime and memory requirements are made. %TODO ref implemenation and performance chapter and describe sections more detailed
+In chapter \ref{chap:ImplemenationAndPerformance} some considerations about the implementation and the performance in terms of runtime and memory requirements are made.
 Different experiments to evaluate the presented approaches are shown in chapter \ref{chap:experimentation}.
 First the data used for testing and the evaluation procedure are explained in sections \ref{sec:data} and \ref{sec:eval}, respectively.
 Section \ref{sec:results} show the performed experiments and their results.
 Discussion of the results is done in section \ref{sec:discussion}.
-At the end in chapter \ref{chap:conclustionAndFutureWork} are conclusion is made and ideas for future work are presented.
+At the end in chapter \ref{chap:conclusionAndFutureWork} are conclusion is made and ideas for future work are presented.
 
 
 
@@ -246,7 +246,7 @@ This approach is not able to guarantee a sufficiently large list of recommendati
 Being $I(N(u))$ the items the neighbours of $u$ purchased, a user-user approach is only able to recommend at most $|I(N(u)) \setminus I(u)|$ items to user $u$.
 This may especially be a problem for users with only a few purchases, because the less items a user purchased the higher is the probability to find a user with the same set of purchased items.
 
-Another user-user approach, that does not suffer from the above problem was implemented in \cite{aiolli2013efficient} or \cite{effectiveLatentModels}, see algorithm \ref{alg:CFUserNN2}.
+Another user-user approach, that does not suffer from the above problem was implemented in \cite{efficientTopN} or \cite{effectiveLatentModels}, see algorithm \ref{alg:CFUserNN2}.
 Here for every item $i$ the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated by: 
 
 \begin{equation}
@@ -462,25 +462,25 @@ For this purpose a content matrix $C \in \mathds{R}^{n \times c}$, where $n$ is 
 \end{algorithm}
 
  
-\subsection{Other recommendation systems}
-\label{rs_others}
-%TODO write other rs section and find papers of implementations
-% demographic and network recommenders.
-Besides collaborative filtering and content-based recommendation there are other recommendation systems like knowledge-based, demographic or network recommendation systems.
-Knowledge-based recommender systems are based on any kind of knowledge-base that has to be built and maintained by domain experts.
+%\subsection{Other recommendation systems}
+%\label{rs_others}
+%%todo write other rs section and find papers of implementations
+%% demographic and network recommenders.
+%Besides collaborative filtering and content-based recommendation there are other recommendation systems like knowledge-based, demographic or network recommendation systems.
+%Knowledge-based recommender systems are based on any kind of knowledge-base that has to be built and maintained by domain experts.
+%
+%%todo why are those systems not used here?
+%
+%\subsection{Hybrid recommendation systems}
+%% shortly describe other hybrid sections from burke and why are they not used in this thesiss
 
-%TODO why are those systems not used here?
+%todo explain switching hybrids
 
-\subsection{Hybrid recommendation systems}
-% shortly describe other hybrid sections from burke and why are they not used in this thesiss
+%todo explain weighted hybrid
 
-%TODO explain switching hybrids
+%todo explain cascade hybrid 
 
-%TODO explain weighted hybrid
-
-%TODO explain cascade hybrid 
-
-%TODO explain other hybrids 
+%todo explain other hybrids 
 
 
 %==============================================================
@@ -562,8 +562,11 @@ Some enhancements were made with respect to e-commerce datasets, described in se
 Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
 Both an item-item and a user-user approach like described in section \ref{sec:memBasedCF} are implemented.
 The item-item approach in algorithm \ref{alg:CFItemNN} was directly implemented without any changes.
-Both user-user approaches were implemented, though algorithm \ref{alg:CFUserNN2} requires a lot more runtime. %TODO add runtime requiremnts
-In algo1 a small change was applied to reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation.
+Both user-user approaches were implemented, though algorithm \ref{alg:CFUserNN2} requires a lot more runtime.
+While algorithm \ref{alg:CFUserNN} only needs to iterate over all users to determine the neighbours and then only needs to determine the most purchased items, \ref{alg:CFUserNN2} needs to iterate over all users for every possible recommendation.
+Algorithm \ref{alg:CFUserNN} has an average runtime of about $O(|U| \cdot \mu_u)$ to determine the nearest neighbours, algorithm \ref{alg:CFUserNN2} needs $O(I \cdot \mu_i \cdot \mu_u)$.
+$\mu_u$ and $mu_i$ refer to the average number of purchased per user and item, respectively.
+For algorithm \ref{alg:CFUserNN} a small change was applied to reduce the chance of not being able to find a sufficiently large list of recommendations and ensure that there is at least one recommendation.
 When determining the nearest neighbours only those are taken into account with a similarity score of less than one, i.e. $S(u,v) = sim(u, v) < 1$, because a score of 1 means that $u$ and $v$ have purchased exactly the same set of items.
 As in many applications the cosine similarity is used for both approaches.
 Since the user and item vectors are binary, experiments were also performed using Jaccard similarity.
@@ -892,23 +895,23 @@ Those n' articles contain many duplicates, because article of the same product, 
 There is no attribute to determine real distinct articles, but the amount of duplicates could be reduced by aggregating items of the same name and handle them as one item.
 This reduces the number of items to 11775.
 So dimensions of the used purchase matrix are 81835 \texttimes \ 11775.
-It contains 663731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. % TODO make table out of stats
-Figure \ref{fig:dataDistribution} shows a histogram showing how the purchases per user and item are distributed.
+It contains 663731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. %todo make table out of stats
+Figure \ref{fig:purchases} shows the number of purchases for every user or article.
+Both curves are very skewed, i.e. there are few articles and users with many purchases, and many users and article with only a small amount of purchases.
 
 %todo add median, 1st and 3rd quantile and create boxplots
 
-%TODO make nicer plot (with visible axis labels...)
 \begin{figure}
-	\label{fig:dataDistribution}
+	\label{fig:purchases}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Distribution of user purchases.}
+		\caption{Number of purchases for every user.}
 		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/userPurchaseHistogram}
+		\includegraphics[width=1\textwidth]{figures/experiments/userPurchases}
 	\end{subfigure}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Distribution of article purchases.}
+		\caption{Number of purchases for every article.}
 		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchaseHistogram_partly}
+		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchases}
 	\end{subfigure}
 \end{figure}
 
@@ -929,7 +932,9 @@ The test set is built by iterating user- and item-wise over purchases and adding
 This ensures that the test purchases are equally distributed over all users.
 Users that only have purchased one item, are removed beforehand, because they cannot be evaluated, since at least one item must be left for training.
 Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique.
-%TODO what are dimension of used dataset? what training and test sets?
+Removing those users results in a dataset of 72318 users and 11666 items.
+In total this matrix contains 654,214 purchases, i.e. there are on average about 9.05 purchases per user and about 56.08 purchases per item.
+The training set then consists of 523,371 and the test set of 130,843 instances.
 
 Cold-start users are not of interest in this thesis, but an unpersonalized recommendation technique is used as a baseline for evaluation.
 This used approach is denoted \textit{MostPop} and always recommends those items to a user that are purchased most often and were not yet purchased by the current user.
@@ -1030,7 +1035,6 @@ Here for 100 features the MAP increases about 23\%, for 200 features about 12\% 
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 
 \begin{figure}
-	\label{fig:LogRegSVDPrediction}
 	\caption{Comparison of different prediction rules. Plots show model-based, user-based, aricle-based or combined prediction of user and article errors for five and one \text{LogRegSVD} model.}
 	\begin{subfigure}[c]{1\textwidth}
 		\caption{Different prediction rules over number of features. The models are trained with 2000 iterations.}
@@ -1042,35 +1046,40 @@ So already after evaluating the first model the instance weights could be adjust
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNum}
 	\end{subfigure}
+	\label{fig:LogRegSVDPrediction}
 \end{figure}
 
-The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features and iteration as can be seen in figure \ref{fig:LogRegSVDPrediction}. 
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features and iteration as can be seen in figure \ref{fig:LogRegSVDPrediction}.
 Only the article-based prediction rule is able ro reach improvements in terms of the MAP when applied to a single \text{LogRegSVD} model for some numbers of iterations.
 
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} was applied to category information about articles.
 It results in a MAP of 0.00306, a user precision of 0.0664 and an overall precision of 0.00572.
-
 The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) was applied to categories, the general information and indication texts.
 The texts were represented in different ways, i.e. either in binary, bag-of-words or tf-idf representation.
 In all cases the cosine similarity is applied.
 In the cases of category data and binary text representation also Jaccard similarity was applied. 
-Results are shown in table .... %TODO add table and explain
+Results are shown in table \ref{tab:CBNN}.
+It can be seen that for binary data Jaccard similarity is slightly better than cosine similarity as it is also the case for the memory-based collaborative filtering algorithms.
+For both kind of texts, the general information and the indication, the tf-idf representation achieves best results.
+With all tested content-based information the content-based recommenders both perform much worse than the unpersonalized recommender.
 
 \begin{table}
 	\caption{Results for CBNN applied to different content-based information and different similarity functions.}
 \label{tab:CBNN}
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c||c|c|}
 	\hline
-&Jaccard&Cosine\\ \hline
-categories&0.00546&0.00532\\ \hline
-indication (binary)&&\\ \hline	
-indication (bag-of-words)&-&\\ \hline	
-indication (td-idf)&-&\\ \hline	
-general information (binary)&&\\ \hline	
-general information (bag-of-words)&-&\\ \hline	
-general information (tf-idf)&-&\\ \hline	
+\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
+categories&0.00507&0.00508\\ \hline
+indication (binary)&0.00573&0.00477\\ \hline	
+indication (bag-of-words)&-&0.00756\\ \hline	
+indication (td-idf)&-&0.00857\\ \hline	
+general information (binary)&0.01231&0.01213\\ \hline	
+general information (bag-of-words)&-&0.00804\\ \hline	
+general information (tf-idf)&-&0.01595\\ \hline	
 \end{tabular}
 \end{table}
+
+%todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
 
 To find out whether hybridization of these techniques are able to improve recommendation performance the resulting lists of recommendation were investigated for correlation.
 A hybrid recommender is only useful if the component recommender produce different results such that they are able to complement each other.
@@ -1080,7 +1089,7 @@ Only if there are many recommendations that are only recommended by the first an
 So the recommendations of different pairs of recommenders are analysed. %TODO perform correaltion experiments, create pie charts and explain them
 
 Besides recommendation performance consideration a cascade hybrid recommendation system was implemented to speed up the recommendation process.
-Figure ... shows the number of purchases per article. %TODO add article purchases figure, plot it again before...
+Figure \ref{fig:purchases} shows the number of purchases for every article.
 It can be seen, that there are few items with many purchases and most item just have few purchases.
 The items with many purchases generally have a higher probability of being purchased, i.e. being a correct recommendation.
 In order to avoid to iterate through the full list of items to make a recommendation only those items are taken into account that were purchased at least $c$ times.
@@ -1098,10 +1107,6 @@ It was applied to different recommendations systems to see whether it diminishes
 \end{figure}
 %TODO add cosine curve as well
 
-
-
-
-%TODO add summary/comparison of best performers for every algorithm, how much better is it than baseline (in percent)?
 
 \section{Discussion}
 \label{sec:discussion}
@@ -1132,8 +1137,6 @@ This results from the nature of e-commerce data.
 The dataset contains duplicate items, that only differ in brand, size of package, colour or the like.
 So items that are recommended by a content-based recommender are probably too similar to the items the current user already purchased, since he probably will not buy products that are almost the same he already bought.
 
-%todo add table with best performances for each approach
-
 
 \subsection{AdaBoost}
 \label{sec:discAdaBoost}
@@ -1150,7 +1153,7 @@ The boosted \textit{LogRegSVD} outperforms the user-user approach, but still per
 % prediction rules were not able to improve performance, if model is sufficiently trained
 The alternative prediction rules suggested for multiple or single \textit{LogRegSVD} models were not able to improve the MAP.
 It only outperformed the traditional prediction rules for single \textit{LogRegSVD} models, that have not been sufficiently trained, i.e. model that have been trained with to few number of iterations.
-In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, in some cases is able to outperform the traditional prediction.
+In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, is able to outperform the traditional prediction approach.
 %todo explain why
 
 \subsection{Hybrid recommendation systems}
@@ -1168,9 +1171,8 @@ Moreover it was shown that it slightly increases recommendation performance, bec
 
 
 %==============================================================
-\chapter{Conclusion and Future Work}
+\chapter{Conclusion}
 \label{chap:conclusionAndFutureWork}
-%TODO write future work
 In this work several common recommendation techniques were implemented and applied to an e-commerce dataset.
 In detail the recommenders are a user-user and an item-item memory-based collaborative approach, a new matrix factorization approach adapting a common SVD-based approach to binary data called \textit{LogRegSVD} and content-based recommendation techniques.
 The recommenders were evaluated using the mean average precision when trained on a training set consisting of 80\% of the data, and a test set consisting of the remaining 20\%.
@@ -1194,7 +1196,8 @@ This approaches removes rarely purchases items from the set before , such that t
 This hybridization achieves slight improvements in computation time and MAP.
 %TODO check after i added experiments
 
-Tasks for future work are on one hand applying the algorithms to other e-commerce dataset to work out whether datasets of different dimensions or different domains achieve significantly different results.
+%todo write future work
+%Tasks for future work are on one hand applying the algorithms to other e-commerce dataset to work out whether datasets of different dimensions or different domains achieve significantly different results. 
 
 
 

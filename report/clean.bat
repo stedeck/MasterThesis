@@ -5,3 +5,6 @@ del thesis_report.log
 del thesis_report.blg
 del thesis_report.bbl
 del thesis_report.toc
+del thesis_report.loa
+del thesis_report.lof
+del thesis_report.lot
