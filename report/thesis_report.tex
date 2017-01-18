@@ -1097,20 +1097,29 @@ A hybrid recommender is only useful if the component recommenders produce differ
 To analyse whether two algorithms are able to complement each other the true positives of both recommenders are taken into account.
 The amount of correct recommendations are measured, that have been recommended by both, only by one or only by the other recommender.
 Only if there are many recommendations that are only recommended by the first and many that are only recommended by the second recommender, those recommenders might be able to be combined to a more effective hybrid recommender systems.
-So the recommendations of different pairs of recommenders are analysed. %TODO add results to table and explain them
+So the recommendations of different pairs of recommenders are analysed.
+Table \ref{tab:correlation} shows the amount of items that were recommended by either both recommenders, only the first one, only the second one or by none them.
+First it can be seen that none of the content-based recommenders is able to enhance recommendation when combined with another approach.
+In the performed experiments a content-based recommender has at most 2.42\% of recommendation that would not have been recommended by another collaborative filtering recommender.
+The most promising combination of recommenders seems to be the user-user and the boosted logistic regression based recommender.
+\textit{CFUserNN} is able to provide 11.32\% and \textit{LogRegSVD} 8.88\% of recommendation that have not been found by the other one, though both are collaborative filtering approaches.
+This might come from serendipitous recommendations made by the user-user approach.
+While the other collaborative filtering approach tend to provide items that are similar to those the current user already purchased, \textit{CFUserNN} might also find items that are dissimilar, but are bought by some similar users.
 
-%todo add percentages to table (as second row in every cell)
 \begin{table}
-	\caption{}
+	\caption{Common recommendations for different pairs of recommenders. \textit{CFUserNN} were applied for 300 neighbours. \textit{CBNN} (text) refers to algorithm \ref{alg:CBNN} using text with general information represented with Jaccard. For \textit{LogRegSVD} a boosted version with 5 models, 300 features trained in 2000 iteration is used. All nearest neighbour algorithms are applied with Jaccard similarity, except for \textit{CBNN} with text. There cosine similarity is used.}
 	\label{tab:correlation}
-	\begin{tabular}{|c|c||c|c|c|c|}
+	\begin{tabular}{|c|c||p{1.2cm}|p{1.2cm}|p{1.2cm}|p{1.2cm}|}
 		\hline
-		\textbf{Reco1}&\textbf{Reco2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
-		\textit{CFItemNN}&\textit{CBNN (Categories)}&400&25446&1185&103812 \\ \hline
-		
-		
-		
-		
+		\textbf{Recommender 1}&\textbf{Recommender2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
+		\textit{CFItemNN}&\textit{CBNN (Categories)}&400 (0.31\%)&25446 (19.45\%)&1185 (0.91\%)&103812 (79.34\%)\\ \hline
+		\textit{CFItemNN}&\textit{CBNN (Categories)}&550 (0.42\%)&28602 (21.86\%)&1035 (0.79\%)&100656 (76.93\%) \\ \hline
+		\textit{CFUserNN}&\textit{CBNN (text)}&1047 (0.80\%)&24789 (18.95\%)&3165 (2.42\%)&101833 (77.83\%) \\ \hline
+		\textit{CFIemNN}&\textit{CBNN (text)}&1713 (1.31\%)&27971 (21.38\%)&2499 (1.91\%)&98660 (75.4\%) \\ \hline
+		\textit{CFItemNN}&\textit{CFUserNN}&20965 (16.02\%)&8719 (6.66\%)&4882 (3.73\%)&96277 (73.58\%) \\ \hline
+		\textit{CFItemNN}&\textit{LogRegSVD}&16795 (12.84\%)&12889 (9.85\%)&5857 (4.48\%)&95302 (72.84\%) \\ \hline
+		\textit{CFUserNN}&\textit{LogRegSVD}&11035 (8.43\%)&14811 (11.32\%)&11617 (8.88\%)&93380 (71.37\%) \\ \hline
+		 \textit{CBNN}&\textit{LogRegSVD}&1769 (1.35\%)&2443 (1.87\%)&20883 (15.96\%)&105748 (80.82\%)\\ \hline
 	\end{tabular}
 \end{table}
 
@@ -1126,8 +1135,12 @@ Results for different candidate thresholds applied to \textit{CFItemNN} can be s
 Slight improvements can be seen up to a threshold of 10.
 Higher thresholds decrease the MAP again.
 Even the best performing threshold only reaches an improvement of about 1.5\% in contrast to a threshold of 1, i.e. using all items as possible recommendation candidates.
+\text{CFUserNN} makes use of the \textit{MostPop} approach anyway, because it is applied to the determined neighbours of the current users.
+So this hybrid was not applied to \textit{CFUserNN}.
+Moreover the set of recommended items is not guaranteed to be large enough anyway, without further restricting the candidates for recommendations.
+Runtime improvements also cannot be achieved here, because the main part of the algorithm iterates over the set of users instead of items.
 
-%TODO perform experiment with other approaches and add
+%TODO perform experiment to cbnn and logregsvd
 %TODO find out how much the thresholds reduce the candidate dataset, add runtime improvements
 
 \begin{figure}
@@ -1189,9 +1202,11 @@ In those cases the article based prediction, see equation \ref{eq:articleErrorPr
 
 \subsection{Hybrid recommendation systems}
 \label{sec:discHybrid}
-The experiments performed to investigate error correlation of the single hybrids showed that all recommenders make similar recommendation errors.
-It could be seen that the better performers have more true positives than the weak ones, but in no combination of recommenders the weaker performer could enhance the stronger one by adding a significant amount of recommendation.
-So a hybrid recommender system would take more time to predict ratings the a single one, but provide no better, but probably even worse results, than the single strong recommender.
+The experiments performed to investigate error correlations of the single hybrids showed that combinations between a content-based and a collaborative filtering approach cannot enhance recommendation performance, since there is only a very small amount of maximal 2.42\% of recommendations that could be found a content-based recommender, but not by another collaborative filtering one.
+The combinations between different collaborative filtering approaches make more diverse errors, especially \textit{CFUserNN} and the boosted version of \textit{LogRegSVD}.
+So the only hybrid recommenders that may be able to improve recommendation results are combinations between collaborative filtering  approaches.
+Combining two memory-based approaches probably would require a lot more runtime for making recommendations, because there are two models that have to process the whole purchase matrix.
+But hybrids between a memory-based and a model-based recommender may be feasible, if the memory-based approach can be incorporated in the training process of the model-based recommender, such that actual recommendation computation will not significantly be slowed down by processing the whole purchase matrix. %todo reference to corresponding hybrids
 
 The hybrid recommender using the unpersonalized \textit{MostPop} approach and any other personalized recommendation showed small improvements over the single unpersonalized ones.
 This is due to the removal of items that are rarely purchased and therefore have a lower probability to be purchased.
@@ -1221,14 +1236,25 @@ This is due to duplicate item in e-commerce datasets.
 The user gets recommendations of items, that are almost equal to those he already purchased, but only differ in brand, size or colour.
 
 Moreover the errors of the evaluated recommenders were analysed for correlation to find candidates for possible hybridization of different recommenders.
-No candidates were found that show remarkable differences in prediction errors, such that hybrid recommenders would probably not improve but possibly even worsen recommendation results, though slowing down recommendation process.
+The only candidates for hybridization are combinations of the presented collaborative filtering approaches, especially between \textit{CFUserNN} and boosted \textit{LogRegSVD}.
 Combinations between the unpersonalized and the other approaches were implemented as a cascade hybrid recommendation system.
 This approaches removes rarely purchases items from the set before , such that the personalized recommenders have to process a smaller set of items.
 This hybridization achieves slight improvements in computation time and MAP.
 %TODO check after i added experiments
 
-%todo write future work
-%Tasks for future work are on one hand applying the algorithms to other e-commerce dataset to work out whether datasets of different dimensions or different domains achieve significantly different results. 
+Tasks for future work are on one hand investigations of possible hybrid systems, especially consisting of the presented \textit{LogRegSVD} and the user-user approach.
+The challenge here is to find a hybridization technique that does not diminish the advantages of the model-based recommenders concerning a shorter runtime for recommendations.
+Techniques need to be investigated that incorporate the user-user algorithm into the training process of the \textit{LogRegSVD} models.
+
+Further experiments for the boosted \textit{LogRegSVD} model can be made by trying to applying the user and article errors to the training process instead of prediction process.
+Updating the instance weights may than be performed with respect to the errors of users and articles instead of instance or whole model errors.
+
+Another problem of recommendation in e-commerce systems still is the lack of negative feedback.
+Recommendations are constant as long as the user does not make further purchases, because they cannot be marked as not needed by the user.
+A possible solution can be to take context or time into account.
+Context may refer to the current or recent article views or queries of the user, such that the system is able to react on current needs.
+Taking time into account means on one hand, that it could be made use of purchase sequences.
+On the other hand recommended items, that have not been purchased or even clicked in some time will be penalized during the recommendation process or are interpreted as not interesting for the user.
 
 
 
