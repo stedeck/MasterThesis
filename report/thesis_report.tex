@@ -629,7 +629,6 @@ When training the updates of user and item feature vectors, the prediction error
 \begin{equation}
 	e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}
 \end{equation}
-%todo add experiments to compare linear and logistic regression with lara
 
 To address the problem of missing negative instances the negative training instances are obtained by randomly choosing them from the unknown instances.
 For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that every user and item gets about as many positive training updates as negative ones to ensure balanced classification problem.
@@ -872,13 +871,48 @@ Using array-based matrix implementations would require additional accesses to a 
 
 \section{Architecture}
 \label{sec:Architecture}
-The recommender systems were split up into classes for data retrieval and actual recommendation processes, such that the recommenders are independent from the data source.
-This is achieved by applying the Adapter
-For the \textit{LogRegSVD} approach an additional class for training and storing a model was introduced.
-This allows the run the recommender class with different precomputed models.
-The models can easily be serialized, such they can be stored and exchanged without needing to train them again.
+The recommender systems are built in a modular manner, such that different components can be easily exchanged.
+Figure \ref{fig:classDiagram} shows a simplified version of the class diagram.
+The different implemented recommendation algorithms are all realizations of the interface \textit{IRecommender}.
+Every recommender has an instance of \textit{IPurchaseMatrix}, an interface that is realized by either a sparse matrix implementation using a map or an array, as explained in section \ref{sec:ImplementationOfPurchaseMatrix}.
+The content-based recommenders have a second instance of \textit{IPurchaseMatrix} for the content-based feature matrix.
+The naive Bayes implementation moreover has a \textit{BayesUserProfile} for every user.
+The nearest-neighbour approaches, both the content-based one and the memory-based collaborative filtering ones, are assigned a similarity function, implementing the interface \textit{ISimilarityFunc}.
+Here classes for cosine and Jaccard similarity are implemented, but other function can be easily added.
+The SVD-based algorithms hold objects of the classes \textit{SVDModel} or \textit{AdaBoostSVDModel}.
+\textit{AdaBoostSVDModel} extends \textit{SVDModel} by adding the different error types, i.e. model error, article errors, user errors and instance errors, and maintaining the instances weights.
+Moreover it can be seen that the normal SVD class holds a single \textit{SVDModel}, while the boosted one holds $T$ \textit{AdaBoostSVDModel}s.
+To enable training models using either the usual SVD approach with linear regression or the one presented in this thesis using logistic regression, the regression functions are applied realizing the interface \textit{IRegFunction}.
 
-%TODO create class diagram, reference to it and explain it
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/implementation/classDiagram}
+	\label{fig:classDiagram}
+	\caption{Simplified class diagram of recommendation architecture.}
+\end{figure}
+
+In order to retrieve data from different sources, an interface calles \textit{IRecoData} is used.
+The realizing classes have to implement the method \textit{getPurchases}, that retrieve the purchase matrix from any source and pass it as a ISparsePurchase matrix implementation to a handler.
+The method is called by any recommender class, where also the handlers are defined to process the returning purchase matrix.
+Using a handler instead of a simple return value, ensures asynchronous computation, i.e. other operations can be made, during the purchase matrix is retrieved.
+Figure \ref{fig:getPurchases} shows the UML notation of the \textit{IRecoData} interface and the sequence of obtaining the purchase matrix.
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.6\textwidth}
+		\includegraphics[width=\textwidth]{figures/implementation/IRecoDataInterface}
+		\caption{Adapter interface to retrieve purchase matrix from different sources.}
+		\label{fig:irecodataInterface}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.35\textwidth}
+		\includegraphics[width=\textwidth]{figures/implementation/getPurchasesSequence}
+		\caption{Sequence of retrieving purchase matrix from IRecoData adapter.}
+		\label{fig:getPurchasesSequence}
+	\end{subfigure}
+	\caption{Applied adapter pattern for different data sources.}
+	\label{fig:getPurchases}
+\end{figure}
 
 
 
@@ -899,15 +933,15 @@ The last two sections of this chapter show the obtained results and discuss them
 
 \begin{figure}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Number of purchases for every user.}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/userPurchases}
+		\caption{Number of purchases for every user.}
 		\label{fig:userPurchases}
 	\end{subfigure}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Number of purchases for every article.}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchases}
+		\caption{Number of purchases for every article.}
 		\label{fig:articlePurchases}
 	\end{subfigure}
 \end{figure}
@@ -981,9 +1015,9 @@ The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \t
 Using the cosine similarity \textit{CFItemNN} reaches a MAP of 0.1333, a user precision of 0.3866 and a precision of 0.2228.
 
 \begin{figure}
-	\caption{Results for \textit{CFUserNN}}
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/CFUserNN}
+	\caption{Results for \textit{CFUserNN}}
 	\label{fig:CFUserNN}
 \end{figure}
 
@@ -1001,14 +1035,14 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 %todo take similarity into account, use them as weights somehow
 
 \begin{figure}
-	\caption{MAP of \textit{LogRegSVD} over number of training iterations for different number of features.}
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDIterations}
+	\caption{MAP of \textit{LogRegSVD} over number of training iterations for different number of features.}
 	\label{fig:LogRegSVDIterations}
 \end{figure}
 %todo add some iteration until curves are obviously flater
 
-The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) was investigated for the impact of different parameters.
+The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) was compared to the traditional SVD approach using linear regression and it was investigated for the impact of different parameters.
 First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
 Figure \ref{fig:LogRegSVDIterations} shows the MAP for different number of features over the number of iterations during training.
 First there can be seen that the MAP increases with the number of iterations regardless of how many features are used.
@@ -1019,17 +1053,17 @@ The Frobenius norm of the reduced matrix is closer to the Frobenius norm of the 
 Removing more features in the decomposition results in a worse approximation, but on the other hand preserves more memory and runtime.
 
 \begin{figure}
-	\caption{MAP for \textit{LogRegSVD} with AdaBoost over different number of models for different numbers of features.}
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDModels}
+	\caption{MAP for \textit{LogRegSVD} with AdaBoost over different number of models for different numbers of features.}
 	\label{fig:LogRegSVDModels}
 \end{figure}
 
 
 \begin{figure}
-	\caption{MAP for \textit{LogRegSVD} over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDWeights}
+	\caption{MAP for \textit{LogRegSVD} over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\label{fig:LogRegSVDWeights}
 \end{figure}
 Moreover the impact of the weights of the random sampled negative feedback are investigated.
@@ -1046,17 +1080,17 @@ Here for 100 features the MAP increases about 23\%, for 200 features about 12\% 
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 
 \begin{figure}
-	\caption{Comparison of different prediction rules. Plots show model-based, user-based, aricle-based or combined prediction of user and article errors for five and one \textit{LogRegSVD} model.}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Different prediction rules over number of features. The models are trained with 2000 iterations.}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNum}
+		\caption{Different prediction rules over number of features. The models are trained with 2000 iterations.}
 	\end{subfigure}
 	\begin{subfigure}[c]{1\textwidth}
-		\caption{Different prediction rules over number of iterations. The models are trained with 300 features.}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNum}
+		\caption{Different prediction rules over number of iterations. The models are trained with 300 features.}
 	\end{subfigure}
+	\caption{Comparison of different prediction rules. Plots show model-based, user-based, aricle-based or combined prediction of user and article errors for five and one \textit{LogRegSVD} model.}
 	\label{fig:LogRegSVDPrediction}
 \end{figure}
 
@@ -1075,19 +1109,19 @@ For both kind of texts, the general information and the indication, the tf-idf r
 With all tested content-based information the content-based recommenders both perform much worse than the unpersonalized recommender.
 
 \begin{table}
-	\caption{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}
-\label{tab:CBNN}
 \begin{tabular}{|c||c|c|}
 	\hline
-\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
-categories&0.00507&0.00508\\ \hline
-indication (binary)&0.00573&0.00477\\ \hline	
-indication (bag-of-words)&-&0.00756\\ \hline	
-indication (td-idf)&-&0.00857\\ \hline	
-general information (binary)&0.01231&0.01213\\ \hline	
-general information (bag-of-words)&-&0.00804\\ \hline	
-general information (tf-idf)&-&0.01595\\ \hline	
-\end{tabular}
+	\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
+	categories&0.00507&0.00508\\ \hline
+	indication (binary)&0.00573&0.00477\\ \hline	
+	indication (bag-of-words)&-&0.00756\\ \hline	
+	indication (td-idf)&-&0.00857\\ \hline	
+	general information (binary)&0.01231&0.01213\\ \hline	
+	general information (bag-of-words)&-&0.00804\\ \hline	
+	general information (tf-idf)&-&0.01595\\ \hline	
+	\end{tabular}
+	\caption{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}	
+	\label{tab:CBNN}
 \end{table}
 
 %todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
@@ -1107,8 +1141,6 @@ This might come from serendipitous recommendations made by the user-user approac
 While the other collaborative filtering approach tend to provide items that are similar to those the current user already purchased, \textit{CFUserNN} might also find items that are dissimilar, but are bought by some similar users.
 
 \begin{table}
-	\caption{Common recommendations for different pairs of recommenders. \textit{CFUserNN} were applied for 300 neighbours. \textit{CBNN} (text) refers to algorithm \ref{alg:CBNN} using text with general information represented with Jaccard. For \textit{LogRegSVD} a boosted version with 5 models, 300 features trained in 2000 iteration is used. All nearest neighbour algorithms are applied with Jaccard similarity, except for \textit{CBNN} with text. There cosine similarity is used.}
-	\label{tab:correlation}
 	\begin{tabular}{|c|c||p{1.2cm}|p{1.2cm}|p{1.2cm}|p{1.2cm}|}
 		\hline
 		\textbf{Recommender 1}&\textbf{Recommender2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
@@ -1121,35 +1153,56 @@ While the other collaborative filtering approach tend to provide items that are 
 		\textit{CFUserNN}&\textit{LogRegSVD}&11035 (8.43\%)&14811 (11.32\%)&11617 (8.88\%)&93380 (71.37\%) \\ \hline
 		 \textit{CBNN}&\textit{LogRegSVD}&1769 (1.35\%)&2443 (1.87\%)&20883 (15.96\%)&105748 (80.82\%)\\ \hline
 	\end{tabular}
+	\caption{Common recommendations for different pairs of recommenders. \textit{CFUserNN} were applied for 300 neighbours. \textit{CBNN} (text) refers to algorithm \ref{alg:CBNN} using text with general information represented with Jaccard. For \textit{LogRegSVD} a boosted version with 5 models, 300 features trained in 2000 iteration is used. All nearest neighbour algorithms are applied with Jaccard similarity, except for \textit{CBNN} with text. There cosine similarity is used.}
+\label{tab:correlation}
 \end{table}
 
 Besides precision consideration a cascade hybrid recommendation system was implemented to speed up the recommendation process.
 Figure \ref{fig:articlePurchases} shows the number of purchases for every article.
-It can be seen, that there are few items with many purchases and most item just have few purchases.
+It can be seen, that there are few items with many purchases and that most items just have few purchases.
 The items with many purchases generally have a higher probability of being purchased, i.e. being a correct recommendation.
 In order to avoid to iterate through the full list of items to make a recommendation only those items are taken into account that were purchased at least $c$ times.
 $c$ will further be denoted as candidate threshold, since it delimits the number of candidates for recommendations.
 This approach can be viewed as a cascade hybrid between the \textit{MostPop} and any other recommendation approach.
-It was applied to different recommendations systems to see whether it diminishes or even improves recommendation performance.
-Results for different candidate thresholds applied to \textit{CFItemNN} can be seen in figure \ref{fig:CFItemNNCandidates}.
-Slight improvements can be seen up to a threshold of 10.
+It was applied to different recommendations systems to see, whether it diminishes or even improves recommendation performance.
+Results for different recommendation approaches can be seen in figure \ref{fig:candidates}.
+For \textit{CFItemNN} slight improvements can be seen up to a threshold of 10.
 Higher thresholds decrease the MAP again.
 Even the best performing threshold only reaches an improvement of about 1.5\% in contrast to a threshold of 1, i.e. using all items as possible recommendation candidates.
+\textit{LogRegSVD} performs worse the higher the candidate threshold gets.
+The number of purchases of an item effects the training of the model anyway, so reducing the set of candidates with respect to their number of purchases cannot improve the SVD based approach.
+For \text{CBNN} - applied on general information text represented as tf-idf values - a smaller set of candidates marginally increases the MAP up to about 400 candidates.
+Then the MAP stagnates for higher thresholds.
+This approach still performs significantly worse than the \textit{MostPop} approach.
 \text{CFUserNN} makes use of the \textit{MostPop} approach anyway, because it is applied to the determined neighbours of the current users.
 So this hybrid was not applied to \textit{CFUserNN}.
 Moreover the set of recommended items is not guaranteed to be large enough anyway, without further restricting the candidates for recommendations.
 Runtime improvements also cannot be achieved here, because the main part of the algorithm iterates over the set of users instead of items.
 
-%TODO perform experiment to cbnn and logregsvd
-%TODO find out how much the thresholds reduce the candidate dataset, add runtime improvements
 
 \begin{figure}
-	\caption{MAP of \textit{CFItemNN} over different candidate thresholds. }
-	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
-	\label{fig:CFItemNNCandidates}
+	\begin{subfigure}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
+		\caption{MAP of \textit{CFItemNN} over different candidate thresholds.}
+		\label{fig:CFItemNNCandidates}
+	\end{subfigure}
+	\begin{subfigure}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDCandidates}
+		\caption{MAP of \textit{LogRegSVD} over different candidate thresholds.}
+		\label{fig:LogRegSVDCandidates}
+	\end{subfigure}
+	\begin{subfigure}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/CBNNCandidates}
+		\caption{MAP of \textit{CBNN} over different candidate thresholds.}
+		\label{fig:CBNNCandidates}
+	\end{subfigure}
+	\caption{Impact of candidate threshold for different approaches}
+	\label{fig:candidates}
 \end{figure}
-%TODO add cosine curve as well
+%todo add cfusernn2
 
 
 \section{Discussion}
