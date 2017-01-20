@@ -166,6 +166,25 @@ In this thesis two memory-based are investigated.
 The memory-based techniques are k-nearest-neighbour algorithms applied to the purchase matrix.
 They either take the similarities between users or items into account.
 
+\paragraph{Similarity measures}
+\label{par:simMeasures}
+There are different methods to calculate similarities between two vectors.
+A common approach is the cosine similarity.
+Intuitively it measures the cosine of the angle between the two vectors $A$ and $B$ using the formula:
+
+\begin{equation}
+sim(A, B) =\frac{A \cdot B}{||A||\ ||B||} = \frac{\sum_{i=1}^{n}{A_i B_i}}{\sqrt{\sum_{i=1}^n{A_i^2}}\sqrt{\sum_{i=1}^n{B_i^2}}}
+\end{equation}
+
+Cosine similarity is usually applied to vectors with numerical elements.
+One measure for binary data is the Jaccard coefficient, which considers common elements with respect to the total number of set elements of the two vectors.
+The formula for the Jaccard coefficient is given by:
+
+\begin{equation}
+sim(A, B) = \frac{|A \cap B|}{|A \cup B|} = \frac{|A \cap B|}{|A|+|B|-|A \cap B|}
+\end{equation}
+
+
 \paragraph{Item-Item}
 In the item-item approach those items are recommended that are closest to the items the current user has already purchased.
 It was among others implemented by Amazon \cite{amazonItemItem}.
@@ -179,7 +198,7 @@ For every item $i$ the current user $u$ has not purchased a score is calculated 
 Here $A \in \mathds{R}^{n \times m}$ denotes the purchase matrix for $n$ users and $m$ items. $A(:,i)$ denotes the $i^{th}$ column vector. $I(u)$ is the set of items user $u$ purchased.
 Then those items are recommended that reach the highest score.
 The function $sim(A(:,i), A(:,j))$ can be substituted by any vector similarity function.
-In this thesis experiments were performed using cosine similarity and the Jaccard coefficient. %todo explained in section. %TODO write section and reference to it
+In this thesis experiments were performed using cosine similarity and the Jaccard coefficient explained above.
 
 \begin{algorithm}
 	\caption{CFItemNN}
@@ -286,6 +305,7 @@ Since memory-based approaches need to parse the whole matrix for every recommend
 But they benefit from adaptivity, because they can immediately incorporate new purchases, and do not need to retrain a model after the purchase matrix is updated.
 Moreover the results can be intuitively explained to the user, because these approaches simply base on purchases of similar users or similar items.
 
+
 \subsubsection{Model-based collaborative filtering}
 \label{sec:modelBasedCF}
 %Explain general svd
@@ -387,7 +407,19 @@ Another common approach is content-based filtering.
 This approach generates recommendations from any kind of content-based item features independently from other users' preferences.
 The item features may be any available information like genres, actors or directors in a movie recommendation context or any kind of texts in general.
 Texts are represented as word vectors $\vec{x} \in \mathds{R}^{|T|}$ with $T$ being the total number of words in any of the item descriptions.
-The vector elements $x_i$ are either binary values indicating the occurrence or absence of a word in the text, the number of occurrences of a word (bag-of-word model) or the corresponding tf-idf value. %TODO explain tf-idf and the formula I used
+The vector elements $x_i$ are either binary values indicating the occurrence or absence of a word in the text, the number of occurrences of a word (bag-of-word model) or the corresponding tf-idf (short for term frequency - inverse document frequency) value.
+Tf-idf refers to the term frequencies within a document with respect to the relevance of that term for the document.
+The relevance of a term is given by the inverse document frequency (idf), expressed as the logarithm of the inverse of the ratio of documents that contain that term.
+The tf-idf value of a term $t$ for a document $d$ is given as:
+
+\begin{equation}
+	\textit{tf-idf(t,d)} = \textit{tf(t,d)} log(\frac{N}{n_t})
+\end{equation}
+
+where $tf(t,d)$ denotes the term frequency of term $t$ within document $d$, $N$ is the number of all documents and $n_t$ is the number of documents that contain term $t$ at least once. 
+This measure on one hand gives those terms a higher value within a specific document that occur more often in a document, and on the other hand increase the value if that term is not common within the other documents.
+The rarer a term is, the more likely it is to be relevant to describe a specific document and therefore receives a higher weight.
+For example stop words like \textit{the}, \textit{and} or \textit{or} probably have high tf-values, but a low idf value, because they probably occur in almost every document.
 
 % What algorithms can be applied? explain naive bayes (because it seems to be often used) and nearest neighbor (because of simplicity)
 The general idea is to recommend items that are most similar to the items the user has already purchased with respect to the given content-based features.
@@ -772,7 +804,7 @@ The next section describes some alternative prediction schemes that are applied 
 	\end{algorithmic}	
 \end{algorithm}
 
-%todo add prediction with adaboost...
+%todo compare runtime of my appraoch and optimizing auc like in paper
 
 \section{Prediction rules}
 \label{sec:predictionRules}
