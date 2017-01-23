@@ -2,7 +2,7 @@
 
 \title{Recommender system for multiple online shops}
 \author{S.\ Deckers}
-\id{} %TODO find out id
+\id{DKE 17-04}
 \department{Artificial Intelligence}
 \committee{Dr. K. Driessens \\ Dr. J. Derks}
 \date{} %TODO fill in date of submission
@@ -84,11 +84,13 @@ The implemented techniques include different collaborative filtering approaches,
 Some techniques, especially model-based collaborative filtering, need to be adjusted to the implicit feedback datasets, especially regarding the lack of negative feedback.
 So a collaborative filtering algorithm is developed that learns latent factors from binary feedback by applying logistic regression.
 To overcome the problems of missing negative feedback and the skewed data distribution an AdaBoost approach is applied to the developed algorithm.
-%todo explain more detailed why I used AdaBoost
 
 % How do they correlate, maybe hybrid
 The single recommendation systems are evaluated and their errors are compared in order to find a hybrid technique that makes use of the benefits of different recommenders.
-It was shown among others by \cite{hybridSurvey} that some hybrid recommenders are able to outperform single recommenders. %todo add other references with data that is more similar to mine... (and especially not knowledge-based)
+It was shown among others by \cite{hybridSurvey} or \cite{hybridcfcbClaypool} that some hybrid recommenders are able to outperform single recommenders.
+\cite{hybridSurvey} offers a survey of different combinations of recommenders applied to a restaurant recommender systems.
+In \cite{hybridcfcbClaypool} a weighted hybrid combination of a collaborative and a content-based filtering approach is applied to a news article dataset.
+\cite{hybridCFCBClustringLi} uses content-based features to cluster items or users and then apply collaborative filtering to the new created feedback matrix. %todo maybe find some other references
 So the resulting recommendation lists are compared and investigated for correlation.
 Techniques with low error correlation might be able to form a hybrid system with better results.
 
@@ -152,7 +154,7 @@ Recommendations are made based on the preferences of all users using their ratin
 These information is represented as a matrix where users are represented as rows and columns represent the items.
 Every matrix entry indicates the interaction of a specific user-item pair.
 For e-commerce data there is an entry of 1 indicating preference for every item a user purchased.
-The other entries remain empty or zero indicating that preference for these items are unknown. %todo maybe write an own chapter for data representation and put this there
+The other entries remain empty or zero indicating that preference for these items are unknown.
 
 Collaborative filtering techniques are divided again into two different approaches: memory-based and model-based approaches.
 While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this model to make recommendations.
@@ -1068,17 +1070,18 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDIterations}
-	\caption{MAP of \textit{LogRegSVD} over number of training iterations for different number of features.}
-	\label{fig:LogRegSVDIterations}
+	\includegraphics[width=1\textwidth]{figures/experiments/SVDIterations}
+	\caption{MAPs of the SVD approaches over number of training iterations for different number of features using either traditional linear regression or the presented logistic regression formula.}
+	\label{fig:SVDIterations}
 \end{figure}
 %todo add some iteration until curves are obviously flater
 
-The logistic regression based matrix factorization algorithm \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) was compared to the traditional SVD approach using linear regression and it was investigated for the impact of different parameters.
+The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
 First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
-Figure \ref{fig:LogRegSVDIterations} shows the MAP for different number of features over the number of iterations during training.
-First there can be seen that the MAP increases with the number of iterations regardless of how many features are used.
+Figure \ref{fig:SVDIterations} shows the MAP for different number of features over the number of iterations during training.
+There it can be seen that the MAP increases with the number of iterations regardless of how many features or which matrix factorization technique is used.
 This is because more iterations result in a better trained model, because the feature vectors are updated more often.
+The \textit{LogRegSVD} outperforms the traditional SVD algorithm for every number of features and iterations.
 Moreover the MAP increases, when more features are used.
 The more features are used when factorizing the purchase matrix, the more information can be preserved, similar to an ordinary singular value decomposition.
 The Frobenius norm of the reduced matrix is closer to the Frobenius norm of the original matrix the greater the rank of the reduced matrix is.
@@ -1086,47 +1089,61 @@ Removing more features in the decomposition results in a worse approximation, bu
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDModels}
-	\caption{MAP for \textit{LogRegSVD} with AdaBoost over different number of models for different numbers of features.}
-	\label{fig:LogRegSVDModels}
+	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
+	\caption{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features.}
+	\label{fig:SVDModels}
 \end{figure}
 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDWeights}
-	\caption{MAP for \textit{LogRegSVD} over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
-	\label{fig:LogRegSVDWeights}
+	\includegraphics[width=1\textwidth]{figures/experiments/SVDWeights}
+	\caption{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
+	\label{fig:SVDWeights}
 \end{figure}
 Moreover the impact of the weights of the random sampled negative feedback are investigated.
 Different weights were assigned to the negative instances.
-Results can be seen in figure \ref{fig:LogRegSVDWeights}.
-For the models trained with 200 and 300 features there is a peak for a weight of 0.5.
+Results can be seen in figure \ref{fig:SVDWeights}.
+The MAP increases for higher weights for the negative instances.
+So in fact using different weights for negative instances does not bring any improvement.
+Probably this results from the random sampling of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
+So a negative instance has a much smaller impact on the trained model than the known positive instances, anyway.
 
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs have been compared for different numbers of models.
-Using only one model refers to the normal \textit{LogRegSVD} algorithm.
-The results are shown in figure \ref{fig:LogRegSVDModels}.
+Using only one model refers to the normal SVD algorithm without boosting.
+The results are shown in figure \ref{fig:SVDModels}.
 As expected the MAP gets better, if more models are used.
-Especially between one and two models there is a large improvement.
+Especially between one and two models there is a large improvement in the \textit{LogRegSVD} algorithm.
 Here for 100 features the MAP increases about 23\%, for 200 features about 12\% and for 300 features about 10\%.
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
+Furthermore the figure shows, that the performance different between models with different number of features gets smaller for higher numbers of models, especially for the linear regression based SVD approach.
 
 \begin{figure}
-	\begin{subfigure}[c]{1\textwidth}
+	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNum}
-		\caption{Different prediction rules over number of features. The models are trained with 2000 iterations.}
 	\end{subfigure}
-	\begin{subfigure}[c]{1\textwidth}
+	\begin{subfigure}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeatures}
+	\end{subfigure}
+	\caption{Comparison of different prediction rules. Plots show model-based, user-based, article-based or combined prediction of user and article errors for five and one SVD model over different number of features.}
+	\label{fig:LogRegSVDPredictions}
+\end{figure}
+\begin{figure}
+	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNum}
-		\caption{Different prediction rules over number of iterations. The models are trained with 300 features.}
 	\end{subfigure}
-	\caption{Comparison of different prediction rules. Plots show model-based, user-based, aricle-based or combined prediction of user and article errors for five and one \textit{LogRegSVD} model.}
-	\label{fig:LogRegSVDPrediction}
+	\begin{subfigure}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterations}
+	\end{subfigure}
+	\caption{Comparison of different prediction rules. Plots show model-based, user-based, article-based or combined prediction of user and article errors for five and one SVD model over different number of iterations.}
+	\label{fig:LinRegSVDPredictions}
 \end{figure}
 
-The presented prediction rules for the SVD and AdaBoost models are compared to each other over different number of features and iteration as can be seen in figure \ref{fig:LogRegSVDPrediction}.
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different numbers of features and iteration as can be seen in figure \ref{fig:LogRegSVDPredictions} and \ref{fig:LinRegSVDPredictions}.
 Only the article-based prediction rule is able ro reach improvements in terms of the MAP when applied to a single \textit{LogRegSVD} model for some numbers of iterations.
 
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} was applied to category information about articles.
