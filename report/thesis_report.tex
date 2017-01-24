@@ -5,7 +5,7 @@
 \id{DKE 17-04}
 \department{Artificial Intelligence}
 \committee{Dr. K. Driessens \\ Dr. J. Derks}
-\date{} %TODO fill in date of submission
+\date{25th January 2017}
 
 
 % new line instead of indent for new paragraph
@@ -42,12 +42,13 @@ They seek to provide users with items that are new to them or they might not hav
 %Probelms with e-commerce data
 While in the context of Netflix or last.fm the users actively search for new movies or music and intentionally use the recommendation system, in the context of e-commerce recommendations are usually shown while browsing the website.
 This also reflects in the kind of input the users give to the recommendation system.
-In systems like Netflix and last.fm the users give explicit feedback to different items in the form of ratings to express how much a user likes an item or by simply stating whether the user likes or dislikes an item.
+In systems like Netflix  \cite{netflixPrize} and last.fm \cite{implExplComparisonLastfm} the users give explicit feedback to different items in the form of ratings to express how much a user likes an item or by simply stating whether the user likes or dislikes an item.
 E-commerce services in contrast need to derive user preferences from their purchase or browsing behaviour.
 This kind of feedback is called implicit feedback.
 For recommendation this kind of feedback leads to problems for several reasons.
 First implicit feedback might be noisy, since it bases on the assumption that a user is interested in an item if he purchased it.
-This assumption is not necessary true, because he may have bought it for a friend or may be unsatisfied with the product.
+This assumption is not necessarily true, because he may have bought it for a friend or may be unsatisfied with the product.
+In \cite{implExplComparisonLastfm} a comparison of implicit and explicit feedback data in the context of music recommendation is given, showing that they perform similarly.
 If a user watches a movie, he is able to give it a low rating.
 This option is not necessarily available within online shops.
 Moreover implicit e-commerce datasets do not contain any information about negative feedback.
@@ -170,7 +171,7 @@ They either take the similarities between users or items into account.
 
 \paragraph{Similarity measures}
 \label{par:simMeasures}
-There are different methods to calculate similarities between two vectors.
+There are different methods to calculate similarities between two vectors \cite{dataMining}.
 A common approach is the cosine similarity.
 Intuitively it measures the cosine of the angle between the two vectors $A$ and $B$ using the formula:
 
@@ -311,8 +312,9 @@ Moreover the results can be intuitively explained to the user, because these app
 \subsubsection{Model-based collaborative filtering}
 \label{sec:modelBasedCF}
 %Explain general svd
-The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD).
+The most common model-based collaborative filtering approach works by matrix factorization like singular value decomposition (SVD) \cite{svdGolubGeneral}.
 It is aimed to find latent factor features to represent users and items instead of using the whole vectors from the purchase matrix.
+In \cite{SVDNeuralNet} it is shown that using latent features is able to improve prediction results in a movie rating dataset.
 Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{m \times n}$, $\Sigma \in \mathds{R}^{n \times n}$ and $V \in \mathds{R}^{n \times n}$, such that 
 
 \begin{equation}
@@ -325,7 +327,7 @@ The eigenvectors in $U$ and $V$ and their eigenvalues in $\Sigma$ are sorted suc
 Intuitively $AA^T$ contains the similarities of row vectors, i.e. users.
 Element $a_{ij}$ of $AA^T$ corresponds to the similarity between user $i$ and $j$, where user similarities are expressed as their common purchases.
 The eigenvectors are stored in descending order of their eigenvalues in $U$ and span a vector space of the user similarities.
-So the first column of $U$ is a vector pointing into the direction of highest user similarity. %TODO add svd reference
+So the first column of $U$ is a vector pointing into the direction of highest user similarity. 
 Item similarities are stored in V respectively.
 Dimensions of the purchase matrix A can than be reduced by cutting lower eigenvalues in $\Sigma$ and their eigenvectors in $U$ and $V$, because the lower eigenvalues are less able to detect purchase patterns of different users or items and are therefore less able to derive user and item features from.
 Cutting eigenvectors and eigenvalues up to $f \in \mathbf{R}$ results in the singular value decomposition 
@@ -354,7 +356,8 @@ Preference of user $u$ for item $i$ can be estimated by
 
 %Explain linear regression approach commonly used for recommendation
 There are several algorithms to compute a singular value decomposition like proposed in \cite{svdGolubSolution}.
-For recommendation systems the reduced user and item representations are often trained by alternating least squares regression instead of applying numerical methods. %TODO add svd paper
+For recommendation systems the reduced user and item representations are often trained by alternating least squares regression instead of applying numerical methods.
+In \cite{matrixFactorizationDifRegParam} this approach was implemented for the netflix prize dataset and various improvements are suggested.
 For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is learned by minimizing the cost function 
 
 \begin{equation}
@@ -363,7 +366,7 @@ For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i
 
 $e_{ui} = r_{ui} - p_u^T q_i$ is the error term that has to be reduced.
 $\lambda (||p_u||^2 + ||q_i||^2)$ is a regularization term to prevent the model from overfitting.
-Optimization is performed by gradient descent.
+Optimization of this least squares term is performed by gradient descent \cite{ngRegressionLectureNotes}.
 The feature vectors are updated into the opposite direction of the partial derivatives of the $p_u$ or $q_i$ vectors of the cost function.
 This yields the update rules
 
@@ -376,7 +379,8 @@ This yields the update rules
 
 where $\alpha$ denotes the learning rate.
 This approach is referred to as batch gradient descent, because for every feature update an iteration over the whole training set is needed.
-A faster way is stochastic gradient descent. %TODO add refernce to any paper that uses "my" version of stochatic descent
+A faster way is stochastic gradient descent.
+Funk \cite{funkLeastSquares} presented an efficient alternating least squares regression approach.
 There a feature vector is updated for every trainings example what leads to update rules 
 
 \begin{equation}
@@ -385,15 +389,24 @@ There a feature vector is updated for every trainings example what leads to upda
 \begin{equation}
 	q_i = q_i + \alpha (e_{ui} p_u + \lambda q_i)
 \end{equation}
-%todo explain difference between funk and me and why his methods doesn't work for me
+
+Funk performed updates for every user and item features separately.
+In contrast to this here all features are updated simultaneously like in \cite{matrixFactorizationDifRegParam}.
 
 % Sampling 
 This approach is usually applied to rating datasets and raises some problems when applied to implicit feedback data.
-While for rating data there are positive as well as negative preferences available in the form of different ratings, in e-commerce there are only purchased items to be considered at interesting for the user and not purchased items that may be either not interesting or unknown to the user.
+While for rating data there are positive as well as negative preferences available in the form of different ratings, in e-commerce there are only purchased items to be considered as interesting for the user and not purchased items that may be either not interesting or unknown to the user.
 The least-squares regression model cannot be trained only on the positive values, so some of the unknown instances have to be used for training as well.
-In \cite{occf} different sampling and weighting methods are investigated to address this issue. %TODO summarize the presented schemes
+In \cite{occf} different sampling methods are investigated to address this issue.
+Moreover some schemes to weight those instances during training the model are presented to express uncertainty of those instances.
 
-%TODO shortly explain cf for implicit feedback datasets paper
+In \cite{CFForImplFeedback} an SVD approach for implicit feedback datasets is presented.
+The squared error is multiplied by a confidence factor $c_ui$ for every user-item-tuple the minimization process.
+It was applied to a TV show recommender and the confidence factors refer to the amount of times a TV show was watched by the user.
+This approach is not applicable to e-commerce data, because the amount of purchases of a specific item probably does not correlate with the user's interest in that item.
+
+Sarwar et al. \cite{nnOnSvd} combined the SVD and neighbour-based approach by using the trained feature vectors as input for memory-based approaches explained above.
+It improves computation time for prediction, but it was shown that for e-commerce data, the results are worse than traditional memory-based approaches.
 
 %todo Add other approaches of sampling i have tried aman or one random value per positive training instance
 %todo add other weighting schemes i have tried (user based from occf paper)
@@ -572,8 +585,8 @@ AdaBoost is applied to the SVD - approach similar to the one explained in sectio
 In \cite{boostingCFRatings} it is applied to a movie rating dataset by optimizing the mean squared error as in usual SVD recommendation approaches.
 The weights for the instances are used to weaken the extent of regularization for instances with higher error.
 In \cite{boostingAUC} AdaBoost was applied to an implicit feedback dataset, but instead of optimizing the prediction error, as it was attempted in this thesis, they optimized the ranking measures MAP and AUC (Area Under Curve) directly.
-AUC is another measure to evaluate the precision of ranked lists taking also recall into account. %todo explain AUC  %TODO what dataset did they use? % TODO why don't I use this approach?
-There the authors evaluated their approach on a movie rating dataset that they transformed into a binary feedback dataset.
+AUC is another measure to evaluate the precision of ranked lists taking also recall into account.
+There the authors evaluated their approach on movie rating datasets that they transformed into a binary feedback datasets and a dataset containing play count of songs.
 
 
 
@@ -636,7 +649,7 @@ Content-based recommendation systems generate intuitive recommendations, since t
 But this also limits the recommendation to a specific set of items features, while in collaborative filtering a greater diversity of items can be recommended.
 In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him.
 For example if the recommendations only differ in size, colour or brand from the product the user already owns.
-So for online shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %TODO refer to hybrid chapter 
+So for online shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %todo refer to hybrid chapter if I add them
 
 % Correlation
 To compare the different algorithms they are separately applied to an e-commerce dataset.
@@ -663,6 +676,8 @@ When training the updates of user and item feature vectors, the prediction error
 \begin{equation}
 	e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}
 \end{equation}
+
+%maybe explain why funk version doesn't work here
 
 To address the problem of missing negative instances the negative training instances are obtained by randomly choosing them from the unknown instances.
 For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that every user and item gets about as many positive training updates as negative ones to ensure balanced classification problem.
@@ -1076,6 +1091,7 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 \end{figure}
 %todo add some iteration until curves are obviously flater
 
+% svd approaches
 The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
 First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
 Figure \ref{fig:SVDIterations} shows the MAP for different number of features over the number of iterations during training.
@@ -1101,6 +1117,7 @@ Removing more features in the decomposition results in a worse approximation, bu
 	\caption{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\label{fig:SVDWeights}
 \end{figure}
+
 Moreover the impact of the weights of the random sampled negative feedback are investigated.
 Different weights were assigned to the negative instances.
 Results can be seen in figure \ref{fig:SVDWeights}.
@@ -1108,6 +1125,24 @@ The MAP increases for higher weights for the negative instances.
 So in fact using different weights for negative instances does not bring any improvement.
 Probably this results from the random sampling of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
 So a negative instance has a much smaller impact on the trained model than the known positive instances, anyway.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/errorsLogLin43}
+	\caption{Mean of absolute errors of all training instances over iterations.}
+	\label{fig:errorsLogLin43}
+\end{figure}
+
+The differences between the traditional matrix factorization algorithm and \textit{LogRegSVD} was further analysed by comparing the error curves they produce during the training process.
+The error curves for a model with 300 features and 2000 iterations in shown in figure \ref{fig:errorsLogLin43}.
+It can be seen that the curve for the linear regression approach is steeper at the beginning, but later becomes flatter than the error curve of \textit{LogRegSVD}.
+So at start 
+%TODO explain the curve behave that differently.
+% model errors do not correlate with performance. why? error curves actually suggest that lin works better up to a specific number of iterations
+
+
+
 
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs have been compared for different numbers of models.
 Using only one model refers to the normal SVD algorithm without boosting.
@@ -1313,13 +1348,13 @@ But hybrids between a memory-based and a model-based recommender may be feasible
 The hybrid recommender using the unpersonalized \textit{MostPop} approach and any other personalized recommendation showed small improvements over the single unpersonalized ones.
 This is due to the removal of items that are rarely purchased and therefore have a lower probability to be purchased.
 The improvements only occur up to specific thresholds otherwise the relevant items are removed by the \textit{MostPop} recommender.
-Moreover it was shown that it slightly increases recommendation performance, because the most purchased items can be precomputed, such that the set of items that have to be taken into account by the personalized recommender is smaller in the actual recommendation step.
-%TODO perform experiments to see, whether that's the case for all recommenders
+Moreover it was shown that it slightly decreases recommendation computation time, because the most purchased items can be precomputed, such that the set of items that have to be taken into account by the personalized recommender is smaller in the actual recommendation step.
+
 
 
 
 %==============================================================
-\chapter{Conclusion}
+\chapter{Conclusion and Future work}
 \label{chap:conclusionAndFutureWork}
 In this work several common recommendation techniques were implemented and applied to an e-commerce dataset.
 In detail the recommenders are a user-user and an item-item memory-based collaborative approach, a new matrix factorization approach adapting a common SVD-based approach to binary data called \textit{LogRegSVD} and content-based recommendation techniques.
@@ -1340,9 +1375,9 @@ The user gets recommendations of items, that are almost equal to those he alread
 Moreover the errors of the evaluated recommenders were analysed for correlation to find candidates for possible hybridization of different recommenders.
 The only candidates for hybridization are combinations of the presented collaborative filtering approaches, especially between \textit{CFUserNN} and boosted \textit{LogRegSVD}.
 Combinations between the unpersonalized and the other approaches were implemented as a cascade hybrid recommendation system.
-This approaches removes rarely purchases items from the set before , such that the personalized recommenders have to process a smaller set of items.
-This hybridization achieves slight improvements in computation time and MAP.
-%TODO check after i added experiments
+This approaches removes rarely purchased items from the set before finding recommendations, such that the personalized recommenders have to process a smaller set of items.
+This hybridization achieves slight improvements in computation time and MAP for the item-item based collaborative filtering approach up to a specific threshold.
+For the content-bases recommender there is an improvement of the MAP as well, but the it still performs much worse than the unpersonalized recommender.
 
 Tasks for future work are on one hand investigations of possible hybrid systems, especially consisting of the presented \textit{LogRegSVD} and the user-user approach.
 The challenge here is to find a hybridization technique that does not diminish the advantages of the model-based recommenders concerning a shorter runtime for recommendations.
@@ -1358,6 +1393,8 @@ Context may refer to the current or recent article views or queries of the user,
 Taking time into account means on one hand, that it could be made use of purchase sequences.
 On the other hand recommended items, that have not been purchased or even clicked in some time will be penalized during the recommendation process or are interpreted as not interesting for the user.
 
+The problem of recommending too similar items when applying content-based recommenders can be addressed by developing a clustering technique to find equal or very similar items and then perform further experiments on the found clusters. 
+This approach was already implemented by \cite{hybridCFCBClustringLi} and successfully applied to a rating dataset for movies. 
 
 
 
