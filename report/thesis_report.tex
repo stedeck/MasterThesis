@@ -408,10 +408,6 @@ This approach is not applicable to e-commerce data, because the amount of purcha
 Sarwar et al. \cite{nnOnSvd} combined the SVD and neighbour-based approach by using the trained feature vectors as input for memory-based approaches explained above.
 It improves computation time for prediction, but it was shown that for e-commerce data, the results are worse than traditional memory-based approaches.
 
-%todo Add other approaches of sampling i have tried aman or one random value per positive training instance
-%todo add other weighting schemes i have tried (user based from occf paper)
-
-
 %todo what problems still arise and how do i solve them? (reference to boosting chapter)
 
 
@@ -641,7 +637,7 @@ Moreover both the nearest-neighbour and the naive Bayes approaches for content-b
 It was applied to item categories as well as descriptions.
 An item can be in multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
 The vector elements $x_c \in \{0,1\}$ indicate whether the item belongs to a specific category or not. 
-Texts were represented as binary word vectors, bag-of-words or tf-idf vectors. %todo what approach are expected to work best?
+Texts were represented as binary word vectors, bag-of-words or tf-idf vectors.
 As in the memory-based collaborative filtering approaches, Jaccard and cosine similarity are applied.
 The naive Bayes and the k-nearest-neighbour recommenders are expected to produce different recommendations, because with k-nearest-neighbour an item is likely to be recommended, if its whole set of features is similar to the those of items the user has already purchased.
 Naive Bayes in contrast also may recommend items that have single item features in common to many of the users purchases.
@@ -649,7 +645,7 @@ Content-based recommendation systems generate intuitive recommendations, since t
 But this also limits the recommendation to a specific set of items features, while in collaborative filtering a greater diversity of items can be recommended.
 In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him.
 For example if the recommendations only differ in size, colour or brand from the product the user already owns.
-So for online shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %todo refer to hybrid chapter if I add them
+So for online shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %todo refer to hybrid chapter if I add it
 
 % Correlation
 To compare the different algorithms they are separately applied to an e-commerce dataset.
@@ -1005,16 +1001,12 @@ It contains 663731 purchases, so it is only 0.06888\% dense, there are on averag
 Figures \ref{fig:userPurchases} and \ref{fig:articlePurchases} show the number of purchases for every user and article, respectively.
 Both curves are very skewed, i.e. there are few articles and users with many purchases and many users and article with only a small amount of purchases.
 
-%todo add median, 1st and 3rd quantile and create boxplots
-
 Besides purchases there is content-based information about items.
 Most items are assigned to one or more categories they belong to.
 In total there are 353 different categories.
 Moreover there are different kinds of texts like general information, indication, ingredient, side effects or interactions.
 For evaluation purposes the texts for general information and indication are used, because they seem to be most relevant to judge the similarity of medicine.
-Within the general information texts there are in total 44755 words, the corpus of indications texts contain 21516 words. %todo check number of items... something seems to be wrong there, since there are more items in the feature matrix than in the purchase matrix (the items that are not in the purchase matrix are not relevant)
-
-%todo Eventually demographic information and other browsing history stuff
+Within the general information texts there are in total 44755 words, the corpus of indications texts contain 21516 words.
 
 
  \section{Evaluation}
@@ -1044,7 +1036,7 @@ Here $U$ is the set of users, who got recommendations in the evaluation process,
 $Precision(i)$ denotes the precision of the recommended list up to position $i$, i.e. the number of correct recommendations within list elements $1$ to $i$ divided by $i$.
 So it is the mean of precisions measured at every position of the list of recommendations averaged over all users who got recommendations.
 All experiments are performed calculating a ranked list of ten recommendations.
-Larger lists would increase performance, because more items would participate in the evaluation and could increase the precisions. %todo how large is the list in literature? difference in evaluation in contrast to rating predcition?
+Larger lists would increase performance, because more items would participate in the evaluation and could increase the precisions.
 But in an online-shop a list of more than ten recommended items would not be useful to the user, since the recommended items are not actively requested by the user, but only shown besides the user browses the shop.
 MAP is a good measure to evaluate the accuracy of a ranked list, but it is quite unintuitive.
 So next to the MAP the precision independent of the rank is measured, i.e. how many of the test instances were recommended correctly, and the user precision is measured.
@@ -1093,6 +1085,8 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 
 % svd approaches
 The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
+All models were trained using a learning rate $\alpha$ of $0.001$, a regularization factor $\lambda$ of $0.01$ and a negative weight $w_n$ for negative instances of $0.5$, if not stated differently.
+User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.
 First the number of features and iterations were investigated to see how many features and iterations are needed to reach sufficient recommendation results.
 Figure \ref{fig:SVDIterations} shows the MAP for different number of features over the number of iterations during training.
 There it can be seen that the MAP increases with the number of iterations regardless of how many features or which matrix factorization technique is used.
@@ -1123,7 +1117,8 @@ Different weights were assigned to the negative instances.
 Results can be seen in figure \ref{fig:SVDWeights}.
 The MAP increases for higher weights for the negative instances.
 So in fact using different weights for negative instances does not bring any improvement.
-Probably this results from the random sampling of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
+Probably this results from the random sampling 
+of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
 So a negative instance has a much smaller impact on the trained model than the known positive instances, anyway.
 
 
@@ -1142,8 +1137,6 @@ So at start
 % model errors do not correlate with performance. why? error curves actually suggest that lin works better up to a specific number of iterations
 
 
-
-
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs have been compared for different numbers of models.
 Using only one model refers to the normal SVD algorithm without boosting.
 The results are shown in figure \ref{fig:SVDModels}.
@@ -1152,34 +1145,11 @@ Especially between one and two models there is a large improvement in the \texti
 Here for 100 features the MAP increases about 23\%, for 200 features about 12\% and for 300 features about 10\%.
 So already after evaluating the first model the instance weights could be adjusted, such that instances that were hard to predict get a better result. 
 Furthermore the figure shows, that the performance different between models with different number of features gets smaller for higher numbers of models, especially for the linear regression based SVD approach.
+There the model trained with 200 features even gets better than the model with 300 features.
+The differences are quite small, so this may result from the random sampling of negative instances, such that for one model a sample was generated, that produces better results, than in the other model.
 
-\begin{figure}
-	\begin{subfigure}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNum}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeatures}
-	\end{subfigure}
-	\caption{Comparison of different prediction rules. Plots show model-based, user-based, article-based or combined prediction of user and article errors for five and one SVD model over different number of features.}
-	\label{fig:LogRegSVDPredictions}
-\end{figure}
-\begin{figure}
-	\begin{subfigure}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNum}
-	\end{subfigure}
-	\begin{subfigure}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterations}
-	\end{subfigure}
-	\caption{Comparison of different prediction rules. Plots show model-based, user-based, article-based or combined prediction of user and article errors for five and one SVD model over different number of iterations.}
-	\label{fig:LinRegSVDPredictions}
-\end{figure}
-
-The presented prediction rules for the SVD and AdaBoost models are compared to each other over different numbers of features and iteration as can be seen in figure \ref{fig:LogRegSVDPredictions} and \ref{fig:LinRegSVDPredictions}.
-Only the article-based prediction rule is able ro reach improvements in terms of the MAP when applied to a single \textit{LogRegSVD} model for some numbers of iterations.
+The presented prediction rules for the SVD and AdaBoost models are compared to each other over different numbers models as shown in figures \ref{fig:LogRegSVDPredictions} and \ref{fig:LinRegSVDPredictions}. %TODO insert plots over models and explain
+Further plots to show the impact of the prediction rules over different numbers of features and iterations can be found in appendix \ref{app:predRulesExperiments}.
 
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} was applied to category information about articles.
 It results in a MAP of 0.00306, a user precision of 0.0664 and an overall precision of 0.00572.
@@ -1227,7 +1197,7 @@ While the other collaborative filtering approach tend to provide items that are 
 \begin{table}
 	\begin{tabular}{|c|c||p{1.2cm}|p{1.2cm}|p{1.2cm}|p{1.2cm}|}
 		\hline
-		\textbf{Recommender 1}&\textbf{Recommender2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
+		\textbf{Reco 1}&\textbf{Reco 2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
 		\textit{CFItemNN}&\textit{CBNN (Categories)}&400 (0.31\%)&25446 (19.45\%)&1185 (0.91\%)&103812 (79.34\%)\\ \hline
 		\textit{CFItemNN}&\textit{CBNN (Categories)}&550 (0.42\%)&28602 (21.86\%)&1035 (0.79\%)&100656 (76.93\%) \\ \hline
 		\textit{CFUserNN}&\textit{CBNN (text)}&1047 (0.80\%)&24789 (18.95\%)&3165 (2.42\%)&101833 (77.83\%) \\ \hline
@@ -1286,7 +1256,6 @@ Runtime improvements also cannot be achieved here, because the main part of the 
 	\caption{Impact of candidate threshold for different approaches}
 	\label{fig:candidates}
 \end{figure}
-%todo add cfusernn2
 
 
 \section{Discussion}
@@ -1326,7 +1295,6 @@ AdaBoost using 5 models achieves an improvement in the MAP of about 15\% as comp
 So focussing on instances with a high recommendation error in the training process increases the recommendation performance.
 Probably the instances with higher errors are those that have only few entries in the purchase matrix, such that AdaBoost achieves a more balanced training process between instances of different numbers of purchases.
 The boosted \textit{LogRegSVD} outperforms the user-user approach, but still performs worse than the memory-based item-item approach, but the recommendation process is much faster and less memory intensive, because it does not require the full purchase matrix.
-
 %todo see whether instance error correlate with number of purchases
 
 \subsection{Prediction rules}
@@ -1335,7 +1303,7 @@ The boosted \textit{LogRegSVD} outperforms the user-user approach, but still per
 The alternative prediction rules suggested for multiple or single \textit{LogRegSVD} models were not able to improve the MAP.
 It only outperformed the traditional prediction rules for single \textit{LogRegSVD} models, that have not been sufficiently trained, i.e. models that have been trained with to few number of iterations.
 In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, is able to outperform the traditional prediction approach.
-%todo explain why
+%TODO update after plot over model is added
 
 \subsection{Hybrid recommendation systems}
 \label{sec:discHybrid}
@@ -1343,7 +1311,7 @@ The experiments performed to investigate error correlations of the single hybrid
 The combinations between different collaborative filtering approaches make more diverse errors, especially \textit{CFUserNN} and the boosted version of \textit{LogRegSVD}.
 So the only hybrid recommenders that may be able to improve recommendation results are combinations between collaborative filtering  approaches.
 Combining two memory-based approaches probably would require a lot more runtime for making recommendations, because there are two models that have to process the whole purchase matrix.
-But hybrids between a memory-based and a model-based recommender may be feasible, if the memory-based approach can be incorporated in the training process of the model-based recommender, such that actual recommendation computation will not significantly be slowed down by processing the whole purchase matrix. %todo reference to corresponding hybrids
+But hybrids between a memory-based and a model-based recommender may be feasible, if the memory-based approach can be incorporated in the training process of the model-based recommender, such that actual recommendation computation will not significantly be slowed down by processing the whole purchase matrix. %todo reference to corresponding hybrid if I add that chapter
 
 The hybrid recommender using the unpersonalized \textit{MostPop} approach and any other personalized recommendation showed small improvements over the single unpersonalized ones.
 This is due to the removal of items that are rarely purchased and therefore have a lower probability to be purchased.
@@ -1400,5 +1368,54 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 
 \bibliography{thesis_report}
 \bibliographystyle{unsrt}
+
+\appendix
+	\chapter{Results of prediction rules}
+	\label{app:predRulesExperiments}
+	Here some additional plots to evaluate the performance of the prediction rules presented in section \ref{sec:predictionRules} are given.
+	
+	\begin{figure}[h!]
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNumSingle}
+		\end{subfigure}
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesSingle}
+		\end{subfigure}
+		\caption{Different prediction rules applied to a single SVD model over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
+	\end{figure}
+	\begin{figure}[h!]
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNumBoost}
+		\end{subfigure}
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesBoost}
+		\end{subfigure}
+		\caption{Different prediction rules applied to 5 boosted SVD models over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
+	\end{figure}
+	\begin{figure}[h!]
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNumSingle}
+		\end{subfigure}
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsSingle}
+		\end{subfigure}
+		\caption{Different prediction rules applied to a single SVD model over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
+	\end{figure}
+	\begin{figure}[h!]
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNumBoost}
+		\end{subfigure}
+		\begin{subfigure}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsBoost}
+		\end{subfigure}
+		\caption{Different prediction rules applied to 5 boosted SVD models over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
+	\end{figure}
+
 \end{document}
 
