@@ -4,7 +4,7 @@
 \author{S.\ Deckers}
 \id{DKE 17-04}
 \department{Artificial Intelligence}
-\committee{Dr. K. Driessens \\ Dr. J. Derks}
+\committee{Dr. K. Driessens \\ Dr. E.N. Smirnov}
 \date{25th January 2017}
 
 
@@ -35,7 +35,7 @@
 
 %==============================================================
 \chapter{Introduction}
-Recommendation systems are systems that aim to make personalized content recommendations to its users.
+Recommendation systems are systems that aim to make personalized recommendations to its users.
 They are widely used in the world wide web in different contexts such as movie recommendation in the streaming service Netflix or music recommendation as in last.fm as well as in e-commerce to recommend products, that the user might purchase.
 They seek to provide users with items that are new to them or they might not have discovered otherwise.
 
@@ -45,10 +45,10 @@ This also reflects in the kind of input the users give to the recommendation sys
 In systems like Netflix  \cite{netflixPrize} and last.fm \cite{implExplComparisonLastfm} the users give explicit feedback to different items in the form of ratings to express, how much a user likes an item, or by simply stating, whether the user likes or dislikes an item.
 E-commerce services in contrast need to derive user preferences from their purchase or browsing behaviour.
 This kind of feedback is called implicit feedback.
-For recommendation this kind of feedback leads to problems for several reasons.
+In \cite{implExplComparisonLastfm} a comparison of implicit and explicit feedback data in the context of music recommendation is given, showing that they perform similarly.
+Though in e-commerce this kind of feedback leads to problems for several reasons.
 First implicit feedback might be noisy, since it bases on the assumption that a user is interested in an item if he purchased it.
 This assumption is not necessarily true, because he may have bought it for a friend or may be unsatisfied with the product.
-In \cite{implExplComparisonLastfm} a comparison of implicit and explicit feedback data in the context of music recommendation is given, showing that they perform similarly.
 If a user watches a movie, he is able to give it a low rating.
 This option is not necessarily available within online shops.
 Moreover implicit e-commerce datasets do not contain any information about negative feedback.
@@ -76,17 +76,34 @@ This must be taken into account for the choice of recommendation algorithms as w
 %todo could add that there are interactive systems or configarionable ones
 %todo also could add different requirements/criteria from the handbook
 
-\section{Problem statement}
+\section{Research questions}
 % Investigate different techniques, see how they perform, what are their pro and cons
+\paragraph{Which types of recommendation algorithms are applicable to \\e-commerce data?}
 The goal of this thesis is to find a recommendation system for e-commerce datasets.
 It is required to provide accurate recommendations in terms of the mean average precision described in section \ref{sec:eval} as well fast recommendations to preserve user satisfaction when using the online shops.
-So the first task of this thesis is to implement different recommendation techniques, measure their performance on an e-commerce dataset and analyse their advantages and drawbacks.
+So it is elaborated which types of recommendation algorithms are applicable to e-commerce.
+The first task of this thesis is to implement different recommendation techniques, measure their performance on an e-commerce dataset and analyse their advantages and drawbacks.
 The implemented techniques include different collaborative filtering approaches, i.e. memory-based and model-based collaborative filtering, and content-based recommendation, see section \ref{sec:recommenderSystems}.
-Some techniques,like model-based collaborative filtering, need to be adjusted to the implicit feedback datasets, especially regarding the lack of negative feedback.
-So a collaborative filtering algorithm is developed, that learns latent factors from binary feedback by applying logistic regression.
+
+% Implicit feedback problem
+\paragraph{Can logistic regression improve performance of model-based collaborative filtering?}
+Many known techniques, especially model-based collaborative filtering techniques, have been developed to perform well only on rating data sets.
+They need to be adjusted to implicit feedback datasets, especially regarding the lack of negative feedback.
+So a new collaborative filtering algorithm is developed, that learns latent factors from binary feedback by applying logistic regression.
+
+\paragraph{Can AdaBoost enhance model-based collaborative filtering on \\e-commerce data?}
 To overcome the problems of missing negative feedback and the skewed data distribution an AdaBoost approach is applied to the developed algorithm.
+A single collaborative filtering model performs more updates of user and item features with more purchases, since more instances are available for training.
+An AdaBoost approach should also emphasize training of user and items with fewer purchases to ensure a more balanced training of different user and item features. 
+
+\paragraph{Can alternative prediction rules for AdaBoost improve prediction results?}
+AdaBoost results in several models to compute recommendations for many users.
+The performance of those model may vary for different users or item.
+So prediction rules are developed, that take the prediction errors of users or items into account instead of the full model error as in traditional AdaBoost approaches.
 
 % How do they correlate, maybe hybrid
+\paragraph{May hybrid recommenders of the presented approaches be able to improve recommendation performance?}
+In the last step of this thesis it will be investigated, whether hybrid recommendation approaches are able to improve precision.
 The single recommendation systems are evaluated and their errors are compared in order to find a hybrid technique, that makes use of the benefits of different recommenders.
 It was shown among others by \cite{hybridSurvey} or \cite{hybridcfcbClaypool} that some hybrid recommenders are able to outperform single recommenders.
 \cite{hybridSurvey} offers a survey of different combinations of recommenders applied to a restaurant recommender systems.
@@ -103,14 +120,16 @@ First it serves as a comparative study of basic recommendation algorithms applie
 Benefits and drawback are pointed out, especially concerning known problems with implicit feedback datasets.
 
 % Logistic regression SVD
-Second a new model-based collaborative filtering approach for binary data is suggested called \textit{LogRegSVD}.
+Second a new model-based collaborative filtering approach for binary data is presented called \textit{LogRegSVD}.
 It is a common collaborative filtering approach based on singular value decomposition, adapted to binary data by incorporating logistic regression.
 
 % AdaBoost for reco
-Furthermore AdaBoost is applied to the presented algorithm to tackle some of the problems raising due to implicit feedback datasets.
+Furthermore AdaBoost is adapted to the presented algorithm to tackle some of the problems raising due to implicit feedback datasets.
 AdaBoost was already applied to collaborative filtering by \cite{boostingCFRatings} on a rating dataset.
 \cite{boostingAUC} applied it to implicit feedback datasets by optimizing ranking measures like the area under the curve (AUC) measure or the mean average precision (MAP, see \ref{sec:eval}).
-This work is original in applying it to a logistic regression approach for recommendation on a real e-commerce dataset.
+This work is original in applying it to a model-based collaborative filtering approach on a real e-commerce dataset.
+Moreover it was applied to the presented logistic regression approach in order to adapt to implicit feedback.
+
 
 
 \section{Organization}
@@ -134,7 +153,7 @@ At the end in chapter \ref{chap:conclusionAndFutureWork} a conclusion is made an
 
 
 %==============================================================
-\chapter{Related Work}
+\chapter{Preliminaries}
 \label{sec:relatedWork}
 
 \section{Recommender Systems}
@@ -151,15 +170,15 @@ These techniques are used for the recommendation system developed in the scope o
 \label{rs_cf}
 
 Collaborative filtering is the most implemented and successful recommendation technique.
-Recommendations are made based on the preferences of all users using their ratings in the context of Netflix or their purchases in an e-commerce context.
-These information is represented as a matrix, where users are represented as rows and columns represent the items.
+Recommendations are made based on the preferences of all users using their ratings in the context such as Netflix or their purchases in an e-commerce context.
+This information is represented as a matrix, where users are represented as rows and columns represent the items.
 Every matrix entry indicates the interaction of a specific user-item pair.
 For e-commerce data there is an entry of 1 indicating preference for every item a user purchased.
 The other entries remain empty or zero indicating, that preferences for these items are unknown.
 
 Collaborative filtering techniques are divided again into two different approaches: memory-based and model-based approaches.
 While memory-based approaches directly make use of the preference matrix, model-based approaches train an alternative model and use this model to make recommendations.
-Model-based recommendation systems need some time to train the model, but are able to make faster recommendations, because they user a more compact model instead of the full purchase matrix.
+Model-based recommendation systems need some time to train the model, but are able to make faster recommendations, because they use a more compact model instead of the full purchase matrix.
 Moreover model-based techniques usually need less memory, because the full purchase matrix is not needed.
 
 \subsubsection{Memory-based collaborative filtering}
@@ -266,13 +285,15 @@ After the nearest neighbours of user $u$ are obtained, those items are recommend
 	\end{algorithmic}	
 \end{algorithm}
 
-This approach is not able to guarantee a sufficiently large list of recommendations, if the neighbours $N(u)$ purchased less items than the number of required recommendations, or if $u$ already purchased too many of the items $N(u)$ purchased.
+This approach is not able to guarantee a sufficiently large list of recommendations.
+While in an item-item approach all item are considered as potential recommendations, in a user-user approach only those are considered that have been bought by the current user's neighbours.
+If the neighbours $N(u)$ purchased less items than the number of required recommendations, or if $u$ already purchased too many of the items $N(u)$ purchased.
 Let $I(N(u))$ be the set of items the neighbours of $u$ purchased, a user-user approach is only able to recommend at most $|I(N(u)) \setminus I(u)|$ items to user $u$.
 This may especially be a problem for users with only a few purchases, because the less items a user purchased the higher is the probability to find neighbours with the same set of purchased items.
 Moreover vectors with few numbers of entries are more similar to other vectors with few entries.
 
 Another user-user approach, that does not suffer from the above problem was implemented in \cite{efficientTopN} or \cite{effectiveLatentModels}, see algorithm \ref{alg:CFUserNN2}.
-Here for every item $i$, the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated by: 
+Here for every item $i$, the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated as using: 
 
 \begin{equation}
 	s(u,i) = \sum_{v \in U(i)}{sim(u,v)}
@@ -358,7 +379,7 @@ Preference of user $u$ for item $i$ can be estimated by
 
 %Explain linear regression approach commonly used for recommendation
 There are several algorithms to compute a singular value decomposition like proposed in \cite{svdGolubSolution}.
-For recommendation systems the reduced user and item representations are often trained by alternating least squares regression instead of applying numerical methods.
+For recommendation systems the reduced user and item representations are often trained by least squares regression instead of applying numerical methods.
 In \cite{matrixFactorizationDifRegParam} this approach was implemented for the netflix prize dataset and various improvements are suggested.
 For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is learned by minimizing the cost function 
 
@@ -373,16 +394,18 @@ The feature vectors are updated into the opposite direction of the partial deriv
 This yields the update rules
 
 \begin{equation}
+\label{eq:updateLinRegP}
 	p_u = p_u + \alpha \sum_{ui}{e_{ui} q_i + \lambda p_u}
 \end{equation}
 \begin{equation}
+\label{eq:updateLinRegQ}
 	q_i = q_i + \alpha \sum_{ui}{e_{ui} p_u + \lambda q_i}
 \end{equation}
 
 where $\alpha$ denotes the learning rate.
 This approach is referred to as batch gradient descent, because for every feature update an iteration over the whole training set is needed.
 A faster way is stochastic gradient descent.
-Funk \cite{funkLeastSquares} presented an efficient alternating least squares regression approach.
+Funk \cite{funkLeastSquares} presented an efficient least squares regression approach.
 There a feature vector is updated for every trainings example, what leads to update rules 
 
 \begin{equation}
@@ -421,6 +444,8 @@ This approach generates recommendations from any kind of content-based item feat
 The item features may be any available information like genres, actors or directors in a movie recommendation context or any kind of texts in general.
 Texts are represented as word vectors $\vec{x} \in \mathds{R}^{|T|}$ with $T$ being the total number of words in any of the item descriptions.
 The vector elements $x_i$ are either binary values indicating the occurrence or absence of a word in the text, the number of occurrences of a word (bag-of-word model) or the corresponding tf-idf (short for term frequency - inverse document frequency) value.
+While the binary or bag-of-words model only take mere word occurrences into account, tf-idf is a measure to describe the importance of a word for a specific document.
+For example if a word like 'the' occurs often in a document, it would have a high value in the bag-of-word model, but it is not important for the text, because it does not carry any information about its content.
 Tf-idf refers to the term frequencies within a document with respect to the relevance of that term for the document.
 The relevance of a term is given by the inverse document frequency (idf), expressed as the logarithm of the inverse of the ratio of documents that contain that term.
 The tf-idf value of a term $t$ for a document $d$ is given as:
@@ -436,7 +461,7 @@ For example stop words like \textit{the}, \textit{and} or \textit{or} probably h
 
 % What algorithms can be applied? explain naive bayes (because it seems to be often used) and nearest neighbor (because of simplicity)
 The general idea is to recommend items, that are most similar to the items the user has already purchased with respect to the given content-based features.
-Two algorithms have been implemented: Naive Bayes classification and k-nearest-neighbour like explained in \cite{contentbasedPazzani}.
+Two algorithms have been implemented: Naive Bayes classification and k-nearest-neighbour as explained in \cite{contentbasedPazzani}.
 Naive Bayes determines the probability, that a user purchases a specific item based on the likelihood of its single features.
 For every user $u$ a profile is trained consisting of the prior probability, that $u$ purchases an item $p_u(b=1)$ and  the likelihoods of $f$ item features $p_u(x_f|b=1)$.
 The probability of $u$ purchasing an item given in terms of item features $x$ can be calculated using the Bayes theorem by 
@@ -536,7 +561,7 @@ For this purpose a content matrix $C \in \mathds{R}^{n \times c}$, where $n$ is 
 \label{sec:boosting}
 Boosting is an ensemble learning technique for classification, that aims to improve the performance of a learning algorithms by training multiple models.
 First boosting algorithms were introduced by Schapire \cite{boostingSchapire} and Freund \cite{boostingFreund}.
-The idea is to train multiple models of the same type iteratively, such that every model performs slightly better than the preceding model.
+The idea is to train multiple models of the same type iteratively, such that a joint model using the models of the single iterations performs better than the single models.
 So even if the initial model is weak and only makes slightly better predictions than random guessing, boosting is able to train a strong classifier.
 This is achieved by focusing on training instances, that are hard to classify.
 After a model $M_i$ is trained, the next model $M_{i+1}$ is trained with higher emphasize on trainings examples, that are misclassified by $M_i$. 
@@ -546,7 +571,7 @@ When all models are trained, predictions are made by majority voting of all trai
 \label{sec:adaBoost}
 The most known boosting algorithm is AdaBoost (adaptive Boosting) developed by Freund and Schapire \cite{boostingIntro}.
 Given a set of training instances $X = \{x_1, ..., x_n\}$ and their corresponding class labels $Y = \{y_1, ..., y_n\}$, with $y_i \in \{-1, 1\}$, the first model $M_1$ is trained on a sample set according to a distribution $D_1(i) = \frac{1}{n}$. So each training instance has the same probability of being added to the training set for the first model.
-Sampling is performed without replacement, so in general one instance may occur more than once in the training set.
+Sampling is performed with replacement, so in general one instance may occur more than once in the training set.
 The model $M_t$ is then tested on the training set and the error $\epsilon_t$ is calculated as the amount of incorrectly classified instances.
 Dependent on this error the model is assigned a weight $\alpha_t = \frac{1}{2} ln(\frac{1 - \epsilon_t}{\epsilon_t})$, such that better models have a higher impact on final predictions.
 The model error is also used to build the distribution for the next model: 
@@ -602,8 +627,8 @@ There the authors evaluate their approach on movie rating datasets, that they tr
 \label{sec:ecommerceRec}
 
 Different approaches from the last chapter are implemented and applied to an e-commerce dataset.
-In section \ref{sec:comparison} the basic approaches are analysed and compared.
-Some enhancements are made with respect to e-commerce datasets, described in sections \ref{sec:logRegSVD} and \ref{sec:myAdaBoost}.
+In section \ref{sec:comparison} the basic approaches that can be directly applied are analysed and compared.
+Some enhancements need to be made with respect to e-commerce datasets, described in sections \ref{sec:logRegSVD} and \ref{sec:myAdaBoost}.
 
 
 \section{Comparison of basic approaches}
@@ -613,10 +638,11 @@ Some enhancements are made with respect to e-commerce datasets, described in sec
 Basic approaches explained in section \ref{sec:recommenderSystems} are implemented and analysed on how suitable they are for e-commerce.
 The item-item approach in algorithm \ref{alg:CFItemNN} is directly implemented without any changes.
 Both user-user approaches are implemented, though algorithm \ref{alg:CFUserNN2} requires a lot more runtime.
-While algorithm \ref{alg:CFUserNN} only needs to iterate over all users to determine the neighbours and then only needs to determine the most purchased items, algorithm \ref{alg:CFUserNN2} needs to iterate over all users once for every item.
-Algorithm \ref{alg:CFUserNN} has an average runtime of about $O(|U| \cdot \mu_u)$ to determine the nearest neighbours, algorithm \ref{alg:CFUserNN2} needs $O(I \cdot \mu_i \cdot \mu_u)$.
+The first user-user approach (algorithm \ref{alg:CFUserNN}) only needs to iterate over all users to determine the neighbours and then only needs to determine the most purchased items.
+It requires an average runtime of about $O(|U| \cdot \mu_u)$ to determine the nearest neighbours.
+The second approach (algorithm \ref{alg:CFUserNN}) needs to iterate over all users once for every item, which needs a runtime of $O(I \cdot \mu_i \cdot \mu_u)$.
 $\mu_u$ and $\mu_i$ refer to the average number of purchases per user and item, respectively.
-For algorithm \ref{alg:CFUserNN} a small change was applied to reduce the chance of not being able to find a sufficiently large list of recommendations and ensure, that there is at least one recommendation.
+For algorithm \ref{alg:CFUserNN} a small change was applied to reduce the probability of not being able to find a sufficiently large list of recommendations and ensure, that there is at least one recommendation.
 When determining the nearest neighbours only those are taken into account, that have a similarity score of less than one, i.e. $s(u,v) = sim(u, v) < 1$, because a score of 1 means, that $u$ and $v$ have purchased exactly the same set of items.
 As in many applications the cosine similarity is used for both approaches.
 Since the user and item vectors are binary, experiments were also performed using Jaccard similarity.
@@ -625,7 +651,7 @@ Both measures take the amount of common attributes into account, but normalizati
 For cosine similarity the normalization factor is the product of the lengths of the single vectors.
 Jaccard similarity counts the total amount of set attributes, i.e. the union of the sets representing the vectors, for normalization.
 %For example there are vectors $\vec{a_1} = \{1,1,1,1,0\}^T$, $\vec{a_2} = \{0,1,1,1,1\}^T$ and $\vec{b_1} = \{1,1,1,0,0\}^T$, $\vec{b_2} = \{1,1,1,1,1\}^T$.
-For recommendation Jaccard similarity is more promising, because the amount of common attributes is more important than single vector lengths.
+For recommendation Jaccard similarity is expected to be more promising, because the amount of common attributes is more important than single vector lengths.
 
 %Collaborative filtering
 The collaborative filtering approaches cannot directly be applied to implicit feedback datasets, because there are no ratings available for e-commerce.
@@ -633,21 +659,20 @@ In traditional approaches the available ratings are used for training a model, t
 Instead of ratings there are only purchases available that are denoted as 1, while not purchased items are marked with 0.
 It is only considered, whether a user purchases an item or not, regardless of how often he bought it, because the amount of purchases probably does not correlate with the users need or interest in that item.
 There are items that are in general only bought once, while others are usually needed and bought on a more regular basis. 
-So in the next chapter an approach is suggested to adapt the matrix factorization approach to a binary feedback dataset.
+So in the section \ref{sec:logRegSVD} an approach is suggested to adapt the matrix factorization approach to a binary feedback dataset.
 
 % Content-based approaches
 Moreover both the nearest-neighbour and the naive Bayes approaches for content-based recommendation are investigated.
 They are applied to item categories as well as descriptions.
-An item can assigned to multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
+An item can be assigned to multiple categories, so they are represented as vectors $\vec{x} \in \mathds{R}^{|C|}$ where $|C|$ is the number of available categories.
 The vector elements $x_c \in \{0,1\}$ indicate whether the item belongs to a specific category or not. 
 Texts are represented as binary word vectors, bag-of-words or tf-idf vectors.
 As in the memory-based collaborative filtering approaches, Jaccard and cosine similarity are applied.
 The naive Bayes and the k-nearest-neighbour recommenders are expected to produce different recommendations, because with k-nearest-neighbour an item is likely to be recommended, if its whole set of features is similar to those items, that the user has already purchased.
 Naive Bayes in contrast also may recommend items that have single item features in common to many of the users purchases.
 Content-based recommendation systems generate intuitive recommendations, since they are always similar to the items the current user already purchased.
-But this also limits the recommendation to a specific set of items features, while in collaborative filtering a greater diversity of items can be recommended.
-In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him.
-For example if the recommendations only differ in size, colour or brand from products the user already owns.
+But this also limits the recommendation to a specific set of item features, e.g. categories, while in collaborative filtering a greater diversity of items can be recommended.
+In e-commerce datasets this constraint may even be a problem, because recommendations that are too similar to the items a user already purchased may be useless to him, for example if the recommendations only differ in size, colour or brand from products the user already owns.
 So for online shops content-based recommender systems may only be used for new users or in combination with another collaborative filtering recommendation system. %todo refer to hybrid chapter if I add it
 
 % Correlation
@@ -670,7 +695,7 @@ Then prediction is performed by
 	\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}
 \end{equation}
 
-When training the user and item feature vectors, the prediction error is then replaced with 
+When training the user and item feature vectors, the prediction error $e_{ui}$ is then replaced with 
 
 \begin{equation}
 	e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}
@@ -681,18 +706,22 @@ When training the user and item feature vectors, the prediction error is then re
 To address the problem of missing negative instances the negative training instances are obtained by randomly choosing them from the unknown instances.
 For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that every user and item gets about as many positive training updates as negative ones to ensure a balanced classification problem.
 $U$ and $I$ denote the set of all users and items, respectively.
-To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules become 
+To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules in equations \ref{eq:updateLinRegP} and \ref{eq:updateLinRegQ} become 
 
 \begin{equation}
+\label{eq:updateLogRegP}
 	p_u = p_u + w_n \alpha (e_{ui} q_i + \lambda p_u)
 \end{equation}
 
 and 
 
 \begin{equation}
+\label{eq:updateLogRegQ}
 	q_i = q_i + w_n \alpha (e_{ui} p_u + \lambda q_i)
 \end{equation}
+
 %todo try different weights for p_u and q_i maybe? 
+$\alpha$ refers to the learning rate and $\lambda$ to the regularization factor as explained in section \ref{sec:collaborativeFiltering}.
 The weight is set to $w_n = 1$ for known positive trainings instances and to $w_n < 1$ for the other randomly chosen negative weights.
 In section \ref{sec:results} experiments for different weights are performed to see, how they effect the performance of the algorithm.
 
@@ -713,7 +742,7 @@ In section \ref{sec:results} experiments for different weights are performed to 
 					\State $p_u^{(f)} := p_u^{(f)} + w_n \alpha (e_{ui} q_i^{(f)} + \lambda p_u^{(f)})$
 					\State $q_i^{(f)} := q_i^{(f)} + w_n \alpha (e_{ui} p_u^{(f)} + \lambda q_i^{(f)})$
 				\EndFor	
-				\State Randomly choose two tuples $(u,j)$ and $(v,i)$ and repeat with errors: 
+				\State Randomly choose two tuples $(u,j)$ and $(v,i)$, such that $A_{uj} = A_{vi} = 0$, and repeat with errors: 
 				\State $e_{uj} := - \frac{1}{1 + e^{-p_u^Tq_j}}$ and
 				\State $e_{vi} := - \frac{1}{1 + e^{-p_v^Tq_i}}$
 			\EndFor
@@ -746,7 +775,7 @@ Items with fewer purchases are harder to train, because there are less training 
 To overcome this problem and emphasize training of the feature vectors of items with fewer purchases, AdaBoost is applied to the presented matrix factorization approach.
 Instead of resampling training instances, the reweighting approach explained in section \ref{sec:reweightingResampling} is applied, because resampling would produce an even sparser purchase matrix.
 The weights are applied to the learning rate of the feature updates, such that instances with higher weights get larger feature updates than those with fewer weights.
-So the update rules from the presented logistic regression matrix factorization are transformed to: 
+So the update rules \ref{eq:updateLogRegP} and \ref{eq:updateLogRegQ} from the presented logistic regression matrix factorization are transformed to: 
 
 \begin{equation}
 p_{u,t} = p_{u,t} + w_n \alpha d_{ui,t} (e_{ui,t} q_{i,t} + \lambda p_{u,t})
@@ -760,28 +789,17 @@ q_{i,t} = q_{i,t} + w_n \alpha d_{ui,t} (e_{ui,t} p_{u,t} + \lambda q_{i,t})
 
 where $d_{ui}$ denotes the weight for training instance of user $u$ for item $i$.
 For the first model the weights are $1$ for all training instances, such that all feature vectors are updated according to the unweighted learning rate.
-The trained model is evaluated using the training set and the weights for next model are updated according to $d_{ui,t+1} = d_{ui,t} \exp(e_{ui})$, such that instances with a larger prediction errors will get larger feature updates when training the next model.
+The trained model is evaluated using the training set and the weights for next model are updated according to $d_{ui,t+1} = d_{ui,t} \exp(e_{ui,t})$, such that instances with a larger prediction errors will cause larger feature updates when training the next model.
 After all weights are updated, they are normalized by $d_{ui,t+1} = \frac{d_{ui,t+1} |R_{train}|}{\sum_{(u,i)}{d_{ui,t+1}}}$, such that the sum of all instance weights adds up to the number of purchases again.
 $R_{train}$ is the set of $(u,i)$-tuples of all purchases of the training set.
-In traditional AdaBoost approaches the weights are updated dependent on the model error, where weights of correctly classified instances are decreased and misclassified instances are increased.
-Here the updates only depend on the instance errors.
+In traditional AdaBoost approaches the weights are updated dependent on the model error $e_t$ by increasing correctly and decreasing misclassified instances.
+Here the updates depend on single instance errors $e_{ui,t}$.
 This allows to perform higher updates for instances with high errors and lower updates for instances with lower errors, instead of different update rules for correctly or incorrectly classified instances. 
 The model error is not incorporated in weight updates, because it is explicitly desired to focus on instances that are hard to classify, even if the overall model performance might get worse.
-If users or items have few purchases and therefore get worse prediction results, they shall be emphasized in the next model in order to get as much updates as easier to classify users or items.
-Taking the model error into account might diminish this effect, because users and items with more purchases have a higher effect on the model error.
+If users or items have fewer purchases, their feature vectors receive fewer updates and the prediction for these users or items is worse.
+So they shall be emphasized in the next model in order to get as much updates as easier to classify users or items.
+Taking the model error into account for the weight updates might diminish this effect, because users and items with more purchases have a higher effect on the model error.
 Algorithm \ref{alg:AdaBoostLogRegSVDTraining} describes the training of $T$ matrix factorization models using the logistic regression approach.
-
-After $T$ models are trained, recommendation is performed by combining the prediction of those models.
-In classification problems a weighted majority vote determines the final predicted class.
-Every model's prediction is multiplied by a model weight $\alpha_t = ln(\frac{1-\epsilon_t}{\epsilon_t})$ and summed up.
-For recommendation this leads to the following prediction rule to determine the score for a user-item-pair:
-
-\begin{equation}
-	\label{eq:adaBoostPredRule}
-	s(u,i) = \sum_t^T{\frac{ln(\frac{1 - \epsilon_t}{\epsilon_t})}{1 + exp(p_{u,t}^Tq_{i,t})}}
-\end{equation}
-
-The next section describes some alternative prediction schemes that are applied in the scope of this thesis.
 
 \begin{algorithm}
 	\caption{AdaBoost LogRegSVD Training}
@@ -825,6 +843,17 @@ The next section describes some alternative prediction schemes that are applied 
 
 \section{Prediction rules}
 \label{sec:predictionRules}
+
+Section \ref{sec:myAdaBoost} explained how AdaBoost models are trained.
+Recommendation is then performed by combining the predictions of those models.
+In classification problems a weighted majority vote determines the final predicted class.
+Every model's prediction is multiplied by a model weight $\alpha_t = ln(\frac{1-\epsilon_t}{\epsilon_t})$ and summed up.
+For recommendation this leads to the following prediction rule to determine the score for a user-item-pair:
+
+\begin{equation}
+\label{eq:adaBoostPredRule}
+s(u,i) = \sum_t^T{\frac{ln(\frac{1 - \epsilon_t}{\epsilon_t})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+\end{equation}
 
 The prediction rule in equation \ref{eq:adaBoostPredRule} incorporates the errors of the whole models, that are trained during the AdaBoost recommendation approach.
 Though the models consist of user and item features, that may vary in performance, i.e. one model may perform better for some users or items, while another model may perform better for other users or items.
@@ -879,7 +908,7 @@ The article error based prediction can also be applied to a single model, i.e. t
 %==============================================================
 \chapter{Implementation and Performance}
 \label{chap:ImplemenationAndPerformance}
-Recommendation system raise some challenges concerning implementation of different algorithms, due to a large feedback matrix and the need to provide fast recommendations.
+Recommendation system raise some challenges concerning implementation of different algorithms, due to a large purchase matrix and the need to provide fast recommendations.
 The following section will give some implementation details. 
 The shop environment the recommender system will be embedded in, is built in a reactive manner using the Java toolkit vert.x.
 This requires the recommender system to work reactively and make use of vert.x as well.
@@ -972,7 +1001,7 @@ Figure \ref{fig:getPurchases} shows the UML notation of the \textit{IRecoData} i
 \chapter{Experimentation}
 \label{chap:experimentation}
 The described algorithms are evaluated against a real-world e-commerce dataset.
-On one hand it is aimed to compare different recommendation approaches on e-commerce data and on the other hand the impact of different parameters is analysed.
+On one hand, it is aimed to compare different recommendation approaches on e-commerce data, and on the other hand, the impact of different parameters is analysed.
 In the next section the data used for evaluating the algorithms is presented.
 Section \ref{sec:eval} explains the used evaluation measures.
 The last two sections of this chapter show the obtained results and discuss them.
@@ -999,12 +1028,19 @@ The last two sections of this chapter show the obtained results and discuss them
 To evaluate the different recommendation approaches, data from an online pharmacy is used.
 The dataset contains purchases from 81,835 users and 14,964 articles.
 Those articles contain many duplicates, because articles of the same product, but with different package sizes or different colours are considered as different articles in the database.
-There is no attribute to determine real distinct articles, but the amount of duplicates could be reduced by aggregating items of the same name and handle them as one item.
+There is no attribute to determine real distinct articles, but the amount of duplicates was reduced by aggregating items of the same name and handle them as one item.
 This reduces the number of items to 11,775.
-So dimensions of the used purchase matrix are 81,835 \texttimes \ 11,775.
+Thus dimensions of the used purchase matrix are 81,835 \texttimes \ 11,775.
 It contains 66,3731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. %todo make table out of stats
 Figures \ref{fig:userPurchases} and \ref{fig:articlePurchases} show the number of purchases for every user and article, respectively.
 Both curves are very skewed, i.e. there are few articles and users with many purchases and many users and article with only a small amount of purchases.
+
+%Removal of cold start users
+Users, that only have purchased one item, are removed beforehand.
+They cannot be evaluated, since at least one item must be left for training.
+Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique.
+Removing those users results in a dataset of 72,318 users and 11,666 items.
+In total this matrix contains 654,214 purchases, i.e. there are on average about 9.05 purchases per user and about 56.08 purchases per item.
 
 Besides purchases there is content-based information about items.
 Most items are assigned to one or more categories they belong to.
@@ -1019,15 +1055,10 @@ Within the general information texts there are in total 44,755 words, the corpus
 The recommendation systems are evaluated using 80 percent of the data as training set to build the model and 20 percent as test set.
 The test set is built by iterating user- and item-wise over purchases and adding every 5\textsuperscript{th} purchase to the test set and removing it from the training set.
 This ensures, that the test purchases are equally distributed over all users.
-Users, that only have purchased one item, are removed beforehand.
-They cannot be evaluated, since at least one item must be left for training.
-Users with no purchase are so called cold-start users and require another unpersonalized recommendation technique.
-Removing those users results in a dataset of 72,318 users and 11,666 items.
-In total this matrix contains 654,214 purchases, i.e. there are on average about 9.05 purchases per user and about 56.08 purchases per item.
 The training set then consists of 523,371 and the test set of 130,843 instances.
 
-Cold-start users are not of interest in this thesis, but an unpersonalized recommendation technique is used as a baseline for evaluation.
-This used approach is denoted \textit{MostPop} and always recommends those items to a user, that are purchased most often.
+An unpersonalized recommendation approach called \textit{MostPop} is used as a baseline for evaluation.
+It always recommends those items to a user, that are purchased most often.
 
 Evaluation is measured in terms of the mean average precision (MAP), a common measure in information retrieval.
 It is a measure for evaluating ranked lists, since it measures precision and incorporates the ranks of true positives.
@@ -1051,6 +1082,7 @@ The unpersonalized approach \textit{MostPop} receives a MAP of 0.0499
 The developed personalized recommendation systems are supposed to being able to outperform approach.
 %todo explain why unpersonalized recommendation performs that well
 
+\subsection{Memory-based collaborative filtering}
 % How does CFItemNN perform with Jaccard and Cosine?
 The memory-based collaborative filtering approaches are evaluated using either the Jaccard coefficient or cosine similarity.
 The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \textit{CFItemNN}, while \textit{CFUserNN} refers to the user-user approach.
@@ -1085,6 +1117,7 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 \end{figure}
 %todo add some iteration until curves are obviously flater
 
+\subsection{Model-based collaborative filtering}
 % svd approaches
 The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
 All models are trained using a learning rate $\alpha$ of $0.001$, a regularization factor $\lambda$ of $0.01$ and a negative weight $w_n$ for negative instances of $0.5$, if not stated differently.
@@ -1155,6 +1188,7 @@ So even if the prediction error is larger, the relation of prediction to actual 
 This may result from the impact of negative instances to the training process.
 While for linear regression the negative instances (i.e. $r_{ui} = 0$) push the model towards the initial state of $p_u^Tq_i \approx 0$ and cause small updates at the start of training, in the case of logistic regression, updates for negative instances actively update the feature vectors into the other direction, such that $p_u^Tq_i$ even may get negative.
 
+\subsection{AdaBoost}
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs are compared for different numbers of models.
 Using only one model refers to the normal SVD algorithm without boosting.
 The results are shown in figure \ref{fig:SVDModels}.
@@ -1189,6 +1223,7 @@ The user-based weighting performs similar, but is slightly worse.
 For the liner regression approach in contrast, the article-based and the combination of article- and user-based predictions outperform the other predictions rules.
 Further plots to show the impact of the prediction rules over different numbers of features and iterations can be found in appendix \ref{app:predRulesExperiments}.
 
+\subsection{Content-based recommendation}
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} is applied to category information about articles.
 It results in a MAP of 0.00306.
 The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) is also applied to categories, the general information and indication texts.
@@ -1218,6 +1253,7 @@ With all tested content-based features the content-based recommenders both perfo
 
 %todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
 
+\subsection{Error correlation of different algorithms}
 To find out whether hybridizations of these techniques might be able to improve recommendation performance, the resulting lists of recommendations are investigated for correlation.
 A hybrid recommender is only useful, if the component recommenders produce different results, such that they are able to complement each other.
 To analyse, whether two algorithms are able to complement each other, the true positives of both recommenders are taken into account.
@@ -1235,7 +1271,7 @@ While the other collaborative filtering approach tend to provide items, that are
 \begin{table}
 	\begin{tabular}{|c|c||p{1.2cm}|p{1.2cm}|p{1.2cm}|p{1.2cm}|}
 		\hline
-		\textbf{Reco 1}&\textbf{Reco 2}&\textbf{both}&\textbf{only 1}&\textbf{only 2}&\textbf{none}\\ \hline
+		\textbf{R. 1}&\textbf{R. 2}&\textbf{both}&\textbf{only R. 1}&\textbf{only R. 2}&\textbf{none}\\ \hline
 		\textit{CFItemNN}&\textit{CBNN (Categories)}&400 (0.31\%)&25446 (19.45\%)&1185 (0.91\%)&103812 (79.34\%)\\ \hline
 		\textit{CFItemNN}&\textit{CBNN (Categories)}&550 (0.42\%)&28602 (21.86\%)&1035 (0.79\%)&100656 (76.93\%) \\ \hline
 		\textit{CFUserNN}&\textit{CBNN (text)}&1047 (0.80\%)&24789 (18.95\%)&3165 (2.42\%)&101833 (77.83\%) \\ \hline
@@ -1370,7 +1406,7 @@ This could be solved by precomputing and storing the similarities between every 
 User-User approaches reach a MAP of at leas twice as good as the unpersonalized baseline predictor.
 The \textit{LogRegSVD} approach was able to outperform the user-user approach, both in terms of MAP and computation time.
 Results are still worse than those provided by the item-item approach, but recommendation can be made faster, because only a pretrained model needs to be computed instead of the full matrix of all purchases.
-The results of this approach are tried to be enhances by applying AdaBoost to it, a meta algorithm to improve results of weak classifiers.
+The results of this approach are tried to be enhanced by applying AdaBoost to it, a meta algorithm to improve results of weak classifiers.
 Results can be enhanced by 16\% to 39\%, depending on the number of trained latent features.
 Moreover alternative prediction rules are suggested, that incorporate different types of errors to express confidence of prediction.
 These rules did not show any remarkable improvements in recommendation process.
