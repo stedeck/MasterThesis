@@ -24,10 +24,10 @@ import de.erichseifert.gral.util.GraphicsUtils;
 import de.erichseifert.gral.graphics.Insets2D;
 
 @SuppressWarnings("serial")
-public class LogRegSVDCandidates extends ExamplePanel{
+public class CFItemNNCandidates extends ExamplePanel{
 	public static void main(String[] args) {
-		String file_name = "..\\LogRegSVDCandidates.csv";
-		new LogRegSVDCandidates(file_name);
+		String file_name = "..//CFItemNNCandidates.csv";
+		new CFItemNNCandidates(file_name);
 	}
 	
 	protected static final double MOST_POP = 0.0499;
@@ -35,24 +35,28 @@ public class LogRegSVDCandidates extends ExamplePanel{
 	protected static final Color COLOR1 = new Color( 55, 170, 200);
 	protected static final Color COLOR2 = Color.GRAY;
 	
-	public LogRegSVDCandidates(String file_name) {
+
+	
+	public CFItemNNCandidates(String file_name) {
 		Path path = FileSystems.getDefault().getPath(file_name);
 
 		DataTable dataTable = null;
 		// Read data from file into dataTable
 		try {
 			BufferedReader reader = Files.newBufferedReader(path);
+			
 			String line = reader.readLine();
 			String[] headers = line.split(",");
 			int fieldsNum = headers.length;
-			dataTable = new DataTable(fieldsNum+1, Double.class);
+			dataTable = new DataTable(fieldsNum, Double.class);
 			
+			dataTable = new DataTable(fieldsNum+1, Double.class);
 			while((line = reader.readLine()) != null){
 				String[] fields = line.split(",");
 				Double[] dataFields = Arrays.stream(fields).map(x -> Double.parseDouble(x)).toArray(size -> new Double[size]);
-				Double[] dataFieldsWithMostPop = Arrays.copyOf(dataFields, fieldsNum+1);
-				dataFieldsWithMostPop[fieldsNum] = MOST_POP;
-				dataTable.add(dataFieldsWithMostPop);
+				Double[] doubleWithMostPop = Arrays.copyOf(dataFields, fieldsNum+1);
+				doubleWithMostPop[fieldsNum] = MOST_POP;
+				dataTable.add(doubleWithMostPop);
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -62,8 +66,9 @@ public class LogRegSVDCandidates extends ExamplePanel{
 		}
 		
 		// Plot
-		DataSeries series1 = new DataSeries("LogRegSVD", dataTable, 0, 1);
+		DataSeries series1 = new DataSeries("CFUserNN", dataTable, 0, 1);
 		DataSeries series2 = new DataSeries("MostPop", dataTable, 0, 2);
+
 		XYPlot plot = new XYPlot(series1, series2);
 		plot.setLegendVisible(true);
 		plot.getLegend().setAlignmentX(1);
@@ -79,7 +84,7 @@ public class LogRegSVDCandidates extends ExamplePanel{
 		AxisRenderer axisRendererX = plot.getAxisRenderer(XYPlot.AXIS_X);
 		AxisRenderer axisRendererY = plot.getAxisRenderer(XYPlot.AXIS_Y);
 		axisRendererY.setLabelDistance(2);
-		axisRendererX.setLabel(new Label("Candidate threshold"));
+		axisRendererX.setLabel(new Label("candidate threshold"));
 		axisRendererY.setLabel(new Label("MAP"));
 		plot.setAxisRenderer(XYPlot.AXIS_X, axisRendererX);
 		plot.setAxisRenderer(XYPlot.AXIS_Y, axisRendererY);
@@ -109,11 +114,11 @@ public class LogRegSVDCandidates extends ExamplePanel{
 
 	@Override
 	public String getTitle() {
-		return "LogRegSVD";
+		return "CFItemNN";
 	}
 
 	@Override
 	public String getDescription() {
-		return "LogRegSVD";
+		return "CFItemNN";
 }
 }

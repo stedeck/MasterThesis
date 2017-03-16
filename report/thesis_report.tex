@@ -704,7 +704,7 @@ When training the user and item feature vectors, the prediction error $e_{ui}$ i
 %maybe explain why funk version doesn't work here
 
 To address the problem of missing negative instances the negative training instances are obtained by randomly choosing them from the unknown instances.
-For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \in U$ and $\{i, j\} \in I$, are chosen, such that every user and item gets about as many positive training updates as negative ones to ensure a balanced classification problem.
+For every positive user-item-pair $(u, i)$ two negative user-item-pairs $(v, i)$ and $(u,j)$, with $\{u, v\} \subset U$ and $\{i, j\} \subset I$, are chosen, such that every user and item gets about as many positive training updates as negative ones to ensure a balanced classification problem.
 $U$ and $I$ denote the set of all users and items, respectively.
 To express uncertainty of the negative instances a weight $w_n$ is added to the feature updates as suggested in \cite{occf}, such that the update rules in equations \ref{eq:updateLinRegP} and \ref{eq:updateLinRegQ} become 
 

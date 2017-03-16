@@ -1,69 +1,48 @@
 package recommenders;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Polygon;
-import java.awt.RadialGradientPaint;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-import javax.swing.JPanel;
 
 import de.erichseifert.gral.data.DataSeries;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.graphics.Label;
-import de.erichseifert.gral.graphics.Location;
 import de.erichseifert.gral.plots.XYPlot;
 import de.erichseifert.gral.plots.axes.AxisRenderer;
-import de.erichseifert.gral.plots.axes.LogarithmicRenderer2D;
-import de.erichseifert.gral.plots.legends.Legend;
-import de.erichseifert.gral.plots.legends.SeriesLegend;
-import de.erichseifert.gral.plots.legends.ValueLegend;
 import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D;
-import de.erichseifert.gral.plots.lines.DiscreteLineRenderer2D;
 import de.erichseifert.gral.plots.lines.LineRenderer;
 import de.erichseifert.gral.plots.points.DefaultPointRenderer2D;
 import de.erichseifert.gral.plots.points.PointRenderer;
-import de.erichseifert.gral.plots.points.SizeablePointRenderer;
 import de.erichseifert.gral.ui.InteractivePanel;
 import de.erichseifert.gral.util.GraphicsUtils;
 import de.erichseifert.gral.graphics.Insets2D;
-import de.erichseifert.gral.graphics.Orientation;
 
+@SuppressWarnings("serial")
 public class SVDModels extends ExamplePanel{
 	public static void main(String[] args) {
-		String file_name = "..\\..\\..\\MasterThesis\\SVDIterations.csv";
+		String file_name = "..\\SVDIterations.csv";
 		new SVDModels(file_name);
 	}
 	
-	private static final Random random = new Random();
+	protected static final double MOST_POP = 0.0499;
 	
-	/** First corporate color used for normal coloring.*/
 	protected static final Color COLOR1 = new Color( 55, 170, 200);
-	/** Second corporate color used as signal color */
 	protected static final Color COLOR2 = new Color(200,  80,  75);
-	
 	protected static final Color COLOR3 = Color.GREEN;
 	
 	protected static final Color COLOR4 = COLOR1.darker();
-	protected static final Color COLOR5= COLOR2.darker();
+	protected static final Color COLOR5 = COLOR2.darker();
 	protected static final Color COLOR6 = COLOR3.darker();
 	
-
+	protected static final Color COLOR7 = Color.GRAY;
 	
 	public SVDModels(String file_name) {
 		Path path = FileSystems.getDefault().getPath(file_name);
@@ -75,12 +54,14 @@ public class SVDModels extends ExamplePanel{
 			String line = reader.readLine();
 			String[] headers = line.split(",");
 			int fieldsNum = headers.length;
-			dataTable = new DataTable(fieldsNum, Double.class);
+			dataTable = new DataTable(fieldsNum+1, Double.class);
 			
 			while((line = reader.readLine()) != null){
 				String[] fields = line.split(",");
 				Double[] dataFields = Arrays.stream(fields).map(x -> Double.parseDouble(x)).toArray(size -> new Double[size]);
-				dataTable.add(dataFields);
+				Double[] dataFieldsWithMostPop = Arrays.copyOf(dataFields, fieldsNum+1);
+				dataFieldsWithMostPop[fieldsNum] = MOST_POP;
+				dataTable.add(dataFieldsWithMostPop);
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -96,7 +77,8 @@ public class SVDModels extends ExamplePanel{
 		DataSeries series4 = new DataSeries("Lin 100 features", dataTable, 0, 4);
 		DataSeries series5 = new DataSeries("Lin 200 features", dataTable, 0, 5);
 		DataSeries series6 = new DataSeries("Lin 300 features", dataTable, 0, 6);
-		XYPlot plot = new XYPlot(series1, series2, series3, series4, series5, series6);
+		DataSeries series7 = new DataSeries("MostPop", dataTable, 0, 7);
+		XYPlot plot = new XYPlot(series1, series2, series3, series4, series5, series6, series7);
 		plot.setLegendVisible(true);
 		plot.getLegend().setAlignmentX(1);
 		plot.getLegend().setAlignmentY(1);
@@ -147,6 +129,10 @@ public class SVDModels extends ExamplePanel{
 		pointRenderer6.setShape(new Ellipse2D.Double(-3.5,-3.5,7,7));
 		plot.setPointRenderers(series6, pointRenderer6);
 		
+		PointRenderer pointRenderer7 = new DefaultPointRenderer2D();
+		pointRenderer7.setShape(null);
+		plot.setPointRenderers(series7, pointRenderer7);
+		
 		// Format data lines
 		LineRenderer lineRenderer1 = new DefaultLineRenderer2D();
 		lineRenderer1.setColor(COLOR1);
@@ -171,6 +157,10 @@ public class SVDModels extends ExamplePanel{
 		LineRenderer lineRenderer6 = new DefaultLineRenderer2D();
 		lineRenderer6.setColor(COLOR6);
 		plot.setLineRenderers(series6, lineRenderer6);
+		
+		LineRenderer lineRenderer7 = new DefaultLineRenderer2D();
+		lineRenderer7.setColor(COLOR7);
+		plot.setLineRenderers(series7, lineRenderer7);
 		
 		// Add plot to Swing component
 		add(new InteractivePanel(plot), BorderLayout.CENTER);
