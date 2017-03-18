@@ -243,6 +243,30 @@ This technique is summarized in algorithm \ref{alg:CFItemNN}.
 	\end{algorithmic}	
 \end{algorithm}
 
+To demonstrate this algorithm an example is used with users Alice, Bob, Carl, Daisy and Emma and item apple, banana, cherry and date.
+Table \ref{tab:example} shows which user has bought which fruits.
+\begin{table}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		&\textbf{apple}&\textbf{banana}&\textbf{cherry}&\textbf{date}\\ \hline
+		\textbf{Alice}&1&1&&\\ \hline
+		\textbf{Bob}&1&&1&\\ \hline	
+		\textbf{Carl}&&&1&1\\ \hline	
+		\textbf{Daisy}&1&&1&1\\ \hline	
+		\textbf{Emma}&&1&1&\\ \hline	
+	\end{tabular}
+	\caption{Example to demonstrate the nearest-neighbour based recommendation algorithms. 1 indicates that the user has purchased the fruit.}	
+	\label{tab:example}
+\end{table}
+
+To find recommendations for Bob, all fruits are taken into account, that have not been purchased yet by him, i.e. banana and data.
+Using Jaccard similarity the scores for these fruits are calculated as follows:
+
+$$s(banana) = sim(banana, apple) + sim(banana, cherry) = \frac{1}{4} + \frac{1}{5} = 0.45$$
+$$s(date) = sim(date, apple) + sim(date, cherry) = \frac{1}{4} + \frac{2}{4} = 0.75$$
+
+The first recommendation for Bob is the date, because it reaches the highest score, i.e. the date has the highest vector similarity to the fruits Bob has purchased.
+
 
 \paragraph{User-User}
 The second memory-based algorithm is a user-user approach. %todo can i find a paper where this is implemented?
@@ -285,6 +309,22 @@ After the nearest neighbours of user $u$ are obtained, those items are recommend
 	\end{algorithmic}	
 \end{algorithm}
 
+Using the above example again, recommendations for Bob would be calculated by first determining his neighbours.
+So a similarity score between Bob and every other user is calculated by: 
+
+$$sim(Bob, Alice) = \frac{1}{3}$$
+$$sim(Bob, Carl) = \frac{1}{4}$$
+$$sim(Bob, Daisy) = \frac{2}{3}$$
+$$sim(Bob, Emma) = \frac{1}{3}$$
+
+Then only the $n$ users with the highest similarity to Bob are taken into account to calculate recommendations for Bob.
+In this case the nearest neighbour is Daisy, followed by Alice and Emma.
+The score of an item not purchased by Bob is the count of purchases of that item of the determined neighbours.
+If only one neighbour (here Daisy) is considered, the date would be recommended to Bob, because it was bought once while the banana was not bought by the nearest neighbour.
+If three neighbours are taken into account, results can be different.
+Then the banana is bought by two nearest neighbours (i.e. Alice and Emma), and the date is only bought once.
+So in this case the banana would be recommended.
+
 This approach is not able to guarantee a sufficiently large list of recommendations.
 While in an item-item approach all item are considered as potential recommendations, in a user-user approach only those are considered that have been bought by the current user's neighbours.
 If the neighbours $N(u)$ purchased less items than the number of required recommendations, or if $u$ already purchased too many of the items $N(u)$ purchased.
@@ -314,12 +354,20 @@ The recommended items are those, that were purchased by those users with the hig
 			\For{every $v \in U(i)$}
 				\State $s(u,i) := s(u,i) + sim(A(u,:)^T, A(v,:)^T)$
 			\EndFor
+			\State $s(u,i) := s(u,i) \cdot \frac{1}{|U(i)|}$
 			\If{$s(u,i) > min(recs)$ or $size(recs) < l$} 
 				\State add $v$ to $N$
 			\EndIf
 		\EndFor
 	\end{algorithmic}	
 \end{algorithm}
+
+Calculating recommendations for Bob again would then look like
+
+$s(banana) = (sim(Bob, Alice) + sim(Bob, Alice)) \cdot \frac{1}{2} = (\frac{1}{3} + \frac{1}{3}) \cdot \frac{1}{2} \approx 0.33$
+$s(date) = (sim(Bob, Carl) + sim(Bob, Daisy)) \cdot \frac{1}{2} = (\frac{1}{4} + \frac{2}{3}) \cdot \frac{1}{2} \approx 0.46$
+
+So Bob best recommendation would be the date again.
 
 Both the item-item and the user-user approach perform on the full purchase matrix, but are expected to obtain different results.
 While an item-item approach tends to recommend items with many common users who purchased them, a user-user approach works on user similarities.
