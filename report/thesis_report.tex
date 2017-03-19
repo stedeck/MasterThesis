@@ -421,6 +421,7 @@ Predictions are performed by multiplying these feature vectors.
 Preference of user $u$ for item $i$ can be estimated by 
 
 \begin{equation}
+	\label{eq:linRegPrediction}
 	\hat{r}_{ui} = p_u^T q_i
 \end{equation}
 
@@ -624,12 +625,14 @@ The model $M_t$ is then tested on the training set and the error $\epsilon_t$ is
 Dependent on this error the model is assigned a weight $\alpha_t = \frac{1}{2} ln(\frac{1 - \epsilon_t}{\epsilon_t})$, such that better models have a higher impact on final predictions.
 The model error is also used to build the distribution for the next model: 
 
-$ D_{t+1}(i) = \frac{D_t(i)}{Z_t} \times 
+\begin{equation}
+\label{eq:adaBootsWeightUpdate}
+D_{t+1}(i) = \frac{D_t(i)}{Z_t} \times 
 \begin{cases}
-	e^{-\alpha_t} & \text{if $ x_i $ was correctly classified} \\ 
-	e^{\alpha_t} & \text{if $ x_i $ was misclassified}
+e^{-\alpha_t} & \text{if $ x_i $ was correctly classified} \\ 
+e^{\alpha_t} & \text{if $ x_i $ was misclassified}
 \end{cases}
-$
+\end{equation}
 
 $Z_t$ is a normalization factor to ensure $D_{t+1}$ is a distribution.
 For the sampling distribution $D_{t+1}$ of the next model misclassified training instances get a higher probability of being added to the training set, while correctly classified are less likely to be added.
@@ -737,7 +740,7 @@ For reasons explained above the matrix factorization as a model-based collaborat
 The given feedback about user preferences $r_{ui}$ consist of binary values, where $r_{ui} = 1$ denotes, that user $u$ has purchased item $i$, and $r_{ui} = 0$ denotes, that he has not.
 So predicting user preferences becomes a classification rather than a regression problem.
 So in the scope of this thesis the SVD approach explained in section \ref{sec:modelBasedCF} is transformed into a logistic regression problem trying to predict a value $\hat{r}_{ui} \in \{0,1\}$.
-Then prediction is performed by 
+Then the prediction in equation \ref{eq:linRegPrediction} becomes 
 
 \begin{equation}
 	\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}
@@ -840,13 +843,9 @@ For the first model the weights are $1$ for all training instances, such that al
 The trained model is evaluated using the training set and the weights for next model are updated according to $d_{ui,t+1} = d_{ui,t} \exp(e_{ui,t})$, such that instances with a larger prediction errors will cause larger feature updates when training the next model.
 After all weights are updated, they are normalized by $d_{ui,t+1} = \frac{d_{ui,t+1} |R_{train}|}{\sum_{(u,i)}{d_{ui,t+1}}}$, such that the sum of all instance weights adds up to the number of purchases again.
 $R_{train}$ is the set of $(u,i)$-tuples of all purchases of the training set.
-In traditional AdaBoost approaches the weights are updated dependent on the model error $e_t$ by increasing correctly and decreasing misclassified instances.
-Here the updates depend on single instance errors $e_{ui,t}$.
-This allows to perform higher updates for instances with high errors and lower updates for instances with lower errors, instead of different update rules for correctly or incorrectly classified instances. 
-The model error is not incorporated in weight updates, because it is explicitly desired to focus on instances that are hard to classify, even if the overall model performance might get worse.
-If users or items have fewer purchases, their feature vectors receive fewer updates and the prediction for these users or items is worse.
-So they shall be emphasized in the next model in order to get as much updates as easier to classify users or items.
-Taking the model error into account for the weight updates might diminish this effect, because users and items with more purchases have a higher effect on the model error.
+In traditional AdaBoost approaches the weights are updated dependent on the model error $\epsilon_t$ by increasing correctly and decreasing incorrectly classified instances, see equation \ref{eq:adaBootsWeightUpdate}.
+Here the updates depend on single instance errors $e_{ui,t} = \hat{r}_{ui, t} - r_{ui}$, i.e. the difference between the $t^{th}$ model's prediction for that user-item pair and its actual value.
+Thus, instances with high errors get a higher weight for the next model and therefore receive higher updates of their feature vectors in the training process.
 Algorithm \ref{alg:AdaBoostLogRegSVDTraining} describes the training of $T$ matrix factorization models using the logistic regression approach.
 
 \begin{algorithm}
@@ -896,14 +895,16 @@ Section \ref{sec:myAdaBoost} explained how AdaBoost models are trained.
 Recommendation is then performed by combining the predictions of those models.
 In classification problems a weighted majority vote determines the final predicted class.
 Every model's prediction is multiplied by a model weight $\alpha_t = ln(\frac{1-\epsilon_t}{\epsilon_t})$ and summed up.
+For classification the model error $\epsilon_t$ is the amount of misclassified instances.
+Here the model error is calculated as the average over all instance errors, i.e. $\epsilon_t = \sum_{(u,i)\in R_{train}}{e_{ui,t}}\frac{1}{|R_{train}|}$, where $|R_{train}|$ is the number of all instances in the training set.
 For recommendation this leads to the following prediction rule to determine the score for a user-item-pair:
 
 \begin{equation}
 \label{eq:adaBoostPredRule}
-s(u,i) = \sum_t^T{\frac{ln(\frac{1 - \epsilon_t}{\epsilon_t})}{1 + exp(p_{u,t}^Tq_{i,t})}}
+s(u,i) = \sum_t^T{\frac{\alpha_t}{1 + exp(p_{u,t}^Tq_{i,t})}}
 \end{equation}
 
-The prediction rule in equation \ref{eq:adaBoostPredRule} incorporates the errors of the whole models, that are trained during the AdaBoost recommendation approach.
+This prediction rule incorporates the errors of the whole models, that are trained during the AdaBoost recommendation approach.
 Though the models consist of user and item features, that may vary in performance, i.e. one model may perform better for some users or items, while another model may perform better for other users or items.
 So the prediction rule for AdaBoost was adopted to incorporate the errors for users or items instead of the total model error.
 The errors for a user $u$ and an item $i$ are calculated as shown in equations \ref{eq:userError} and \ref{eq:articleError}, respectively.
