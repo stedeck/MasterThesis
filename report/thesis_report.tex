@@ -1128,15 +1128,41 @@ But in an online-shop a list of more than ten recommended items would not be use
 \section{Results}
 \label{sec:results}
 The unpersonalized approach \textit{MostPop} receives a MAP of 0.0499
-The developed personalized recommendation systems are supposed to being able to outperform approach.
+The developed personalized recommendation systems are supposed to being able to outperform this approach.
 %todo explain why unpersonalized recommendation performs that well
+
+\subsection{Content-based recommendation}
+The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} is applied to category information about articles.
+It results in a MAP of 0.00306.
+The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) is also applied to categories, the general information and indication texts.
+The texts are represented in different ways, i.e. either in binary, bag-of-words or tf-idf representation.
+In all cases the cosine similarity is applied.
+In the cases of category data and binary text representation also Jaccard similarity was applied. 
+Results are shown in table \ref{tab:CBNN}.
+It can be seen, that for binary data Jaccard similarity performs slightly better than cosine similarity as it is also the case for the memory-based collaborative filtering algorithms.
+For both kind of texts, the general information and the indication, the tf-idf representation achieves best results.
+With all tested content-based features the content-based recommenders both perform much worse than the unpersonalized recommender.
+
+\begin{table}
+	\begin{tabular}{|c||c|c|}
+		\hline
+		\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
+		categories&0.00507&0.00508\\ \hline
+		indication (binary)&0.00573&0.00477\\ \hline	
+		indication (bag-of-words)&-&0.00756\\ \hline	
+		indication (td-idf)&-&0.00857\\ \hline	
+		general information (binary)&0.01231&0.01213\\ \hline	
+		general information (bag-of-words)&-&0.00804\\ \hline	
+		general information (tf-idf)&-&0.01595\\ \hline	
+	\end{tabular}
+	\caption{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}	
+	\label{tab:CBNN}
+\end{table}
 
 \subsection{Memory-based collaborative filtering}
 % How does CFItemNN perform with Jaccard and Cosine?
 The memory-based collaborative filtering approaches are evaluated using either the Jaccard coefficient or cosine similarity.
 The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \textit{CFItemNN}, while \textit{CFUserNN} refers to the user-user approach.
-\textit{CFItemNN} works better using the Jaccard coefficient resulting in a MAP of 0.1371.
-Using the cosine similarity \textit{CFItemNN} a MAP of 0.1333 is reached.
 
 \begin{figure}
 	\centering
@@ -1145,9 +1171,9 @@ Using the cosine similarity \textit{CFItemNN} a MAP of 0.1333 is reached.
 	\label{fig:CFUserNN}
 \end{figure}
 
-\textit{CFUserNN} was tested both with the Jaccard coefficient and cosine similarity.
-Moreover the performance was measured over different neighbourhood sizes, see figure \ref{fig:CFUserNN}.
-Like with \textit{CFItemNN} Jaccard similarity outperforms cosine similarity.
+The performance of \textit{CFUserNN} was measured over different neighbourhood sizes, see figure \ref{fig:CFUserNN}.
+For lower neighbourhood sizes Jaccard similarity outperforms cosine similarity.
+From 300 and higher number of neighbours, cosine similarity works slightly better.
 The best number of nearest neighbours to be investigated to calculate the recommendation are 300.
 Up to this point performance of the algorithm increases, but it decreases for larger neighbourhood sizes.
 Too few neighbours are not able to suggest enough possible recommendations and recommendations are not that confident as if voted for by more neighbours.
@@ -1158,6 +1184,11 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 %TODO investigate size of recommendation lists...
 %todo take similarity into account, use them as weights somehow
 
+\textit{CFItemNN} performs better than the \textit{CFUserNN} resulting in a MAP of 0.1371 using Jaccard similarity and 0.1333 using cosine similarity.
+
+\subsection{Model-based collaborative filtering}
+% svd approaches
+
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDIterations}
@@ -1166,8 +1197,6 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 \end{figure}
 %todo add some iteration until curves are obviously flater
 
-\subsection{Model-based collaborative filtering}
-% svd approaches
 The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
 All models are trained using a learning rate $\alpha$ of $0.001$, a regularization factor $\lambda$ of $0.01$ and a negative weight $w_n$ for negative instances of $0.5$, if not stated differently.
 User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean 0 and a standard deviation of $0.1$.
@@ -1272,33 +1301,7 @@ The user-based weighting performs similar, but is slightly worse.
 For the liner regression approach in contrast, the article-based and the combination of article- and user-based predictions outperform the other predictions rules.
 Further plots to show the impact of the prediction rules over different numbers of features and iterations can be found in appendix \ref{app:predRulesExperiments}.
 
-\subsection{Content-based recommendation}
-The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} is applied to category information about articles.
-It results in a MAP of 0.00306.
-The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) is also applied to categories, the general information and indication texts.
-The texts are represented in different ways, i.e. either in binary, bag-of-words or tf-idf representation.
-In all cases the cosine similarity is applied.
-In the cases of category data and binary text representation also Jaccard similarity was applied. 
-Results are shown in table \ref{tab:CBNN}.
-It can be seen, that for binary data Jaccard similarity performs slightly better than cosine similarity as it is also the case for the memory-based collaborative filtering algorithms.
-For both kind of texts, the general information and the indication, the tf-idf representation achieves best results.
-With all tested content-based features the content-based recommenders both perform much worse than the unpersonalized recommender.
 
-\begin{table}
-\begin{tabular}{|c||c|c|}
-	\hline
-	\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
-	categories&0.00507&0.00508\\ \hline
-	indication (binary)&0.00573&0.00477\\ \hline	
-	indication (bag-of-words)&-&0.00756\\ \hline	
-	indication (td-idf)&-&0.00857\\ \hline	
-	general information (binary)&0.01231&0.01213\\ \hline	
-	general information (bag-of-words)&-&0.00804\\ \hline	
-	general information (tf-idf)&-&0.01595\\ \hline	
-	\end{tabular}
-	\caption{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}	
-	\label{tab:CBNN}
-\end{table}
 
 %todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
 
@@ -1334,7 +1337,8 @@ While the other collaborative filtering approach tend to provide items, that are
 \label{tab:correlation}
 \end{table}
 
-Besides precision consideration a cascade hybrid recommendation system was implemented to speed up the recommendation process.
+\subsection{Candidate threshold}
+To speed up recommendation a cascade hybrid system was implemented.
 Figure \ref{fig:articlePurchases} shows the number of purchases for every article.
 It can be seen, that there are few items with many purchases, and that most items just have few purchases.
 The items with many purchases generally have a higher probability of being purchased, i.e. being a correct recommendation.
