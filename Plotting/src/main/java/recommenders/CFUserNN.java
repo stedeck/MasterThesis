@@ -31,12 +31,16 @@ public class CFUserNN extends ExamplePanel{
 		new CFUserNN(file_name);
 	}
 	
-	/** First corporate color used for normal coloring.*/
 	protected static final Color COLOR1 = new Color( 55, 170, 200);
-	/** Second corporate color used as signal color */
 	protected static final Color COLOR2 = new Color(200,  80,  75);
 	
-	protected static final Color COLOR3 = Color.GRAY;
+	protected static final Color COLOR3 = COLOR1.darker();
+	protected static final Color COLOR4 = COLOR2.darker();
+	
+	protected static final Color COLOR5 = COLOR1.brighter();
+	protected static final Color COLOR6 = COLOR2.brighter();
+	
+	protected static final Color COLOR7 = Color.GRAY;
 	
 
 	
@@ -53,13 +57,17 @@ public class CFUserNN extends ExamplePanel{
 			int fieldsNum = headers.length;
 			dataTable = new DataTable(fieldsNum, Double.class);
 			
-			dataTable = new DataTable(4, Double.class);
+			dataTable = new DataTable(fieldsNum+5, Double.class);
 			while((line = reader.readLine()) != null){
 				String[] fields = line.split(",");
 				Double[] dataFields = Arrays.stream(fields).map(x -> Double.parseDouble(x)).toArray(size -> new Double[size]);
-				Double[] doubleWithMostPop = Arrays.copyOf(dataFields, 4);
-				doubleWithMostPop[3] = 0.0499;
-				dataTable.add(doubleWithMostPop);
+				Double[] doubleWithCFItemNNAndMostPop = Arrays.copyOf(dataFields, fieldsNum+5);
+				doubleWithCFItemNNAndMostPop[3] = 0.0916;
+				doubleWithCFItemNNAndMostPop[4] = 0.0896;
+				doubleWithCFItemNNAndMostPop[5] = 0.1371;
+				doubleWithCFItemNNAndMostPop[6] = 0.1333;
+				doubleWithCFItemNNAndMostPop[7] = 0.0499;
+				dataTable.add(doubleWithCFItemNNAndMostPop);
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -69,11 +77,15 @@ public class CFUserNN extends ExamplePanel{
 		}
 		
 		// Plot
-		DataSeries series1 = new DataSeries("Jaccard", dataTable, 0, 1);
-		DataSeries series2 = new DataSeries("Cosine", dataTable, 0, 2);
-		DataSeries series3 = new DataSeries("MostPop", dataTable, 0, 3);
+		DataSeries series1 = new DataSeries("CFUserNN Jaccard", dataTable, 0, 1);
+		DataSeries series2 = new DataSeries("CFUserNN Cosine", dataTable, 0, 2);
+		DataSeries series3 = new DataSeries("CFUserNN2 Jaccard", dataTable, 0, 3);
+		DataSeries series4 = new DataSeries("CFUserNN2 Cosine", dataTable, 0, 4);
+		DataSeries series5 = new DataSeries("CFItemNN Jaccard", dataTable, 0, 5);
+		DataSeries series6 = new DataSeries("CFUserNN Cosine", dataTable, 0, 6);
+		DataSeries series7 = new DataSeries("MostPop", dataTable, 0, 7);
 
-		XYPlot plot = new XYPlot(series1, series2, series3);
+		XYPlot plot = new XYPlot(series1, series2, series3, series4, series5, series6, series7);
 		plot.setLegendVisible(true);
 		plot.getLegend().setAlignmentX(1);
 		plot.getLegend().setAlignmentY(1);
@@ -104,8 +116,28 @@ public class CFUserNN extends ExamplePanel{
 		
 		PointRenderer pointRenderer3 = new DefaultPointRenderer2D();
 		pointRenderer3.setShape(null);
-		pointRenderer3.setColor(GraphicsUtils.deriveDarker(COLOR3));
+		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR3));
 		plot.setPointRenderers(series3, pointRenderer3);
+		
+		PointRenderer pointRenderer4 = new DefaultPointRenderer2D();
+		pointRenderer4.setShape(null);
+		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR4));
+		plot.setPointRenderers(series4, pointRenderer4);
+		
+		PointRenderer pointRenderer5 = new DefaultPointRenderer2D();
+		pointRenderer5.setShape(null);
+		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR5));
+		plot.setPointRenderers(series5, pointRenderer5);
+		
+		PointRenderer pointRenderer6 = new DefaultPointRenderer2D();
+		pointRenderer6.setShape(null);
+		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR6));
+		plot.setPointRenderers(series6, pointRenderer6);
+		
+		PointRenderer pointRenderer7 = new DefaultPointRenderer2D();
+		pointRenderer7.setShape(null);
+		pointRenderer2.setColor(GraphicsUtils.deriveDarker(COLOR7));
+		plot.setPointRenderers(series7, pointRenderer7);
 		
 		// Format data lines
 		LineRenderer lineRenderer1 = new DefaultLineRenderer2D();
@@ -120,6 +152,22 @@ public class CFUserNN extends ExamplePanel{
 		lineRenderer3.setColor(COLOR3);
 		plot.setLineRenderers(series3, lineRenderer3);
 		
+		LineRenderer lineRenderer4 = new DefaultLineRenderer2D();
+		lineRenderer4.setColor(COLOR4);
+		plot.setLineRenderers(series4, lineRenderer4);
+		
+		LineRenderer lineRenderer5 = new DefaultLineRenderer2D();
+		lineRenderer5.setColor(COLOR5);
+		plot.setLineRenderers(series5, lineRenderer5);
+		
+		LineRenderer lineRenderer6 = new DefaultLineRenderer2D();
+		lineRenderer6.setColor(COLOR6);
+		plot.setLineRenderers(series6, lineRenderer6);
+		
+		LineRenderer lineRenderer7 = new DefaultLineRenderer2D();
+		lineRenderer7.setColor(COLOR7);
+		plot.setLineRenderers(series7, lineRenderer7);
+		
 		// Add plot to Swing component
 		add(new InteractivePanel(plot), BorderLayout.CENTER);
 		showInFrame();
@@ -127,11 +175,11 @@ public class CFUserNN extends ExamplePanel{
 
 	@Override
 	public String getTitle() {
-		return "CFUserNN";
+		return "Memory-based CF";
 	}
 
 	@Override
 	public String getDescription() {
-		return "CFUserNN";
+		return "Memory-based CF";
 }
 }

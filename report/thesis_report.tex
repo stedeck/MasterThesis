@@ -1166,12 +1166,12 @@ The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \t
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/CFUserNN}
-	\caption{Results for \textit{CFUserNN}}
-	\label{fig:CFUserNN}
+	\includegraphics[width=1\textwidth]{figures/experiments/MemoryBasedCF}
+	\caption{Results for \textit{CFUserNN} over different numbers of nearest neighbours (lines in the middle, with square markers), \textit{CFUserNN2} (darker lines below) and \textit{CFItemNN} (brighter lines above). Gray line at the bottom marks the unpersonalized \textit{MostPop} algorithm.}
+	\label{fig:memBasedCF}
 \end{figure}
 
-The performance of \textit{CFUserNN} was measured over different neighbourhood sizes, see figure \ref{fig:CFUserNN}.
+The performance of \textit{CFUserNN} was measured over different neighbourhood sizes, see figure \ref{fig:memBasedCF}.
 For lower neighbourhood sizes Jaccard similarity outperforms cosine similarity.
 From 300 and higher number of neighbours, cosine similarity works slightly better.
 The best number of nearest neighbours to be investigated to calculate the recommendation are 300.
