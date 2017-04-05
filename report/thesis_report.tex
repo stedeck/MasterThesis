@@ -245,7 +245,7 @@ This technique is summarized in algorithm \ref{alg:CFItemNN}.
 
 To demonstrate this algorithm an example is used with users Alice, Bob, Carl, Daisy and Emma and item apple, banana, cherry and date.
 Table \ref{tab:example} shows which user has bought which fruits.
-\begin{table}
+\begin{table}[h!]
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline
 		&\textbf{apple}&\textbf{banana}&\textbf{cherry}&\textbf{date}\\ \hline
@@ -1011,7 +1011,7 @@ The SVD-based algorithms hold objects of the classes \textit{SVDModel} or \texti
 Moreover it can be seen, that the normal SVD class holds a single \textit{SVDModel}, while the boosted one holds $T$ \textit{AdaBoostSVDModel}s.
 To enable training models using either the usual SVD approach with linear regression or the one presented in this thesis using logistic regression, the regression functions are applied realizing the interface \textit{IRegFunction}.
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/implementation/classDiagram}
 	\caption{Simplified class diagram of the recommendation architecture.}
@@ -1025,7 +1025,7 @@ Using a handler instead of a simple return value, ensures asynchronous computati
 Figure \ref{fig:getPurchases} shows the UML notation of the \textit{IRecoData} interface and the sequence of obtaining the purchase matrix.
 
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\begin{subfigure}[t]{0.6\textwidth}
 		\includegraphics[width=\textwidth]{figures/implementation/IRecoDataInterface}
@@ -1058,7 +1058,7 @@ The last two sections of this chapter show the obtained results and discuss them
 \section{Data}
 \label{sec:data}
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{subfigure}[c]{1\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/userPurchases}
@@ -1127,7 +1127,7 @@ But in an online-shop a list of more than ten recommended items would not be use
 
 \section{Results}
 \label{sec:results}
-The unpersonalized approach \textit{MostPop} receives a MAP of 0.0499
+The unpersonalized approach \textit{MostPop} receives a MAP of 0.0499.
 The developed personalized recommendation systems are supposed to being able to outperform this approach.
 %todo explain why unpersonalized recommendation performs that well
 
@@ -1139,11 +1139,11 @@ The texts are represented in different ways, i.e. either in binary, bag-of-words
 In all cases the cosine similarity is applied.
 In the cases of category data and binary text representation also Jaccard similarity was applied. 
 Results are shown in table \ref{tab:CBNN}.
-It can be seen, that for binary data Jaccard similarity performs slightly better than cosine similarity as it is also the case for the memory-based collaborative filtering algorithms.
-For both kind of texts, the general information and the indication, the tf-idf representation achieves best results.
+It can be seen, that for binary data Jaccard similarity performs slightly better than cosine similarity.
+For both kinds of texts, the general information and the indication, the tf-idf representation achieves best results.
 With all tested content-based features the content-based recommenders both perform much worse than the unpersonalized recommender.
 
-\begin{table}
+\begin{table}[h!]
 	\begin{tabular}{|c||c|c|}
 		\hline
 		\textbf{Dataset}&\textbf{Jaccard}&\textbf{Cosine}\\ \hline
@@ -1163,22 +1163,23 @@ With all tested content-based features the content-based recommenders both perfo
 % How does CFItemNN perform with Jaccard and Cosine?
 The memory-based collaborative filtering approaches are evaluated using either the Jaccard coefficient or cosine similarity.
 The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \textit{CFItemNN}, while \textit{CFUserNN} refers to the user-user approach.
+Figure \ref{fig:memBasedCF} shows the results for those three algorithms and the \textit{MostPop} approach.
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/MemoryBasedCF}
 	\caption{Results for \textit{CFUserNN} over different numbers of nearest neighbours (lines in the middle, with square markers), \textit{CFUserNN2} (darker lines below) and \textit{CFItemNN} (brighter lines above). Gray line at the bottom marks the unpersonalized \textit{MostPop} algorithm.}
 	\label{fig:memBasedCF}
 \end{figure}
 
-The performance of \textit{CFUserNN} was measured over different neighbourhood sizes, see figure \ref{fig:memBasedCF}.
+The performance of \textit{CFUserNN} was measured over different neighbourhood sizes.
 For lower neighbourhood sizes Jaccard similarity outperforms cosine similarity.
 From 300 and higher number of neighbours, cosine similarity works slightly better.
 The best number of nearest neighbours to be investigated to calculate the recommendation are 300.
 Up to this point performance of the algorithm increases, but it decreases for larger neighbourhood sizes.
 Too few neighbours are not able to suggest enough possible recommendations and recommendations are not that confident as if voted for by more neighbours.
 Too many neighbours on the other hand produce fuzzy recommendations, because the neighbours may not be close enough to the current user.
-MAP for more users converges to the approach of recommending the most purchased items, because \textit{MostPop} and \textit{CFUserNN} result in the same algorithm, if all users are considered as neighbours.
+The MAP for more users converges to the approach of recommending the most purchased items, because \textit{MostPop} and \textit{CFUserNN} result in the same algorithm, if all users are considered as neighbours.
 Algorithm \ref{alg:CFUserNN2} is also evaluated and produces a MAP of 0.0916 with Jaccard similarity and a MAP of 0.0897 with cosine similarity.
 So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 %TODO investigate size of recommendation lists...
@@ -1189,7 +1190,7 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 \subsection{Model-based collaborative filtering}
 % svd approaches
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDIterations}
 	\caption{MAPs of the SVD approaches over number of training iterations for different number of features using either traditional linear regression or the presented logistic regression formula.}
@@ -1200,8 +1201,10 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 The matrix factorization approaches \textit{LogRegSVD} (see algorithms \ref{alg:LogRegSVDTraining} and \ref{alg:LogRegSVDRecommendation}) and the traditional approach using linear regression are investigated for the impact of different parameters.
 All models are trained using a learning rate $\alpha$ of $0.001$, a regularization factor $\lambda$ of $0.01$ and a negative weight $w_n$ for negative instances of $0.5$, if not stated differently.
 User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean 0 and a standard deviation of $0.1$.
+After manually trying different values for those parameters, these values produced best results.
+A sophisticated parameter optimization could not be performed due to time constraints and the long run of the training process.
 First the number of features and iterations are investigated, to see how many features and iterations are needed to reach sufficient recommendation results.
-Figure \ref{fig:SVDIterations} shows the MAP for different number of features over the number of iterations during training.
+Figure \ref{fig:SVDIterations} shows the MAP for different numbers of features over the number of iterations during training.
 There it can be seen, that the MAP increases with the number of iterations regardless of how many features or which matrix factorization technique is used.
 This is because more iterations result in a better trained model, because the feature vectors are updated more often.
 \textit{LogRegSVD} outperforms the traditional SVD algorithm for every number of features and iterations.
@@ -1210,22 +1213,14 @@ The more features are used, when factorizing the purchase matrix, the more infor
 The Frobenius norm of the reduced matrix is closer to the Frobenius norm of the original matrix the greater the rank of the reduced matrix is.
 Removing more features in the decomposition results in a worse approximation, but on the other hand preserves more memory and runtime.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
-	\caption{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
-	\label{fig:SVDModels}
-\end{figure}
-
-
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDWeights}
 	\caption{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\label{fig:SVDWeights}
 \end{figure}
 
-Moreover the impact of the weights of the random sampled negative feedback is investigated.
+Moreover the impact of the weights of the randomly sampled negative feedback is investigated.
 Different weights are assigned to the negative instances.
 Results can be seen in figure \ref{fig:SVDWeights}.
 The MAP increases for higher weights for the negative instances.
@@ -1234,14 +1229,14 @@ Probably this results from the random sampling
 of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
 So a negative instance has a much smaller impact on the trained model than the known positive instances, anyway.
 
-\begin{figure}
-	\begin{subfigure}{0.5\textwidth}
+\begin{figure}[h!]
+	\begin{subfigure}{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/errorsLogLin43}
 		\caption{Mean of absolute errors of all training instances over iterations.}
 		\label{fig:errorsLogLin43}
 	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
+	\begin{subfigure}{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/predictionErrors}
 		\caption{Errors for predicted values for positive instances with linear and logistic regression function.}
@@ -1267,6 +1262,13 @@ This may result from the impact of negative instances to the training process.
 While for linear regression the negative instances (i.e. $r_{ui} = 0$) push the model towards the initial state of $p_u^Tq_i \approx 0$ and cause small updates at the start of training, in the case of logistic regression, updates for negative instances actively update the feature vectors into the other direction, such that $p_u^Tq_i$ even may get negative.
 
 \subsection{AdaBoost}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
+	\caption{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
+	\label{fig:SVDModels}
+\end{figure}
+
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs are compared for different numbers of models.
 Using only one model refers to the normal SVD algorithm without boosting.
 The results are shown in figure \ref{fig:SVDModels}.
@@ -1278,14 +1280,14 @@ Furthermore the figure shows, that the performance difference between models wit
 There the model trained with 200 features even gets better than the model with 300 features.
 The differences are quite small, so this may result from the random sampling of negative instances, such that for one model a sample was generated, that produces better results, than in the other model.
 
-\begin{figure}
-	\begin{subfigure}[c]{0.5\textwidth}
+\begin{figure}[h!]
+	\begin{subfigure}[c]{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionsOModels}
 		\caption{\textit{LogRegSVD} models}
 		\label{fig:LogRegSVDPredictionsOModels}
 	\end{subfigure}
-	\begin{subfigure}[c]{0.5\textwidth}
+	\begin{subfigure}[c]{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOModels}
 		\caption{\textit{LinRegSVD} models}
@@ -1320,7 +1322,7 @@ The most promising combination of recommenders seems to be the user-user and the
 This might come from serendipitous recommendations made by the user-user approach.
 While the other collaborative filtering approach tend to provide items, that are similar to those the current user already purchased, \textit{CFUserNN} might also find items, that are dissimilar, but are bought by some similar users.
 
-\begin{table}
+\begin{table}[h!]
 	\begin{tabular}{|c|c||p{1.2cm}|p{1.2cm}|p{1.2cm}|p{1.2cm}|}
 		\hline
 		\textbf{R. 1}&\textbf{R. 2}&\textbf{both}&\textbf{only R. 1}&\textbf{only R. 2}&\textbf{none}\\ \hline
@@ -1361,7 +1363,7 @@ Moreover the set of recommended items is not guaranteed to be large enough anywa
 Runtime improvements also cannot be achieved here, because the main part of the algorithm iterates over the set of users instead of items.
 
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
