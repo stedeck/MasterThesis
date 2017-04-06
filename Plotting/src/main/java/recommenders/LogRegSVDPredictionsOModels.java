@@ -89,6 +89,7 @@ public class LogRegSVDPredictionsOModels extends ExamplePanel{
 		plot.setInsets(new Insets2D.Double(70.0, 70.0, 70.0, 70.0));
 		plot.setBackground(Color.WHITE);
 		plot.getTitle().setText(getDescription());
+		plot.getAxis(XYPlot.AXIS_Y).setMin(MOST_POP - 0.005);
 		
 		// Format axes
 		AxisRenderer axisRendererX = plot.getAxisRenderer(XYPlot.AXIS_X);
