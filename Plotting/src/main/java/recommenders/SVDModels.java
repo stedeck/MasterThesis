@@ -28,7 +28,7 @@ import de.erichseifert.gral.graphics.Insets2D;
 @SuppressWarnings("serial")
 public class SVDModels extends ExamplePanel{
 	public static void main(String[] args) {
-		String file_name = "..\\SVDIterations.csv";
+		String file_name = "..\\SVDModels.csv";
 		new SVDModels(file_name);
 	}
 	
@@ -93,7 +93,7 @@ public class SVDModels extends ExamplePanel{
 		AxisRenderer axisRendererX = plot.getAxisRenderer(XYPlot.AXIS_X);
 		AxisRenderer axisRendererY = plot.getAxisRenderer(XYPlot.AXIS_Y);
 		axisRendererY.setLabelDistance(2);
-		axisRendererX.setLabel(new Label("# iterations"));
+		axisRendererX.setLabel(new Label("# models"));
 		axisRendererY.setLabel(new Label("MAP"));
 		plot.setAxisRenderer(XYPlot.AXIS_X, axisRendererX);
 		plot.setAxisRenderer(XYPlot.AXIS_Y, axisRendererY);

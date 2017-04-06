@@ -1105,6 +1105,8 @@ The recommendation systems are evaluated using 80 percent of the data as trainin
 The test set is built by iterating user- and item-wise over purchases and adding every 5\textsuperscript{th} purchase to the test set and removing it from the training set.
 This ensures, that the test purchases are equally distributed over all users.
 The training set then consists of 523,371 and the test set of 130,843 instances.
+Every experiment is run once using the same training and test sets.
+Applying k-fold-cross or other more advanced evaluation techniques could not be applied due to time constraints, because calculating recommendations and especially training the models can take several hours for a single experiment.
 
 An unpersonalized recommendation approach called \textit{MostPop} is used as a baseline for evaluation.
 It always recommends those items to a user, that are purchased most often.
