@@ -224,7 +224,7 @@ In this thesis experiments were performed using cosine similarity and the Jaccar
 This technique is summarized in algorithm \ref{alg:CFItemNN}.
 
 \begin{algorithm}
-	\caption{CFItemNN}
+	\caption[CFItemNN]{CFItemNN}
 	\label{alg:CFItemNN}
 	\begin{algorithmic}[1]
 		\Require current user $u$, feedback matrix $A$, set of items $I$, number of recommendations $l$
@@ -255,7 +255,7 @@ Table \ref{tab:example} shows which user has bought which fruits.
 		\textbf{Daisy}&1&&1&1\\ \hline	
 		\textbf{Emma}&&1&1&\\ \hline	
 	\end{tabular}
-	\caption{Example to demonstrate the nearest-neighbour based recommendation algorithms. 1 indicates that the user has purchased the fruit.}	
+	\caption[Example for nearest-neighbour based algorithms]{Example to demonstrate the nearest-neighbour based recommendation algorithms. 1 indicates that the user has purchased the fruit.}	
 	\label{tab:example}
 \end{table}
 
@@ -282,7 +282,7 @@ The similarity function $sim(A(u,:)^T, A(v, :)^T)$ refers to the same vector sim
 After the nearest neighbours of user $u$ are obtained, those items are recommended that are purchased most often by the determined neighbours, see algorithm \ref{alg:CFUserNN}.
 
 \begin{algorithm}
-	\caption{CFUserNN}
+	\caption[CFUserNN]{CFUserNN}
 	\label{alg:CFUserNN}
 	\begin{algorithmic}[1]
 		\Require current user $u$, feedback matrix $A$, set of users $U$, number of neighbours $n$, number of recommendations $l$
@@ -343,7 +343,7 @@ The nearest neighbours are not directly determined, so the recommendations are n
 The recommended items are those, that were purchased by those users with the highest similarity to $u$.
 
 \begin{algorithm}
-	\caption{CFUserNN2}
+	\caption[CFUserNN2]{CFUserNN2}
 	\label{alg:CFUserNN2}
 	\begin{algorithmic}[1]
 		\Require current user $u$, feedback matrix $A$, set of items $I$, set of users $U$, number of recommendations $l$
@@ -541,7 +541,7 @@ The constants $2$ and $1$ in equation \ref{eq:BayesFeatureProb} are added to avo
 This technique is called Laplace-smoothing.
 
 \begin{algorithm}
-	\caption{CBBayes}
+	\caption[CBBayes]{CBBayes}
 	\label{alg:CBBayes}
 	\begin{algorithmic}[1]
 		\Require current user $u$, content matrix $C$, set of items $I$, number of recommendations $l$
@@ -565,7 +565,7 @@ For this purpose a content matrix $C \in \mathds{R}^{n \times c}$, where $n$ is 
 
 
 \begin{algorithm}
-	\caption{CBNN}
+	\caption[CBNN]{CBNN}
 	\label{alg:CBNN}
 	\begin{algorithmic}[1]
 		\Require current user $u$, content matrix $C$, set of items $I$, number of recommendations $l$
@@ -777,7 +777,7 @@ The weight is set to $w_n = 1$ for known positive trainings instances and to $w_
 In section \ref{sec:results} experiments for different weights are performed to see, how they effect the performance of the algorithm.
 
 \begin{algorithm}
-	\caption{LogRegSVD Training}
+	\caption[LogRegSVD Training]{LogRegSVD Training}
 	\label{alg:LogRegSVDTraining}
 	\begin{algorithmic}[1]
 		\Require purchase matrix $A$, set of purchases $R$, number of features $F$, number of iterations $iterNum$, weight for negative instances $w_n$, learning rate $\alpha$, regularization factor $\lambda$
@@ -803,7 +803,7 @@ In section \ref{sec:results} experiments for different weights are performed to 
 
 
 \begin{algorithm}
-	\caption{LogRegSVD Recommendation}
+	\caption[LogRegSVD Recommendation]{LogRegSVD Recommendation}
 	\label{alg:LogRegSVDRecommendation}
 	\begin{algorithmic}[1]
 		\Require current user $u$, user feature vector $p_u$ and item feature vectors $q_i$, set of items $I$, number of recommendations $l$
@@ -849,7 +849,7 @@ Thus, instances with high errors get a higher weight for the next model and ther
 Algorithm \ref{alg:AdaBoostLogRegSVDTraining} describes the training of $T$ matrix factorization models using the logistic regression approach.
 
 \begin{algorithm}
-	\caption{AdaBoost LogRegSVD Training}
+	\caption[AdaBoost LogRegSVD Training]{AdaBoost LogRegSVD Training}
 	\label{alg:AdaBoostLogRegSVDTraining}
 	\begin{algorithmic}[1]
 		\Require purchase matrix $A$, set of purchases $R$, number of features $F$, number of iterations $iterNum$, weight for negative instance $w_n$, learning rate $\alpha$, regularization factor $\lambda$, number of models $T$
@@ -1014,7 +1014,7 @@ To enable training models using either the usual SVD approach with linear regres
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/implementation/classDiagram}
-	\caption{Simplified class diagram of the recommendation architecture.}
+	\caption[Class diagram]{Simplified class diagram of the recommendation architecture.}
 	\textit{}\label{fig:classDiagram}
 \end{figure}
 
@@ -1029,15 +1029,15 @@ Figure \ref{fig:getPurchases} shows the UML notation of the \textit{IRecoData} i
 	\centering
 	\begin{subfigure}[t]{0.6\textwidth}
 		\includegraphics[width=\textwidth]{figures/implementation/IRecoDataInterface}
-		\caption{Adapter interface to retrieve the purchase matrix from different sources.}
+		\caption[Adapter interface for different data sources]{Adapter interface to retrieve the purchase matrix from different sources.}
 		\label{fig:irecodataInterface}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.35\textwidth}
 		\includegraphics[width=\textwidth]{figures/implementation/getPurchasesSequence}
-		\caption{Sequence of retrieving the purchase matrix from \textit{IRecoData} adapter.}
+		\caption[Sequence diagram of for retrieving data]{Sequence diagram of retrieving the purchase matrix from \textit{IRecoData} adapter.}
 		\label{fig:getPurchasesSequence}
 	\end{subfigure}
-	\caption{Applied adapter pattern for different data sources.}
+	\caption[Class and sequence diagram of applied adapter pattern]{Applied adapter pattern for different data sources.}
 	\label{fig:getPurchases}
 \end{figure}
 
@@ -1062,16 +1062,16 @@ The last two sections of this chapter show the obtained results and discuss them
 	\begin{subfigure}[c]{1\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/userPurchases}
-		\caption{Number of purchases for every user.}
+		\caption[Number of purchases per user]{Number of purchases for every user.}
 		\label{fig:userPurchases}
 	\end{subfigure}
 	\begin{subfigure}[c]{1\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/articlePurchases}
-		\caption{Number of purchases for every article.}
+		\caption[Number of purchases per article]{Number of purchases for every article.}
 		\label{fig:articlePurchases}
 	\end{subfigure}
-	\caption{Distribution of purchases.}
+	\caption[Distribution of purchases]{Distribution of purchases.}
 \end{figure}
 
 To evaluate the different recommendation approaches, data from an online pharmacy is used.
@@ -1157,7 +1157,7 @@ With all tested content-based features the content-based recommenders both perfo
 		general information (bag-of-words)&-&0.00804\\ \hline	
 		general information (tf-idf)&-&0.01595\\ \hline	
 	\end{tabular}
-	\caption{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}	
+	\caption[Results for \textit{CBNN}]{Results for \textit{CBNN} applied to different content-based information and different similarity functions.}	
 	\label{tab:CBNN}
 \end{table}
 
@@ -1170,7 +1170,7 @@ Figure \ref{fig:memBasedCF} shows the results for those three algorithms and the
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/MemoryBasedCF}
-	\caption{Results for \textit{CFUserNN} over different numbers of nearest neighbours (lines in the middle, with square markers), \textit{CFUserNN2} (darker lines below) and \textit{CFItemNN} (brighter lines above). Gray line at the bottom marks the unpersonalized \textit{MostPop} algorithm.}
+	\caption[Results for memory-based collaborative filtering algorithms]{Results for \textit{CFUserNN} over different numbers of nearest neighbours (lines in the middle, with square markers), \textit{CFUserNN2} (darker lines below) and \textit{CFItemNN} (brighter lines above). Gray line at the bottom marks the unpersonalized \textit{MostPop} algorithm.}
 	\label{fig:memBasedCF}
 \end{figure}
 
@@ -1195,7 +1195,7 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDIterations}
-	\caption{MAPs of the SVD approaches over number of training iterations for different number of features using either traditional linear regression or the presented logistic regression formula.}
+	\caption[MAPs for SVD approaches over different number of iterations]{MAPs for the SVD approaches over number of training iterations for different number of features using either traditional linear regression or the presented logistic regression formula.}
 	\label{fig:SVDIterations}
 \end{figure}
 %todo add some iteration until curves are obviously flater
@@ -1218,7 +1218,7 @@ Removing more features in the decomposition results in a worse approximation, bu
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDWeights}
-	\caption{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
+	\caption[MAPs for SVD approaches over different weights for negative instances]{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\label{fig:SVDWeights}
 \end{figure}
 
@@ -1235,16 +1235,16 @@ So a negative instance has a much smaller impact on the trained model than the k
 	\begin{subfigure}{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/errorsLogLin43}
-		\caption{Mean of absolute errors of all training instances over iterations.}
+		\caption[Mean absolute error over iterations]{Mean of absolute errors of all training instances over iterations.}
 		\label{fig:errorsLogLin43}
 	\end{subfigure}
 	\begin{subfigure}{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/predictionErrors}
-		\caption{Errors for predicted values for positive instances with linear and logistic regression function.}
+		\caption[Error of positive instances for different predictions]{Errors for predicted values for positive instances with linear and logistic regression function.}
 		\label{fig:predictionErrors}
 	\end{subfigure}
-	\caption{Prediction errors for linear and logistic regression functions.}
+	\caption[Comparison of prediction errors for linear and logistic regression]{Comparison of prediction errors for linear and logistic regression functions.}
 	\label{fig:errors}
 \end{figure}
 
@@ -1267,7 +1267,7 @@ While for linear regression the negative instances (i.e. $r_{ui} = 0$) push the 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
-	\caption{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
+	\caption[MAPs for AdaBoost over number of models]{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
 	\label{fig:SVDModels}
 \end{figure}
 
@@ -1286,16 +1286,16 @@ The differences are quite small, so this may result from the random sampling of 
 	\begin{subfigure}[c]{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionsOModels}
-		\caption{\textit{LogRegSVD} models}
+		\caption[\textit{LogRegSVD} models]{\textit{LogRegSVD} models}
 		\label{fig:LogRegSVDPredictionsOModels}
 	\end{subfigure}
 	\begin{subfigure}[c]{0.9\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOModels}
-		\caption{\textit{LinRegSVD} models}
+		\caption[\textit{LinRegSVD} models]{\textit{LinRegSVD} models}
 		\label{fig:LinRegSVDPredictionsOModels}
 	\end{subfigure}
-	\caption{MAP of different prediction rules over the number models trained with 2000 iterations and 300 features.}
+	\caption[MAPs for different prediction rules]{MAP of different prediction rules over the number models trained with 2000 iterations and 300 features.}
 	\label{fig:SVDPredictionOModels}
 \end{figure}
 
@@ -1337,7 +1337,7 @@ While the other collaborative filtering approach tend to provide items, that are
 		\textit{CFUserNN}&\textit{LogRegSVD}&11035 (8.43\%)&14811 (11.32\%)&11617 (8.88\%)&93380 (71.37\%) \\ \hline
 		 \textit{CBNN}&\textit{LogRegSVD}&1769 (1.35\%)&2443 (1.87\%)&20883 (15.96\%)&105748 (80.82\%)\\ \hline
 	\end{tabular}
-	\caption{Common recommendations for different pairs of recommenders. \textit{CFUserNN} were applied for 300 neighbours. \textit{CBNN} (text) refers to algorithm \ref{alg:CBNN} using text with general information represented. For \textit{LogRegSVD} a boosted version with 5 models, 300 features trained in 2000 iteration is used. All nearest neighbour algorithms are applied with Jaccard similarity, except for \textit{CBNN} with text. There cosine similarity is used.}
+	\caption[Comparison of recommendations for different algotithms]{Common recommendations for different pairs of recommenders. \textit{CFUserNN} were applied for 300 neighbours. \textit{CBNN} (text) refers to algorithm \ref{alg:CBNN} using text with general information represented. For \textit{LogRegSVD} a boosted version with 5 models, 300 features trained in 2000 iteration is used. All nearest neighbour algorithms are applied with Jaccard similarity, except for \textit{CBNN} with text. There cosine similarity is used.}
 \label{tab:correlation}
 \end{table}
 
@@ -1369,22 +1369,22 @@ Runtime improvements also cannot be achieved here, because the main part of the 
 	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/CFItemNNCandidates}
-		\caption{MAP of \textit{CFItemNN} over different candidate thresholds.}
+		\caption[MAP of \textit{CFItemNN} over different candidate thresholds]{MAP of \textit{CFItemNN} over different candidate thresholds.}
 		\label{fig:CFItemNNCandidates}
 	\end{subfigure}
 	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDCandidates}
-		\caption{MAP of \textit{LogRegSVD} over different candidate thresholds.}
+		\caption[MAP of \textit{LogRegSVD} over different candidate thresholds.]{MAP of \textit{LogRegSVD} over different candidate thresholds}
 		\label{fig:LogRegSVDCandidates}
 	\end{subfigure}
 	\begin{subfigure}[c]{0.5\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/CBNNCandidates}
-		\caption{MAP of \textit{CBNN} over different candidate thresholds.}
+		\caption[MAP of \textit{CBNN} over different candidate thresholds]{MAP of \textit{CBNN} over different candidate thresholds.}
 		\label{fig:CBNNCandidates}
 	\end{subfigure}
-	\caption{Impact of candidate threshold for different approaches}
+	\caption[Impact of candidate threshold for different approaches]{Impact of candidate threshold for different approaches}
 	\label{fig:candidates}
 \end{figure}
 
@@ -1513,7 +1513,7 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesSingle}
 		\end{subfigure}
-		\caption{Different prediction rules applied to a single SVD model over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
+		\caption[Prediction rules for single SVD model over number of features]{Different prediction rules applied to a single SVD model over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
 	\end{figure}
 	\begin{figure}[h!]
 		\begin{subfigure}[c]{0.5\textwidth}
@@ -1524,7 +1524,7 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesBoost}
 		\end{subfigure}
-		\caption{Different prediction rules applied to 5 boosted SVD models over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
+		\caption[Prediction rules for AdaBoost SVD over number of features]{Different prediction rules applied to 5 boosted SVD models over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
 	\end{figure}
 	\begin{figure}[h!]
 		\begin{subfigure}[c]{0.5\textwidth}
@@ -1534,7 +1534,7 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsSingle}
 		\end{subfigure}
-		\caption{Different prediction rules applied to a single SVD model over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
+		\caption[Prediction rules for single SVD model over iterations]{Different prediction rules applied to a single SVD model over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
 	\end{figure}
 	\begin{figure}[h!]
 		\begin{subfigure}[c]{0.5\textwidth}
@@ -1545,7 +1545,7 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsBoost}
 		\end{subfigure}
-		\caption{Different prediction rules applied to 5 boosted SVD models over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
+		\caption[Prediction rules for AdaBoost SVD over iterations]{Different prediction rules applied to 5 boosted SVD models over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
 	\end{figure}
 
 \end{document}
