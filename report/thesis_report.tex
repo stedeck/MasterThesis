@@ -23,6 +23,9 @@
 
 \usepackage{url}
 
+% Ensure floats land in the section where they are defined
+\usepackage[section]{placeins}
+
 
 \begin{document}
 \maketitle
@@ -194,17 +197,17 @@ There are different methods to calculate similarities between two vectors \cite{
 A common approach is the cosine similarity.
 Intuitively it measures the cosine of the angle between the two vectors $A$ and $B$ using the formula:
 
-\begin{equation}
+$$
 sim(A, B) =\frac{A \cdot B}{||A||\ ||B||} = \frac{\sum_{i=1}^{n}{A_i B_i}}{\sqrt{\sum_{i=1}^n{A_i^2}}\sqrt{\sum_{i=1}^n{B_i^2}}}
-\end{equation}
+$$
 
 Cosine similarity is usually applied to vectors with numerical elements.
 One measure for binary data is the Jaccard coefficient, which considers common elements with respect to the total number of set elements of the two vectors.
 The formula for the Jaccard coefficient is given by:
 
-\begin{equation}
+$$
 sim(A, B) = \frac{|A \cap B|}{|A \cup B|} = \frac{|A \cap B|}{|A|+|B|-|A \cap B|}
-\end{equation}
+$$
 
 
 \paragraph{Item-Item}
@@ -213,9 +216,9 @@ It was among others implemented by Amazon \cite{amazonItemItem}.
 In \cite{itemItemAlgorithms} it is evaluated using different similarity measures for rating data. %todo found further references
 For every item $i$, the current user $u$ has not purchased, a score is calculated by
 
-\begin{equation}
-	 s(u,i) = \sum_{j \in I(u)}{sim(A(:,i), A(:,j))}
-\end{equation}
+$$
+s(u,i) = \sum_{j \in I(u)}{sim(A(:,i), A(:,j))}
+$$
 
 Here $A \in \mathds{R}^{n \times m}$ denotes the purchase matrix for $n$ users and $m$ items. $A(:,i)$ denotes the $i^{th}$ column vector. $I(u)$ is the set of items, that user $u$ purchased.
 Then those items are recommended, that reach the highest score.
@@ -273,9 +276,9 @@ The second memory-based algorithm is a user-user approach. %todo can i find a pa
 Here the similarities between users instead of items are taken into account.
 In the first step the nearest neighbours of the current user $u$, denoted by $N(u)$, are determined by getting those users $v$, which reach the highest score according to
 
-\begin{equation}
-	s(u,v) = sim(A(u,:)^T, A(v, :)^T)
-\end{equation}
+$$
+s(u,v) = sim(A(u,:)^T, A(v, :)^T)
+$$
 
 $A(u,:)$ and $A(v,:)$ are the $u^{th}$ and $v^{th}$ row vectors of the purchase matrix, respectively.
 The similarity function $sim(A(u,:)^T, A(v, :)^T)$ refers to the same vector similarities as in the item-item approach.
@@ -335,9 +338,9 @@ Moreover vectors with few numbers of entries are more similar to other vectors w
 Another user-user approach, that does not suffer from the above problem was implemented in \cite{efficientTopN} or \cite{effectiveLatentModels}, see algorithm \ref{alg:CFUserNN2}.
 Here for every item $i$, the current user $u$ has not purchased, the similarity score between the current user $u$ and every user who has purchased $i$ is calculated as using: 
 
-\begin{equation}
-	s(u,i) = \sum_{v \in U(i)}{sim(u,v)}
-\end{equation}
+$$
+s(u,i) = \sum_{v \in U(i)}{sim(u,v)}
+$$
 
 The nearest neighbours are not directly determined, so the recommendations are not limited to the items the neighbours purchased.
 The recommended items are those, that were purchased by those users with the highest similarity to $u$.
@@ -388,9 +391,9 @@ It is aimed to find latent factor features to represent users and items instead 
 In \cite{SVDNeuralNet} it is shown that using latent features is able to improve prediction results in a movie rating dataset.
 Generally SVD decomposes a matrix $A \in \mathds{R}^{m \times n}$ into the matrices $U \in \mathds{R}^{m \times n}$, $\Sigma \in \mathds{R}^{n \times n}$ and $V \in \mathds{R}^{n \times n}$, such that 
 
-\begin{equation}
-	A = U \Sigma V^T
-\end{equation}
+$$
+A = U \Sigma V^T
+$$
 
 The column vectors of $U$ are the eigenvectors of $AA^T$, the columns of $V$ are the eigenvectors of $A^TA$.
 $\Sigma$ is a diagonal matrix $diag(\sigma_1, ..., \sigma_n)$ containing the square roots of the corresponding eigenvalues.  %todo explain relation to pca
@@ -403,16 +406,16 @@ Item similarities are stored in V respectively.
 Dimensions of the purchase matrix A can than be reduced by cutting lower eigenvalues in $\Sigma$ and their eigenvectors in $U$ and $V$, because the lower eigenvalues contain less information about the user similarity matrix and are therefore less able to derive user and item features from.
 Cutting eigenvectors and eigenvalues up to $f \in \mathbf{R}$ results in the singular value decomposition 
 
-\begin{equation}
+$$
 	A_f = U_f \Sigma_f V_f^T
-\end{equation}
+$$
 
 with $A_f \in \mathds{R}^{m \times n}$, $U_f \in \mathbf{R}^{m \times f}$, $\Sigma_f \in \mathds{R}^{f \times f}$ and $V_f \in \mathds{R}^{n \times f}$.
 This can be transformed to 
 
-\begin{equation}
+$$
 	A_f = U_f \Sigma_f^{1/2} \Sigma_f^{1/2} V_f^T = P_f Q_f
-\end{equation}
+$$
 
 with $\Sigma_f^{1/2} = diag(\sqrt{\sigma_1}, ..., \sqrt{\sigma_f})$, $P_f = U_f \Sigma_f^{1/2}$ and $Q_f = \Sigma_f^{1/2} V_f^T$.
 Users and items are expressed as $f$ latent features in $P_f$ and $Q_f$ respectively.
@@ -432,9 +435,9 @@ For recommendation systems the reduced user and item representations are often t
 In \cite{matrixFactorizationDifRegParam} this approach was implemented for the netflix prize dataset and various improvements are suggested.
 For every user $u$ a feature vector $p_u \in \mathds{R}^f$ and for every item $i$ a feature vector $q_i \in \mathds{R}^f$ is learned by minimizing the cost function 
 
-\begin{equation}
+$$
 	\sum_{u, i}{(r_{ui} - p_u^T q_i)^2 + \lambda (||p_u||^2 + ||q_i||^2)}
-\end{equation}
+$$
 
 $e_{ui} = r_{ui} - p_u^T q_i$ is the error term that has to be reduced.
 $\lambda (||p_u||^2 + ||q_i||^2)$ is a regularization term to prevent the model from overfitting.
@@ -457,12 +460,10 @@ A faster way is stochastic gradient descent.
 Funk \cite{funkLeastSquares} presented an efficient least squares regression approach.
 There a feature vector is updated for every trainings example, what leads to update rules 
 
-\begin{equation}
-	p_u = p_u + \alpha (e_{ui} q_i + \lambda p_u)
-\end{equation}
-\begin{equation}
-	q_i = q_i + \alpha (e_{ui} p_u + \lambda q_i)
-\end{equation}
+\begin{align*}
+	p_u &= p_u + \alpha (e_{ui} q_i + \lambda p_u) \\
+	q_i &= q_i + \alpha (e_{ui} p_u + \lambda q_i)
+\end{align*}
 
 Funk performs updates for every user and item features separately, i.e. first trains the first features using all training instances, then the second features and so on.
 In contrast to this here all features are updated simultaneously like in \cite{matrixFactorizationDifRegParam}.
@@ -499,9 +500,9 @@ Tf-idf refers to the term frequencies within a document with respect to the rele
 The relevance of a term is given by the inverse document frequency (idf), expressed as the logarithm of the inverse of the ratio of documents that contain that term.
 The tf-idf value of a term $t$ for a document $d$ is given as:
 
-\begin{equation}
+$$
 	\textit{tf-idf(t,d)} = \textit{tf(t,d)} log(\frac{N}{n_t})
-\end{equation}
+$$
 
 where $tf(t,d)$ denotes the term frequency of term $t$ within document $d$, $N$ is the number of all documents and $n_t$ is the number of documents that contain term $t$ at least once. 
 This measure on one hand gives those terms a higher value for a specific document, that occur more often in a document, and on the other hand increase the value, if that term is not common within the other documents.
@@ -515,19 +516,17 @@ Naive Bayes determines the probability, that a user purchases a specific item ba
 For every user $u$ a profile is trained consisting of the prior probability, that $u$ purchases an item $p_u(b=1)$ and  the likelihoods of $f$ item features $p_u(x_f|b=1)$.
 The probability of $u$ purchasing an item given in terms of item features $x$ can be calculated using the Bayes theorem by 
 
-\begin{equation}
-\label{BayesPost}
+$$
 	p_u(b=1|x) = \frac{p_u(b=1) p_u(x|b=1)}{p_u(x)} \propto \frac{p_u(x|b=1)}{p_u(x)}
-\end{equation}
+$$
 
 $p_u(b=1)$ denotes the probability for user $u$ to purchase an item independently from its features.
 This value is the same for every item, so for calculating the recommendations it can be omitted.
 $p_u(x|b=1)$ is calculated by 
 
-\begin{equation}
-\label{BayesEvid}
+$$
 p_u(x|b=1) = \prod_f{p_{u, x_f}^{x_f}(1-p_{u, x_f})^{(1-x_f)}}
-\end{equation}
+$$
 
 due to the independence assumption.
 The likelihoods of single item features $f$ are calculated using a users past purchases by
@@ -742,15 +741,15 @@ So predicting user preferences becomes a classification rather than a regression
 So in the scope of this thesis the SVD approach explained in section \ref{sec:modelBasedCF} is transformed into a logistic regression problem trying to predict a value $\hat{r}_{ui} \in \{0,1\}$.
 Then the prediction in equation \ref{eq:linRegPrediction} becomes 
 
-\begin{equation}
+$$
 	\hat{r}_{ui} = \frac{1}{1 + e^{-p_u^Tq_i}}
-\end{equation}
+$$
 
 When training the user and item feature vectors, the prediction error $e_{ui}$ is then replaced with 
 
-\begin{equation}
+$$
 	e_{ui} = r_{ui} - \frac{1}{1 + e^{-p_u^Tq_i}}
-\end{equation}
+$$
 
 %maybe explain why funk version doesn't work here
 
@@ -828,15 +827,15 @@ Instead of resampling training instances, the reweighting approach explained in 
 The weights are applied to the learning rate of the feature updates, such that instances with higher weights get larger feature updates than those with fewer weights.
 So the update rules \ref{eq:updateLogRegP} and \ref{eq:updateLogRegQ} from the presented logistic regression matrix factorization are transformed to: 
 
-\begin{equation}
+$$
 p_{u,t} = p_{u,t} + w_n \alpha d_{ui,t} (e_{ui,t} q_{i,t} + \lambda p_{u,t})
-\end{equation}
+$$
 
 and 
 
-\begin{equation}
+$$
 q_{i,t} = q_{i,t} + w_n \alpha d_{ui,t} (e_{ui,t} p_{u,t} + \lambda q_{i,t})
-\end{equation}
+$$
 
 where $d_{ui}$ denotes the weight for training instance of user $u$ for item $i$.
 For the first model the weights are $1$ for all training instances, such that all feature vectors are updated according to the unweighted learning rate.
@@ -899,10 +898,9 @@ For classification the model error $\epsilon_t$ is the amount of misclassified i
 Here the model error is calculated as the average over all instance errors, i.e. $\epsilon_t = \sum_{(u,i)\in R_{train}}{e_{ui,t}}\frac{1}{|R_{train}|}$, where $|R_{train}|$ is the number of all instances in the training set.
 For recommendation this leads to the following prediction rule to determine the score for a user-item-pair:
 
-\begin{equation}
-\label{eq:adaBoostPredRule}
+$$
 s(u,i) = \sum_t^T{\frac{\alpha_t}{1 + exp(p_{u,t}^Tq_{i,t})}}
-\end{equation}
+$$
 
 This prediction rule incorporates the errors of the whole models, that are trained during the AdaBoost recommendation approach.
 Though the models consist of user and item features, that may vary in performance, i.e. one model may perform better for some users or items, while another model may perform better for other users or items.
@@ -941,7 +939,7 @@ A third possibility is to incorporate both the user and item errors by
 s(u,i) = \sum_t^T{\frac{ln(\frac{1 - e_u}{e_u})ln(\frac{1 - e_i}{e_i})}{1 + exp(p_{u,t}^Tq_{i,t})}}
 \end{equation}
 
-Prediction rules \ref{eq:articleErrorPrediction} and \ref{eq:combinedErrorPrediction} do not only weight the results of the different models, but also assign different weights to different items according to their error.
+In contrast to \ref{eq:userErrorPrediction} prediction rules \ref{eq:articleErrorPrediction} and \ref{eq:combinedErrorPrediction} do not only weight the results of the different models, but also assign different weights to different items according to their error.
 Intuitively those weights refer to the confidence of the calculated prediction.
 For articles with a higher error the confidence of the prediction is lower and so the calculated score is lower as well.
 The article error based prediction can also be applied to a single model, i.e. to the traditional or the presented matrix factorization approach without applying AdaBoost.
@@ -1115,13 +1113,16 @@ Evaluation is measured in terms of the mean average precision (MAP), a common me
 It is a measure for evaluating ranked lists, since it measures precision and incorporates the ranks of true positives.
 It is calculated by:
 
-\begin{equation}
-	MAP_n = \frac{1}{|U|} \sum_u^{|U|} \frac{1}{|I_u|}\sum_i^{|I_u|} Precision(i)
-\end{equation}
+\begin{align*}
+	MAP_n &= \frac{1}{|U|} \sum_u^{|U|} \frac{1}{|I_u|}\sum_i^{|I_u|} Precision(i) \\
+	&= \frac{1}{|U|} \sum_u^{|U|} \frac{1}{|I_u|}\sum_i^{|I_u|} \frac{\sum_{k}^{i}{\mathbf{1}_{true}(I_{uk})}}{i}
+\end{align*}
 
-Here $U$ is the set of users, who got recommendations in the evaluation process, and $I_u$ is the list of items, that is recommended to user $u$.
+Here $U$ is the set of users, who got recommendations in the evaluation process, and $I_u$ is the list of items (of size $n$), that is recommended to user $u$.
 $Precision(i)$ denotes the precision of the recommended list up to position $i$, i.e. the number of correct recommendations within list elements $1$ to $i$ divided by $i$.
-So it is the mean of precisions measured at every position of the list of recommendations averaged over all users, who got recommendations.
+$\mathbf{1}_{true}(I_{uk})$ is the indicator function for the $k^{th}$ element of $I_{u}$ being a true positive, i.e. a correct recommendation.
+This function is 1 if $I_{uk}$ is a correct recommendation and 0 otherwise.
+So the MAP is the mean of precisions measured at every position of the list of recommendations averaged over all users, who got recommendations.
 All experiments are performed calculating a ranked list of ten recommendations.
 Larger lists would increase performance, because more items would participate in the evaluation and could increase the precisions.
 But in an online-shop a list of more than ten recommended items would not be useful to the user, since the recommended items are not actively requested by the user, but only shown besides the user browses the shop. 
@@ -1189,12 +1190,14 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 
 \textit{CFItemNN} performs better than the \textit{CFUserNN} resulting in a MAP of 0.1371 using Jaccard similarity and 0.1333 using cosine similarity.
 
+\FloatBarrier
+
 \subsection*{Model-based collaborative filtering}
 % svd approaches
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/SVDIterations}
+	\includegraphics[width=0.95\textwidth]{figures/experiments/SVDIterations}
 	\caption[MAPs for SVD approaches over different number of iterations]{MAPs for the SVD approaches over number of training iterations for different number of features using either traditional linear regression or the presented logistic regression formula.}
 	\label{fig:SVDIterations}
 \end{figure}
@@ -1217,7 +1220,7 @@ Removing more features in the decomposition results in a worse approximation, bu
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/SVDWeights}
+	\includegraphics[width=0.95\textwidth]{figures/experiments/SVDWeights}
 	\caption[MAPs for SVD approaches over different weights for negative instances]{MAP for SVD approaches over different weights for negative instances for different number of features. The models are trained with 2000 iterations.}
 	\label{fig:SVDWeights}
 \end{figure}
@@ -1231,14 +1234,14 @@ Probably this results from the random sampling
 of negative instances: the negative instances are randomly sampled from the training set in every iteration, i.e. there probably is a different sample in every iteration.
 So a negative instance has a much smaller impact on the trained model than the known positive instances, anyway.
 
-\begin{figure}[h!]
-	\begin{subfigure}{0.9\textwidth}
+\begin{figure}[hb!]
+	\begin{subfigure}{0.75\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/errorsLogLin43}
 		\caption[Mean absolute error over iterations]{Mean of absolute errors of all training instances over iterations.}
 		\label{fig:errorsLogLin43}
 	\end{subfigure}
-	\begin{subfigure}{0.9\textwidth}
+	\begin{subfigure}{0.75\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{figures/experiments/predictionErrors}
 		\caption[Error of positive instances for different predictions]{Errors for predicted values for positive instances with linear and logistic regression function.}
@@ -1263,14 +1266,9 @@ So even if the prediction error is larger, the relation of prediction to actual 
 This may result from the impact of negative instances to the training process.
 While for linear regression the negative instances (i.e. $r_{ui} = 0$) push the model towards the initial state of $p_u^Tq_i \approx 0$ and cause small updates at the start of training, in the case of logistic regression, updates for negative instances actively update the feature vectors into the other direction, such that $p_u^Tq_i$ even may get negative.
 
-\subsection*{AdaBoost}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
-	\caption[MAPs for AdaBoost over number of models]{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
-	\label{fig:SVDModels}
-\end{figure}
+\FloatBarrier
 
+\subsection*{AdaBoost}
 To evaluate the performance of the implemented AdaBoost approach (algorithm \ref{alg:AdaBoostLogRegSVDTraining}) the MAPs are compared for different numbers of models.
 Using only one model refers to the normal SVD algorithm without boosting.
 The results are shown in figure \ref{fig:SVDModels}.
@@ -1281,6 +1279,13 @@ So already after evaluating the first model, the instance weights could be adjus
 Furthermore the figure shows, that the performance difference between models with different number of features gets smaller for higher numbers of models, especially for the linear regression based SVD approach.
 There the model trained with 200 features even gets better than the model with 300 features.
 The differences are quite small, so this may result from the random sampling of negative instances, such that for one model a sample was generated, that produces better results, than in the other model.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
+	\caption[MAPs for AdaBoost over number of models]{MAP for SVD approaches with AdaBoost over different number of models for different numbers of features trained in 2000 iterations.}
+	\label{fig:SVDModels}
+\end{figure}
 
 \begin{figure}[h!]
 	\begin{subfigure}[c]{0.9\textwidth}
@@ -1305,7 +1310,7 @@ The user-based weighting performs similar, but is slightly worse.
 For the liner regression approach in contrast, the article-based and the combination of article- and user-based predictions outperform the other predictions rules.
 Further plots to show the impact of the prediction rules over different numbers of features and iterations can be found in appendix \ref{app:predRulesExperiments}.
 
-
+\FloatBarrier
 
 %todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
 
@@ -1506,42 +1511,42 @@ This approach was already implemented by \cite{hybridCFCBClustringLi} and succes
 	Here some additional plots to evaluate the performance of the prediction rules presented in section \ref{sec:predictionRules} are given.
 	
 	\begin{figure}[h!]
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNumSingle}
 		\end{subfigure}
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesSingle}
 		\end{subfigure}
 		\caption[Prediction rules for single SVD model over number of features]{Different prediction rules applied to a single SVD model over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
 	\end{figure}
 	\begin{figure}[h!]
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverFeatureNumBoost}
 		\end{subfigure}
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOFeaturesBoost}
 		\end{subfigure}
 		\caption[Prediction rules for AdaBoost SVD over number of features]{Different prediction rules applied to 5 boosted SVD models over number of features. Models are trained with 2000 iterations, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances. User and item features $p_u$ and $q_i$ are initialized using a Gaussian random distribution with mean zero and a standard deviation of $0.1$.}
 	\end{figure}
 	\begin{figure}[h!]
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering	\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNumSingle}
 		\end{subfigure}
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsSingle}
 		\end{subfigure}
 		\caption[Prediction rules for single SVD model over iterations]{Different prediction rules applied to a single SVD model over number of iterations. Models are trained with 300 features, a learning rate $\alpha$ of 0.001, a regularization factor $\lambda$ of 0.01 and a weight $w_n$ of 0.5 for negative instances.}
 	\end{figure}
 	\begin{figure}[h!]
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LogRegSVDPredictionOverIterationNumBoost}
 		\end{subfigure}
-		\begin{subfigure}[c]{0.5\textwidth}
+		\begin{subfigure}[c]{1\textwidth}
 			\centering
 			\includegraphics[width=1\textwidth]{figures/experiments/LinRegSVDPredictionsOIterationsBoost}
 		\end{subfigure}
