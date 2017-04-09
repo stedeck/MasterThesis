@@ -165,7 +165,7 @@ These techniques are used for the recommendation system developed in the scope o
 %In section \ref{rs_others} the other mentioned techniques will be shortly introduced to complete the picture of possible recommendation techniques.
 %todo add reference, if  i add those chapters again
 
-\subsection{Collaborative filtering}
+\subsection*{Collaborative filtering}
 \label{sec:collaborativeFiltering}
 \label{rs_cf}
 
@@ -485,7 +485,7 @@ It improves computation time for prediction, but it is shown, that for e-commerc
 %todo what problems still arise and how do i solve them? (reference to boosting chapter)
 
 
-\subsection{Content-based recommendation systems}
+\subsection*{Content-based recommendation systems}
 \label{rs_cb}
 
 Another common approach is content-based filtering.
@@ -616,7 +616,7 @@ This is achieved by focusing on training instances, that are hard to classify.
 After a model $M_i$ is trained, the next model $M_{i+1}$ is trained with higher emphasize on trainings examples, that are misclassified by $M_i$. 
 When all models are trained, predictions are made by majority voting of all trained models.
 
-\subsection{AdaBoost}
+\subsection*{AdaBoost}
 \label{sec:adaBoost}
 The most known boosting algorithm is AdaBoost (adaptive Boosting) developed by Freund and Schapire \cite{boostingIntro}.
 Given a set of training instances $X = \{x_1, ..., x_n\}$ and their corresponding class labels $Y = \{y_1, ..., y_n\}$, with $y_i \in \{-1, 1\}$, the first model $M_1$ is trained on a sample set according to a distribution $D_1(i) = \frac{1}{n}$. So each training instance has the same probability of being added to the training set for the first model.
@@ -643,7 +643,7 @@ $h_t(x)$ is the hypothesis, i.e. the prediction, made by model $t$ for instance 
 The weighted hypotheses of the single models sum up to the final hypothesis $H(x)$. 
 
 
-\subsection{Reweighting and resampling}
+\subsection*{Reweighting and resampling}
 \label{sec:reweightingResampling}
 In the original AdaBoost approach, explained in the last section, the weights of the training instances are used for resampling.
 So only a sample of the available training set is used for one iteration and the weights correspond to the chance, that a training instance is added to it.
@@ -652,7 +652,7 @@ When AdaBoost is applied with reweighting the whole training set is used as usua
 A comparative study was performed in \cite{resamplingReweighting} showing that there is no remarkable difference in performance comparing reweighting and resampling.
 
 
-\subsection{AdaBoost for recommendation}
+\subsection*{AdaBoost for recommendation}
 \label{sec:adaBoostForRecommendation}
 Attempts were made using AdaBoost for recommendation among others in \cite{boostingCFRatings} and \cite{boostingAUC}.
 AdaBoost is applied to a SVD approach similar to the one explained in section \ref{rs_cf}.
@@ -1133,7 +1133,7 @@ The unpersonalized approach \textit{MostPop} receives a MAP of 0.0499.
 The developed personalized recommendation systems are supposed to being able to outperform this approach.
 %todo explain why unpersonalized recommendation performs that well
 
-\subsection{Content-based recommendation}
+\subsection*{Content-based recommendation}
 The content-based naive Bayes recommender in algorithm \ref{alg:CBBayes} is applied to category information about articles.
 It results in a MAP of 0.00306.
 The nearest-neighbour algorithm using content-based features (algorithm \ref{alg:CBNN}) is also applied to categories, the general information and indication texts.
@@ -1161,7 +1161,7 @@ With all tested content-based features the content-based recommenders both perfo
 	\label{tab:CBNN}
 \end{table}
 
-\subsection{Memory-based collaborative filtering}
+\subsection*{Memory-based collaborative filtering}
 % How does CFItemNN perform with Jaccard and Cosine?
 The memory-based collaborative filtering approaches are evaluated using either the Jaccard coefficient or cosine similarity.
 The item-item approach (algorithm \ref{alg:CFItemNN}) will further be denoted \textit{CFItemNN}, while \textit{CFUserNN} refers to the user-user approach.
@@ -1189,7 +1189,7 @@ So results are worse than the observed ones from algorithm \ref{alg:CFUserNN}.
 
 \textit{CFItemNN} performs better than the \textit{CFUserNN} resulting in a MAP of 0.1371 using Jaccard similarity and 0.1333 using cosine similarity.
 
-\subsection{Model-based collaborative filtering}
+\subsection*{Model-based collaborative filtering}
 % svd approaches
 
 \begin{figure}[h!]
@@ -1263,7 +1263,7 @@ So even if the prediction error is larger, the relation of prediction to actual 
 This may result from the impact of negative instances to the training process.
 While for linear regression the negative instances (i.e. $r_{ui} = 0$) push the model towards the initial state of $p_u^Tq_i \approx 0$ and cause small updates at the start of training, in the case of logistic regression, updates for negative instances actively update the feature vectors into the other direction, such that $p_u^Tq_i$ even may get negative.
 
-\subsection{AdaBoost}
+\subsection*{AdaBoost}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{figures/experiments/SVDModels}
@@ -1309,7 +1309,7 @@ Further plots to show the impact of the prediction rules over different numbers 
 
 %todo add summary/comparison (as table) of best performers for every algorithm, how much better is it than baseline (in percent)?
 
-\subsection{Error correlation of different algorithms}
+\subsection*{Error correlation of different algorithms}
 To find out whether hybridizations of these techniques might be able to improve recommendation performance, the resulting lists of recommendations are investigated for correlation.
 A hybrid recommender is only useful, if the component recommenders produce different results, such that they are able to complement each other.
 To analyse, whether two algorithms are able to complement each other, the true positives of both recommenders are taken into account.
@@ -1341,7 +1341,7 @@ While the other collaborative filtering approach tend to provide items, that are
 \label{tab:correlation}
 \end{table}
 
-\subsection{Candidate threshold}
+\subsection*{Candidate threshold}
 To speed up recommendation a cascade hybrid system was implemented.
 Figure \ref{fig:articlePurchases} shows the number of purchases for every article.
 It can be seen, that there are few items with many purchases, and that most items just have few purchases.
@@ -1397,7 +1397,7 @@ The weaknesses and strengths of the basic recommendation systems in e-commerce c
 The success of the presented \textit{LogRegSVD} algorithm is discussed.
 Moreover the performance of the AdaBoost approach and the applied prediction rules are summarized.
 
-\subsection{Single recommendation systems}
+\subsection*{Single recommendation systems}
 \label{sec:discSingleRecommendationSystems}
 % Memory-based: CFItem works better
 The experiments performed for the memory-based collaborative filtering approaches show, that the item-item approach performs best on the e-commerce dataset.
@@ -1419,7 +1419,7 @@ The dataset contains duplicate items, that only differ in brand, size of package
 So items, that are recommended by a content-based recommender, are probably too similar to the items the current user already purchased, since he probably will not buy products, that are almost equal to those, he already bought.
 
 
-\subsection{AdaBoost}
+\subsection*{AdaBoost}
 \label{sec:discAdaBoost}
 % Outperfroms CFUserNN, but worse than CFItemNN
 AdaBoost using 5 models achieves an improvement in the MAP of about 15\% as compared with a single \textit{LogRegSVD} model.
@@ -1428,7 +1428,7 @@ Probably the instances with higher errors are those, that have only few entries 
 The boosted \textit{LogRegSVD} outperforms the user-user approach, but still performs worse than the memory-based item-item approach, but the recommendation process is much faster and less memory intensive, because it does not require the full purchase matrix.
 %todo see whether instance error correlate with number of purchases
 
-\subsection{Prediction rules}
+\subsection*{Prediction rules}
 \label{sec:discPredRules}
 % prediction rules were not able to improve performance, if model is sufficiently trained
 The alternative prediction rules suggested for multiple or single \textit{LogRegSVD} models were not able to improve the MAP.
@@ -1436,7 +1436,7 @@ It only outperformed the traditional prediction rules for single \textit{LogRegS
 In those cases the article based prediction, see equation \ref{eq:articleErrorPrediction}, is able to outperform the traditional prediction approach.
 %TODO update after plot over model is added
 
-\subsection{Hybrid recommendation systems}
+\subsection*{Hybrid recommendation systems}
 \label{sec:discHybrid}
 The experiments performed to investigate error correlations of the single hybrids showed, that combinations between a content-based and a collaborative filtering approach cannot enhance recommendation performance, since there is only a very small amount of maximal 2.42\% of recommendations, that can be found a content-based recommender, but not by another collaborative filtering one.
 The combinations between different collaborative filtering approaches make more diverse errors, especially \textit{CFUserNN} and the boosted version of \textit{LogRegSVD}.
