@@ -30,6 +30,18 @@
 \begin{document}
 \maketitle
 
+\begin{abstract}
+	This thesis aims at developing a recommender system for e-commerce datasets.
+	Many known recommendation techniques have been developed for rating datasets, i.e. datasets in which users explicitly rate the items according to different rating schemes.
+	E-commerce datasets usually only contain implicit feedback instead of explicit ratings.
+	This means user preferences need to be derived from the user's behaviour.
+	This work focuses on binary implicit feedback, considering which items have been purchased by a user and which have not.
+	Different recommendation techniques are applied to such a dataset to find out which types of algorithms are suitable for recommendation in online-shops.
+	The focus is on a model-based collaborative filtering algorithm using matrix factorization which is adjusted to provide good results on implicit feedback datasets.
+	The adjustments include the use of logistic regression as well as the implementation of AdaBoost.
+	Moreover correlation of different recommendation systems is investigated to find out whether potential hybrid systems may improve performance of recommendations.
+\end{abstract}
+
 \tableofcontents
 
 \listoffigures
@@ -909,12 +921,12 @@ The errors for a user $u$ and an item $i$ are calculated as shown in equations \
 
 \begin{equation}
 	\label{eq:userError}
-	e_{u} = \frac{1}{|S(u)|} \sum_{(u,i) \in Q(u)}{e_{ui}}
+	e_{u} = \frac{1}{|S(u)|} \sum_{(u,i) \in S(u)}{e_{ui}}
 \end{equation}
 
 \begin{equation}
 	\label{eq:articleError}
-	e_{i} = \frac{1}{|S(i)|} \sum_{(u,i) \in Q(i)}{e_{ui}}
+	e_{i} = \frac{1}{|S(i)|} \sum_{(u,i) \in S(i)}{e_{ui}}
 \end{equation}
 
 $S(u)$ is the set of $(u,i)$ tuples for user $u$, that were used for training in the last iteration.
@@ -1078,7 +1090,7 @@ Those articles contain many duplicates, because articles of the same product, bu
 There is no attribute to determine real distinct articles, but the amount of duplicates was reduced by aggregating items of the same name and handle them as one item.
 This reduces the number of items to 11,775.
 Thus dimensions of the used purchase matrix are 81,835 \texttimes \ 11,775.
-It contains 66,3731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. %todo make table out of stats
+It contains 663,731 purchases, so it is only 0.06888\% dense, there are on average 56.37 purchases per item and 8.11 purchases per user. %todo make table out of stats
 Figures \ref{fig:userPurchases} and \ref{fig:articlePurchases} show the number of purchases for every user and article, respectively.
 Both curves are very skewed, i.e. there are few articles and users with many purchases and many users and article with only a small amount of purchases.
 
